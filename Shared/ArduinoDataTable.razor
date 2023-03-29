@@ -1,0 +1,96 @@
+﻿@inject IJSRuntime JsRuntime
+@inject WindowDimension WindowsDimension
+
+@if (_selectedClient.Components.Count > 0)
+{
+    <div class="row gutters-sm mt-3" role="list" style="margin-left: .75rem !important;">
+        @for (int cols = 0; cols < Columns; cols++)
+        {
+            <div class="@ColumnClass">
+                @for (int rows = 0; rows < Rows; rows++)
+                {
+                    int index = rows * Columns + cols;
+                    if (index >= _selectedClient.Components.Count)
+                        continue;
+
+                    var component = _selectedClient.Components[index];
+
+                    <ArduinoComponent Component="@component" Reference="@ClientElement[component.Id]"></ArduinoComponent>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string WrapperState { get; set; } = String.Empty;
+
+    [Parameter]
+    public ArduinoClient SelectedClient { get; set; } = new ArduinoClient();
+
+    private ArduinoClient _selectedClient { get; set; } = new ArduinoClient();
+
+
+    private Dictionary<Guid, ElementReference> ClientElement = new Dictionary<Guid, ElementReference>();
+    private int Columns = 3;
+    private int Rows = 0;
+
+    public Random random = new Random();
+    private string ColumnClass = "col-md-4";
+
+    string[] RandomImages = new string[]
+    {
+        "https://wallpapercave.com/wp/wp2722942.jpg",
+        "https://images.unsplash.com/photo-1512850183-6d7990f42385?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dmVydGljYWwlMjB3YWxscGFwZXJ8ZW58MHx8MHx8&w=1000&q=80",
+        "https://wallpaperaccess.com/full/1642272.jpg",
+        "",
+    };
+
+    public void CreateTable(List<iGenericComponent> components)
+    {
+        int elementsDivided = components.Count / Columns;
+        Rows = components.Count % Columns == 0 ? elementsDivided : elementsDivided + 1;
+
+        for (int rows = 0; rows < Rows; rows++)
+        {
+            for (int cols = 0; cols < Columns; cols++)
+            {
+                int index = rows * Columns + cols;
+                if (index < components.Count)
+                {
+                    ClientElement[components[index].Id] = new ElementReference();
+                }
+            }
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (WrapperState == "toggled")
+        {
+            ColumnClass = "col-md-3";
+            Columns = 4;
+        }
+        else
+        {
+            ColumnClass = "col-md-4";
+            Columns = 3;
+        }
+
+        if (!ArduinoClient.IsNullOrEmpty(SelectedClient))
+        {
+            _selectedClient = SelectedClient;
+            if (_selectedClient.Components.Count > 0)
+                CreateTable(_selectedClient.Components);
+            else
+                //TODO: Do some sht
+            StateHasChanged();
+        }
+        else
+        {
+            //TODO: Show some text template ~Client has no Data~
+        }
+
+    }
+}

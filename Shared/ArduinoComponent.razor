@@ -1,0 +1,30 @@
+﻿@if (Component != null)
+{
+    Guid Description = Component.Id;
+    <div @ref="@Reference" class="item mt-3 mb-4" role="listitem" style="width: 400px">
+        <div class="card">
+            <div class="card-header">
+                <a>@Component.Description</a>
+            </div>
+            <div class="card-body">
+                @*<img src="@RandomImages[random.Next(0, 3)]" class="img-fluid">*@
+            </div>
+            <div class="card-footer">
+                <a>@Component.Id</a>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public iGenericComponent Component { get; set; }
+
+    [Parameter]
+    public ElementReference Reference { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        StateHasChanged();
+    }
+}

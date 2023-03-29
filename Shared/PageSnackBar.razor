@@ -1,0 +1,34 @@
+﻿@inject Models.CustomTimeModule CustomTime
+
+<div class="@_snackBarState" id="snackbar">@_snackBarMessage</div>
+
+@code {
+    private string _snackBarState { get; set; } = String.Empty;
+
+    private string _snackBarMessage { get; set; } = String.Empty;
+
+    [Parameter] public string SnackBarMessage { get; set; }
+
+    public async Task ChangeSnackBarState(string state = "show", int delay = 2600)
+    {
+        while (_snackBarState.StartsWith("show"))
+        {
+            await CustomTime.WaitAmountOfSeconds(0.5);
+        }
+        _snackBarMessage = SnackBarMessage;
+        _snackBarState = "show";
+        StateHasChanged();
+        await Task.Run(async () => { await Task.Delay(delay); _snackBarState = ""; });
+        StateHasChanged();
+        _snackBarMessage = String.Empty;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_snackBarMessage != SnackBarMessage && !string.IsNullOrEmpty(SnackBarMessage))
+        {
+            _snackBarMessage = SnackBarMessage;
+            await ChangeSnackBarState();
+        }
+	}
+}

@@ -1,0 +1,37 @@
+﻿@inject IJSRuntime JSRuntime
+@inject Models.ClipboardService ClipboardService
+
+<div class="bg-arduinolist border-right vh-100" id="sidebar-wrapper">
+    <div class="sidebar-heading">Smart Home</div>
+    <div class="list-group list-group-flush overflow-auto h-100">
+        <a href="arduino/#" class="list-group-item list-group-item-action bg-light disabled">Connected Arduino</a>
+        @foreach (var client in Clients)
+        {
+            <button @onclick="() => OnClientClick(client)" class="list-group-item list-group-item-action">@client.Id - @client.Name</button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<ArduinoClient> Clients { get; set; } = new List<ArduinoClient>();
+
+    [Parameter]
+    public EventCallback<ArduinoClient> ClientClick { get; set; }
+
+    public Guid[,] ClientsTable = new Guid[,] { };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Clients != null && Clients.Count > 0)
+        {
+
+        }
+    }
+
+    private async Task OnClientClick(ArduinoClient client)
+    {
+        await ClipboardService.CopyToClipboard(JSRuntime, client.Id.ToString());
+        await ClientClick.InvokeAsync(client);
+    }
+}

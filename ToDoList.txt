@@ -1,0 +1,74 @@
+1. Comunicarea cu Arduino
+	a. Arduino trimite la site Request
+	b. Site-ul creeaza un class pentru Arduino (si pastreaza in Database)*
+		- ID
+		- Adresa IP
+		- Placa Arduino
+		- Lista de dispozitive conectate
+			a. ID-ul standardizat al dispozitivului
+			b. Pin-ul conectat
+			c. Modul de Citire/Scriere
+		- Informatie aditionala ...
+	c. Site-ul transmite la Arduino Response/Request
+		- ID-ul pentru Arduino (doar prima data)
+		- Tipul operatiei (inscriere ID/efectuare comenzi)
+		- O lista de comenzi
+			a. ID-ul standardizat al comenzii (Read/Write/...)
+			b. ID-ul dispozitivului conectat
+			c. Portul conectat
+			d. Lista de parametrib
+	d. Arduino transmite
+		- ID-ul
+		- Codul starii executarii comenzii
+
+2. Afisarea pe Web
+
+3. Salvarea datelor in JSON
+
+
+Echipamente Conectate:
+1. ESP8266 - controller pentru sistem de ventilare
+	a. Releu
+		1. Releu pentru viteza de 3V
+		2. Releu pentru viteza de 5V
+	b. Butoane 2x:
+		1 - On/Off
+		2..3 - Regimul de viteza
+	c. Led-uri 3x
+		1 - On/Off
+		2..3 - Regimul de viteza
+2. ESP8266 - controller pentru usa
+	a. Releu - conecteaza lumina exterioara
+	b. Releu - care conecteaza lumina interioara
+	c. Senzor de miscare
+	d. Senzor de luminozitate - Afara
+	e. Buton 2x
+3. ESP8266 - controller pentru monitorizarea Caracteristicilor de Suport al Vietii
+	a. Temperatura
+		- In camera
+		- Afara
+	b. Umiditatea
+		- In camera
+		- Afara
+	c. Senzor de particule daunatoare
+	d. Reprezentare color a starii
+		- Verde -- Bine
+		- Galben -- Mediu
+		- Rosu -- Rea
+!Releu pentru conectare/deconectare alimentare proiect
+
+Releu 4x - 79.14MDL + 15.07MDL
+Butoane (10x) - 3.01MDL + 12.44MDL
+Led (100x) - 17.90MDL + 19.41MDL
+Senzor de Miscare 1x - 24.68MDL + 0.00MDL
+Senzor Lumina (10x) - 11.49MDL + 13.94MDL
+Senzor Temperatura/Umiditate 2x - 65.95MDL + 10.17MDL
+Senzor Gas 1x - 17.71MDL + 12.25MDL
+Cabluri (120x) - 33.16MDL + 15.45MDL
+Arduino R3 Wifi 2x - 280MDL + 84.41MDL
+Arduino R3 Wifi 1x - 320MDL (Moldova)
+
+Pret Componente = 533.04MDL
+Taxa Expediere = 183.44MDL
+TOTAL (AliExpress) = 716.48MDL
+TOTAL = 1036.48MDL
