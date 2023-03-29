@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
 
-namespace SmartHome.Models
+namespace SmartHome.WebSite.Models
 {
     public class ClipboardService
     {

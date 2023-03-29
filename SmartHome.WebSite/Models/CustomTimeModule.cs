@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
-namespace SmartHome.Models;
+namespace SmartHome.WebSite.Models;
 
 public class CustomTimeModule
 {

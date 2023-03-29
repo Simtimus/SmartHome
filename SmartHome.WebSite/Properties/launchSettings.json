@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "SmartHome": {
+    "SmartHome.WebSite": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using SmartHome.Data;
+using SmartHome.WebSite.Data;
 using SmartHome.Arduino.Models;
-using SmartHome.Models;
+using SmartHome.WebSite.Models;
 using System.Reflection;
 using SmartHome.Arduino.Models.Components;
 using Microsoft.JSInterop;

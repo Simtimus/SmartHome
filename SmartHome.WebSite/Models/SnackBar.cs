@@ -1,4 +1,4 @@
-﻿namespace SmartHome.Models
+﻿namespace SmartHome.WebSite.Models
 {
     public class SnackBar
     {

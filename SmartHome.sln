@@ -1,14 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.4.33205.214
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartHome", "SmartHome.csproj", "{3BF4DAB3-865A-41BB-88AA-9F873372FCA8}"
-	ProjectSection(ProjectDependencies) = postProject
-		{85C5FD9A-B256-4B58-B2DE-C0D6FF573865} = {85C5FD9A-B256-4B58-B2DE-C0D6FF573865}
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{12130F10-2B9A-40CE-8641-01B788F74B54}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartHome.Arduino", "..\SmartHome.Arduino\SmartHome.Arduino.csproj", "{85C5FD9A-B256-4B58-B2DE-C0D6FF573865}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{5E997F46-942C-44E4-B34E-AA7E291773A5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{80044B0E-A274-4F30-8DDA-46196FE794A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9D46A1AB-D880-48E8-9B6C-EB6F62D1B748}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartHome.WebSite", "SmartHome.WebSite\SmartHome.WebSite.csproj", "{F0C87500-7309-466A-82B3-C986EF1457C0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartHome.Arduino", "SmartHome.Arduino\SmartHome.Arduino.csproj", "{A44AD10F-14B7-4DBC-80FA-92B1E8FB127C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,19 +21,23 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3BF4DAB3-865A-41BB-88AA-9F873372FCA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3BF4DAB3-865A-41BB-88AA-9F873372FCA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3BF4DAB3-865A-41BB-88AA-9F873372FCA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3BF4DAB3-865A-41BB-88AA-9F873372FCA8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{85C5FD9A-B256-4B58-B2DE-C0D6FF573865}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85C5FD9A-B256-4B58-B2DE-C0D6FF573865}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85C5FD9A-B256-4B58-B2DE-C0D6FF573865}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85C5FD9A-B256-4B58-B2DE-C0D6FF573865}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0C87500-7309-466A-82B3-C986EF1457C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0C87500-7309-466A-82B3-C986EF1457C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0C87500-7309-466A-82B3-C986EF1457C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0C87500-7309-466A-82B3-C986EF1457C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A44AD10F-14B7-4DBC-80FA-92B1E8FB127C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A44AD10F-14B7-4DBC-80FA-92B1E8FB127C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A44AD10F-14B7-4DBC-80FA-92B1E8FB127C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A44AD10F-14B7-4DBC-80FA-92B1E8FB127C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F0C87500-7309-466A-82B3-C986EF1457C0} = {12130F10-2B9A-40CE-8641-01B788F74B54}
+		{A44AD10F-14B7-4DBC-80FA-92B1E8FB127C} = {5E997F46-942C-44E4-B34E-AA7E291773A5}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {CFF538B6-D1DE-4640-AD65-F4A31E753A9F}
+		SolutionGuid = {FC754A30-EDB3-40ED-8E58-50BF769AD550}
 	EndGlobalSection
 EndGlobal
