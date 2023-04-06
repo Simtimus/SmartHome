@@ -2,12 +2,12 @@
 @inject IJSRuntime JsRuntime
 @inject Models.SnackBar SnackBar
 @inject Models.WindowDimension WindowDimension
-@inject SmartHome.Arduino.Models.Server ArduinoServer
-@inject SmartHome.Arduino.Models.Components.GenericComponent GenericComponent
+@inject Server ArduinoServer
+@inject GenericComponent GenericComponent
 
 <div class="d-flex @WrapperState" id="wrapper">
     <!-- Sidebar -->
-    <ArduinoSidebar Clients="@ArduinoServer.ClientManager.Clients" ClientClick="@OnClientClick"></ArduinoSidebar>
+    <ArduinoSidebar Clients="@ClientManager.Clients" ClientClick="@OnClientClick"></ArduinoSidebar>
     <!-- /#sidebar-wrapper -->
     <!-- Page Content -->
     <div id="page-content-wrapper">
@@ -71,7 +71,7 @@
 
     protected override void OnInitialized()
     {
-        if (ArduinoServer.ClientManager.Clients.Count > 0)
+        if (ClientManager.Clients.Count > 0)
         {
             //TODO: In case I want by default a Client to be selected
         }

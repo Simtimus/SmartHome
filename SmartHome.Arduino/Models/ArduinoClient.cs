@@ -14,7 +14,7 @@ namespace SmartHome.Arduino.Models
         public IPEndPoint? IP { get; set; }
         public DateTime LastConnection { get; set; }
         public ConnectionState State { get; set; }
-        public int Ping { get; set; } = 0;
+        public double Ping { get; set; } = 0;
 
         public enum ConnectionState
         {

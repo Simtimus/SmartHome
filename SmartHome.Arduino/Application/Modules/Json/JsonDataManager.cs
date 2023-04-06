@@ -10,20 +10,18 @@ using Newtonsoft.Json;
 
 namespace SmartHome.Arduino.Application.Modules.DataSaving
 {
-    public class JsonDataManager
+    public static class JsonDataManager
     {
         public static void SaveObjectToFile(string filePath, object data)
         {
 
             if (data == null)
             {
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException(nameof(data));
             }
             string serializedObject = JsonConvert.SerializeObject(data);
-            using (StreamWriter writer = new StreamWriter(filePath))
-            {
-                writer.Write(serializedObject);
-            }
+            using StreamWriter writer = new (filePath);
+            writer.Write(serializedObject);
         }
 
 
@@ -31,10 +29,8 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
         {
             if (File.Exists(filePath))
             {
-                using (StreamReader reader = new StreamReader(filePath))
-                {
-                     return reader.ReadToEnd();
-                }
+                using StreamReader reader = new(filePath);
+                return reader.ReadToEnd();
             }
             return null;
         }

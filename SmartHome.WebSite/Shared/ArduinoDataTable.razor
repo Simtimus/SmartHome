@@ -47,7 +47,7 @@
         "",
     };
 
-    public void CreateTable(List<iGenericComponent> components)
+    public void CreateTable(List<IGenericComponent> components)
     {
         int elementsDivided = components.Count / Columns;
         Rows = components.Count % Columns == 0 ? elementsDivided : elementsDivided + 1;

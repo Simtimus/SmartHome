@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SmartHome.Arduino.Application.Modules.DataSaving;
-using SmartHome.Arduino.Models.Components;
+using SmartHome.Arduino.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,20 +8,20 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartHome.Arduino.Models
+namespace SmartHome.Arduino.Application
 {
-    public class ClientManager
+    public static class ClientManager
     {
-        private readonly string FileName = "ClientData.json";
-        public List<ArduinoClient> Clients { get; set; } = new List<ArduinoClient>();
-        
-        public void AddNewClient(ArduinoClient client)
+        private static readonly string FileName = "ClientData.json";
+        public static List<ArduinoClient> Clients { get; set; } = new List<ArduinoClient>();
+
+        public static void AddNewClient(ArduinoClient client)
         {
             client.Id = Guid.NewGuid();
             Clients.Add(client);
         }
 
-        public void UpdateClient(ArduinoClient client)
+        public static void UpdateClient(ArduinoClient client)
         {
             ArduinoClient? foundClient = Clients.Find(x => x.Id == client.Id);
             if (ArduinoClient.IsNullOrEmpty(foundClient))
@@ -33,20 +33,24 @@ namespace SmartHome.Arduino.Models
                 ArduinoClient bufferClient = foundClient;
                 foundClient = client;
                 foundClient.Id = bufferClient.Id;
+                if (bufferClient.State == ArduinoClient.ConnectionState.Online)
+                {
+                    foundClient.Ping = foundClient.LastConnection.Subtract(bufferClient.LastConnection).TotalMilliseconds;
+                }
             }
         }
 
-        public void SaveClientData()
+        public static void SaveClientData()
         {
             JsonDataManager.SaveObjectToFile(FileName, Clients);
         }
 
-        public void SaveClientTestData()
+        public static void SaveClientTestData()
         {
             JsonDataManager.SaveObjectToFile(FileName, TestDecoy);
         }
 
-        public void RecoverClientData()
+        public static void RecoverClientData()
         {
             string? serializedObject = JsonDataManager.GetObjectFromFile(FileName);
             if (string.IsNullOrEmpty(serializedObject)) return;
@@ -58,18 +62,18 @@ namespace SmartHome.Arduino.Models
                     Clients = arduinoClients;
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception) { }
         }
 
-        public List<ArduinoClient> TestDecoy = new List<ArduinoClient>()
+        public static List<ArduinoClient> TestDecoy = new()
         {
             new ArduinoClient()
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<iGenericComponent>()
+                Components = new List<IGenericComponent>()
                 {
-                    new Components.LightSensor.LightSensor()
+                    new Models.Components.LightSensor()
                     {
                         Id = Guid.NewGuid(),
                         ConnectedPins = new List<BoardPin>()
@@ -84,7 +88,7 @@ namespace SmartHome.Arduino.Models
                         },
                         Description = "Some dumb message",
                     },
-                    new Components.Relay.Relay()
+                    new Models.Components.Relay()
                     {
                         Id = Guid.NewGuid(),
                         ConnectedPins = new List<BoardPin>()
@@ -97,11 +101,11 @@ namespace SmartHome.Arduino.Models
                                 ValueType = BoardPin.ObjectValueType.Boolean,
                             }
                         },
-                        Description = String.Empty,
+                        Description = "Another dumb message??",
                     }
                 },
                 Model = "Arduino UNO WiFi",
-                Description = String.Empty,
+                Description = string.Empty,
                 IP = new System.Net.IPEndPoint(123424, 8088),
                 LastConnection = Server.GetDTNow(),
                 State = ArduinoClient.ConnectionState.Online
@@ -110,9 +114,9 @@ namespace SmartHome.Arduino.Models
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<iGenericComponent>()
+                Components = new List<IGenericComponent>()
                 {
-                    new Components.LightSensor.LightSensor()
+                    new Models.Components.LightSensor()
                     {
                         Id = Guid.NewGuid(),
                         ConnectedPins = new List<BoardPin>()
@@ -125,11 +129,11 @@ namespace SmartHome.Arduino.Models
                                 ValueType = BoardPin.ObjectValueType.Integer,
                             }
                         },
-                        Description = String.Empty,
+                        Description = string.Empty,
                     }
                 },
                 Model = "Arduino UNO WiFi",
-                Description = String.Empty,
+                Description = string.Empty,
                 IP = new System.Net.IPEndPoint(123424, 8088),
                 LastConnection = Server.GetDTNow(),
                 State = ArduinoClient.ConnectionState.Online
@@ -138,9 +142,9 @@ namespace SmartHome.Arduino.Models
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<iGenericComponent>()
+                Components = new List<IGenericComponent>()
                 {
-                    new Components.LightSensor.LightSensor()
+                    new Models.Components.LightSensor()
                     {
                         Id = Guid.NewGuid(),
                         ConnectedPins = new List<BoardPin>()
@@ -153,11 +157,11 @@ namespace SmartHome.Arduino.Models
                                 ValueType = BoardPin.ObjectValueType.Integer,
                             }
                         },
-                        Description = String.Empty,
+                        Description = string.Empty,
                     }
                 },
                 Model = "Arduino UNO WiFi",
-                Description = String.Empty,
+                Description = string.Empty,
                 IP = new System.Net.IPEndPoint(123424, 8088),
                 LastConnection = Server.GetDTNow(),
                 State = ArduinoClient.ConnectionState.Online
@@ -167,9 +171,9 @@ namespace SmartHome.Arduino.Models
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<iGenericComponent>()
+                Components = new List<IGenericComponent>()
                 {
-                    new Components.LightSensor.LightSensor()
+                    new Models.Components.LightSensor()
                     {
                         Id = Guid.NewGuid(),
                         ConnectedPins = new List<BoardPin>()
@@ -182,11 +186,11 @@ namespace SmartHome.Arduino.Models
                                 ValueType = BoardPin.ObjectValueType.Integer,
                             }
                         },
-                        Description = String.Empty,
+                        Description = string.Empty,
                     }
                 },
                 Model = "Arduino UNO WiFi",
-                Description = String.Empty,
+                Description = string.Empty,
                 IP = new System.Net.IPEndPoint(123424, 8088),
                 LastConnection = Server.GetDTNow(),
                 State = ArduinoClient.ConnectionState.Online
@@ -195,9 +199,9 @@ namespace SmartHome.Arduino.Models
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<iGenericComponent>()
+                Components = new List<IGenericComponent>()
                 {
-                    new Components.LightSensor.LightSensor()
+                    new Models.Components.LightSensor()
                     {
                         Id = Guid.NewGuid(),
                         ConnectedPins = new List<BoardPin>()
@@ -210,11 +214,11 @@ namespace SmartHome.Arduino.Models
                                 ValueType = BoardPin.ObjectValueType.Integer,
                             }
                         },
-                        Description = String.Empty,
+                        Description = string.Empty,
                     }
                 },
                 Model = "Arduino UNO WiFi",
-                Description = String.Empty,
+                Description = string.Empty,
                 IP = new System.Net.IPEndPoint(123424, 8088),
                 LastConnection = Server.GetDTNow(),
                 State = ArduinoClient.ConnectionState.Online

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SmartHome.Arduino.Application.Exceptions;
 
-namespace SmartHome.Arduino.Models.Components
+namespace SmartHome.Arduino.Models
 {
     public class GenericComponent
     {
@@ -23,7 +23,7 @@ namespace SmartHome.Arduino.Models.Components
             string componentName = Enum.GetName(typeof(ComponentsId), componentId) ?? string.Empty;
             if (string.IsNullOrEmpty(componentName))
                 throw new ComponentNotFoundException(componentId);
-            return Type.GetType($"SmartHome.Arduino.Models.Components.{componentName}.{componentName}");
+            return Type.GetType($"SmartHome.Arduino.Models.Components.{componentName}");
         }
 
         public static ComponentsId GetIdByString(string componentName)

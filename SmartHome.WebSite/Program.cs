@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using SmartHome.WebSite.Data;
 using SmartHome.Arduino.Models;
+using SmartHome.Arduino.Application;
 using SmartHome.WebSite.Models;
 using System.Reflection;
-using SmartHome.Arduino.Models.Components;
 using Microsoft.JSInterop;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ namespace SmartHome.Arduino.Models
 		public PinMode Mode { get; set; }
 		public object? Value { get; set; }
 		public ObjectValueType ValueType { get; set; }
+		public DataLink DataLink { get; set; } = new DataLink();
+		[JsonIgnore] public IGenericComponent? ParentComponent { get; set; }
 
 		public enum PinMode
 		{
@@ -33,7 +36,6 @@ namespace SmartHome.Arduino.Models
 			return Value is null ? String.Empty : Value.ToString();
 		}
 
-		public override string ToString() => $"Pin {Id.ToString()} [{Enum.GetName(typeof(PinMode), Mode)}]";
-
-	}
+		public override string ToString() => $"Pin {Id} [{Enum.GetName(typeof(PinMode), Mode)}]";
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SmartHome.Arduino.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SmartHome.Arduino.Models.Components
+namespace SmartHome.Arduino.Application.Modules.DataSaving
 {
-    public class JsonDataParser
+    public static class JsonDataParser
     {
         public static List<ArduinoClient> ParseClients(string serializedObject)
         {
-            List<ArduinoClient> arduinoClients = new List<ArduinoClient>();
+            List<ArduinoClient> arduinoClients = new();
 
             JArray jsonArray = JArray.Parse(serializedObject);
             foreach (var jsonClient in jsonArray)
@@ -41,9 +42,11 @@ namespace SmartHome.Arduino.Models.Components
             JArray componentsArray = (JArray)jsonObject["Components"];
             foreach (var jsonComponent in componentsArray)
             {
-                iGenericComponent? component = ParseComponent(jsonComponent.ToString());
+                IGenericComponent? component = ParseComponent(jsonComponent.ToString());
                 if (component != null)
                 {
+                    UpdateComponentChildrenReferences(component);
+                    component.ParentClient = client;
                     client.Components.Add(component);
                 }
             }
@@ -51,7 +54,7 @@ namespace SmartHome.Arduino.Models.Components
             return client;
         }
 
-        public static iGenericComponent? ParseComponent(string serializedObject)
+        public static IGenericComponent? ParseComponent(string serializedObject)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
             GenericComponent.ComponentsId componentId = GenericComponent.GetIdByString(jsonObject["ComponentId"].ToString());
@@ -60,7 +63,15 @@ namespace SmartHome.Arduino.Models.Components
                 return null;
             object? deserializedObject = JsonConvert.DeserializeObject(serializedObject, componentType);
 
-            return deserializedObject as iGenericComponent;
+            return deserializedObject as IGenericComponent;
+        }
+
+        private static void UpdateComponentChildrenReferences(IGenericComponent component)
+        {
+            foreach (BoardPin boardPin in component.ConnectedPins)
+            {
+                boardPin.ParentComponent = component;
+            }
         }
 
         private static ArduinoClient? GetClientFromJsonObject(JObject jsonObject)
@@ -68,7 +79,7 @@ namespace SmartHome.Arduino.Models.Components
             if (jsonObject["Id"] is null)
                 return null;
 
-            ArduinoClient client = new ArduinoClient();
+            ArduinoClient client = new();
             UpdateClientByJsonObject(client, jsonObject);
             client.State = ArduinoClient.ConnectionState.Offline;
             //client.State = (ArduinoClient.ConnectionState)Enum.Parse(typeof(ArduinoClient.ConnectionState), jsonObject["State"].ToString());
@@ -83,13 +94,18 @@ namespace SmartHome.Arduino.Models.Components
 
             foreach (PropertyInfo property in properties)
             {
-                JToken? value;
-                if (jsonObject.TryGetValue(property.Name, out value))
+                if (jsonObject.TryGetValue(property.Name, out JToken? value))
                 {
                     object? deserializedValue = null;
 
                     if (property.PropertyType == typeof(Guid))
                     {
+                        //  Checks if `client` has a GUID
+                        if (value.Type == JTokenType.Null)
+                        {
+                            client = new();
+                            break;
+                        }
                         deserializedValue = Guid.Parse(value.ToString());
                     }
                     else if (property.PropertyType == typeof(IPEndPoint))
@@ -106,6 +122,10 @@ namespace SmartHome.Arduino.Models.Components
                     else if (property.PropertyType == typeof(int))
                     {
                         deserializedValue = int.Parse(value.ToString());
+                    }
+                    else if (property.PropertyType == typeof(double))
+                    {
+                        deserializedValue = double.Parse(value.ToString());
                     }
                     else if (property.PropertyType == typeof(string))
                     {

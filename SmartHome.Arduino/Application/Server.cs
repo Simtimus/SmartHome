@@ -6,47 +6,63 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.NetworkInformation;
+using System.Diagnostics;
+using SmartHome.Arduino.Models;
+using SmartHome.Arduino.Application.Modules.DataSaving;
 
-namespace SmartHome.Arduino.Models
+namespace SmartHome.Arduino.Application
 {
     public class Server
     {
         public string IpHost { get { return ipHost; } }
         private readonly string ipHost = "0.0.0.0";
+        private const int ArduinoCycleTime = 1000;
 
         private const int PortHost = 8080;
 
         private const int secondsUntilOffline = 10;
-        private const int secondsUntilDelete = 60;
 
-        private readonly UdpClient server = new UdpClient(PortHost);
-        public readonly ClientManager ClientManager = new ClientManager();
+        private readonly UdpClient server = new(PortHost);
 
-        public static TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time");
+        private static readonly TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time");
 
         public Server()
         {
             ipHost = GetLocalIPv4(NetworkInterfaceType.Wireless80211);
             Console.WriteLine(ipHost);
-            ClientManager.SaveClientTestData();
+            //ClientManager.SaveClientTestData();
             ClientManager.RecoverClientData();
-
             Task.Run(() => RecieveMessages());
-            Task.Run(() => MonitorClientsState());
+            Task.Run(() => MonitorClients());
         }
 
-        private void MonitorClientsState()
+        private static void MonitorClients()
         {
-            DateTime offlineTime;
+            DateTime currentTime = GetDTNow();
             foreach (var client in ClientManager.Clients)
             {
-                offlineTime = client.LastConnection;
-                offlineTime.AddSeconds(secondsUntilOffline);
+                MonitorClientState(client, client.LastConnection.AddSeconds(secondsUntilOffline));
+                if (client.State != ArduinoClient.ConnectionState.Offline)
+                    MonitorClientPing(client, currentTime);
+            }
+        }
 
-                if (offlineTime.Subtract(GetDTNow()).TotalSeconds <= 0)
-                {
-                    client.State = ArduinoClient.ConnectionState.Offline;
-                }
+        private static void MonitorClientPing(ArduinoClient client, DateTime currentTime)
+        {
+            double timeDelta = currentTime.Subtract(client.LastConnection).TotalMilliseconds;
+            if (timeDelta >= ArduinoCycleTime)
+            {
+                client.Ping = timeDelta - ArduinoCycleTime;
+            }
+        }
+
+        private static void MonitorClientState(ArduinoClient client, DateTime offlineTime)
+        {
+            offlineTime.AddSeconds(secondsUntilOffline);
+
+            if (offlineTime.Subtract(GetDTNow()).TotalSeconds <= 0)
+            {
+                client.State = ArduinoClient.ConnectionState.Offline;
             }
         }
 
@@ -59,7 +75,8 @@ namespace SmartHome.Arduino.Models
                 byte[] data = server.Receive(ref recivedClientIP);
                 string message = Encoding.UTF8.GetString(data);
 
-                ArduinoClient arduinoClient = ArduinoClient.ParseFromJson(recivedClientIP, message);
+                ArduinoClient arduinoClient = JsonDataParser.ParseClient(message) ?? new();
+                arduinoClient.IP = recivedClientIP;
                 arduinoClient.State = ArduinoClient.ConnectionState.Online;
                 arduinoClient.LastConnection = GetDTNow();
 
@@ -82,7 +99,7 @@ namespace SmartHome.Arduino.Models
             return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZone);
         }
 
-        private string GetLocalIPv4(NetworkInterfaceType _type)
+        private static string GetLocalIPv4(NetworkInterfaceType _type)
         {
             string output = "";
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
