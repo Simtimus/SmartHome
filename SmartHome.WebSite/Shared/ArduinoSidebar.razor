@@ -7,7 +7,11 @@
         <a href="arduino/#" class="list-group-item list-group-item-action bg-light disabled">Connected Arduino</a>
         @foreach (var client in Clients)
         {
-            <button @onclick="() => OnClientClick(client)" class="list-group-item list-group-item-action">@client.Id - @client.Name</button>
+            <button @onclick="() => OnClientClick(client)" class="list-group-item list-group-item-action">
+                <div>@client.Name</div>
+                <div>@client.State | Ping: @client.Ping</div>
+                <div>@client.Id</div>
+            </button>
         }
     </div>
 </div>

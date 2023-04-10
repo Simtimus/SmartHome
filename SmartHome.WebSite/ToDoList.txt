@@ -16,13 +16,28 @@
 			a. ID-ul standardizat al comenzii (Read/Write/...)
 			b. ID-ul dispozitivului conectat
 			c. Portul conectat
-			d. Lista de parametrib
+			d. Lista de parametri
 	d. Arduino transmite
-		- ID-ul
-		- Codul starii executarii comenzii
+		A. Comenzi
+			- Arduino Id
+			- Command Id
+			- Starea de executare ??
+		B. Date
+			Arduino transmite odata la 10 secunde date de tip Board pana ce nu primeste response cu Id
+			Daca deja are Id, omite pasul de mai sus si trece direct la cel de mai jos
+			Dupa ce are atribuit Id, arduino incepe transmiterea restului informatiei
+			Transmiterea pachetelor mici de date --> formarea modulara a classului pentru client
 
 2. Afisarea pe Web
-
+	a. Sidebar
+		- Name
+		- Ping
+		- Name
+		- Offline/Online
+	b. Arduino data page
+	c. Arduino logic management
+		- Data linking
+		- Conditions
 3. Salvarea datelor in JSON
 
 

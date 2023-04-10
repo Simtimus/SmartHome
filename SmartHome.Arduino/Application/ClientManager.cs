@@ -15,29 +15,32 @@ namespace SmartHome.Arduino.Application
         private static readonly string FileName = "ClientData.json";
         public static List<ArduinoClient> Clients { get; set; } = new List<ArduinoClient>();
 
+        public static bool ClientsUpdated = false;
+
         public static void AddNewClient(ArduinoClient client)
         {
-            client.Id = Guid.NewGuid();
             Clients.Add(client);
+            ClientsUpdated = true;
         }
 
         public static void UpdateClient(ArduinoClient client)
         {
-            ArduinoClient? foundClient = Clients.Find(x => x.Id == client.Id);
-            if (ArduinoClient.IsNullOrEmpty(foundClient))
+            int index = Clients.FindIndex(c => c.Id == client.Id);
+            if (index == -1)
             {
                 AddNewClient(client);
             }
             else
             {
-                ArduinoClient bufferClient = foundClient;
-                foundClient = client;
-                foundClient.Id = bufferClient.Id;
+                ArduinoClient bufferClient = Clients[index];
+                Clients[index] = client;
+                Clients[index].Id = bufferClient.Id;
                 if (bufferClient.State == ArduinoClient.ConnectionState.Online)
                 {
-                    foundClient.Ping = foundClient.LastConnection.Subtract(bufferClient.LastConnection).TotalMilliseconds;
+                    Clients[index].Ping = (int)Clients[index].LastConnection.Subtract(bufferClient.LastConnection).TotalMilliseconds;
                 }
             }
+            ClientsUpdated = true;
         }
 
         public static void SaveClientData()

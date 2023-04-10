@@ -9,6 +9,7 @@ using System.Net.NetworkInformation;
 using System.Diagnostics;
 using SmartHome.Arduino.Models;
 using SmartHome.Arduino.Application.Modules.DataSaving;
+using System.Runtime.CompilerServices;
 
 namespace SmartHome.Arduino.Application
 {
@@ -20,40 +21,49 @@ namespace SmartHome.Arduino.Application
 
         private const int PortHost = 8080;
 
-        private const int secondsUntilOffline = 10;
+        private const int secondsUntilOffline = 60;
+        private const int secondsBetweenSaves = 30;
 
         private readonly UdpClient server = new(PortHost);
 
         private static readonly TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time");
 
+        private static DateTime LastSave = new();
+
         public Server()
         {
             ipHost = GetLocalIPv4(NetworkInterfaceType.Wireless80211);
-            Console.WriteLine(ipHost);
+            //Console.WriteLine(ipHost);
             //ClientManager.SaveClientTestData();
-            ClientManager.RecoverClientData();
+            //ClientManager.RecoverClientData();
             Task.Run(() => RecieveMessages());
             Task.Run(() => MonitorClients());
         }
 
-        private static void MonitorClients()
+        private static async Task MonitorClients()
         {
-            DateTime currentTime = GetDTNow();
-            foreach (var client in ClientManager.Clients)
+            while (true)
             {
-                MonitorClientState(client, client.LastConnection.AddSeconds(secondsUntilOffline));
-                if (client.State != ArduinoClient.ConnectionState.Offline)
-                    MonitorClientPing(client, currentTime);
+                DateTime currentTime = GetDTNow();
+                foreach (var client in ClientManager.Clients)
+                {
+                    MonitorClientState(client, client.LastConnection.AddSeconds(secondsUntilOffline));
+                    if (client.State != ArduinoClient.ConnectionState.Offline)
+                        MonitorClientPing(client, currentTime);
+                }
+                if (currentTime >= LastSave.AddSeconds(secondsBetweenSaves))
+                {
+                    ClientManager.SaveClientData();
+                    LastSave = currentTime;
+                }
+                await Task.Delay(1000);
             }
         }
 
         private static void MonitorClientPing(ArduinoClient client, DateTime currentTime)
         {
             double timeDelta = currentTime.Subtract(client.LastConnection).TotalMilliseconds;
-            if (timeDelta >= ArduinoCycleTime)
-            {
-                client.Ping = timeDelta - ArduinoCycleTime;
-            }
+            client.Ping = (int)timeDelta;
         }
 
         private static void MonitorClientState(ArduinoClient client, DateTime offlineTime)
@@ -63,6 +73,7 @@ namespace SmartHome.Arduino.Application
             if (offlineTime.Subtract(GetDTNow()).TotalSeconds <= 0)
             {
                 client.State = ArduinoClient.ConnectionState.Offline;
+                ClientManager.ClientsUpdated = true;
             }
         }
 
@@ -85,6 +96,7 @@ namespace SmartHome.Arduino.Application
 
                 if (arduinoClient.Id == Guid.Empty)
                 {
+                    arduinoClient.Id = Guid.NewGuid();
                     ClientManager.AddNewClient(arduinoClient);
                 }
                 else

@@ -1,0 +1,170 @@
+[
+	{
+		"IP": "32.226.1.0:8088",
+		"LastConnection": "2023-04-04T20:50:22.3077869",
+		"State": 1,
+		"Ping": 0.0,
+		"Id": "a257c3c4-3e70-4479-a616-9d8833cfeecb",
+		"Name": "Living Parameters",
+		"Components": [
+			{
+				"Id": "7ed71d92-3d9c-4010-bf71-bf0f96cd7a8d",
+				"ComponentId": 1,
+				"ConnectedPins": [
+					{
+						"Id": 4,
+						"Mode": 0,
+						"Value": 454,
+						"ValueType": 1,
+						"DataLink": {
+							"BoardId": "00000000-0000-0000-0000-000000000000",
+							"ComponentId": "00000000-0000-0000-0000-000000000000",
+							"PinId": 0
+						}
+					}
+				],
+				"Description": "Some dumb message"
+			},
+			{
+				"Id": "775f7a15-81fc-462d-928b-abb7567afbf3",
+				"ComponentId": 2,
+				"ConnectedPins": [
+					{
+						"Id": 6,
+						"Mode": 0,
+						"Value": true,
+						"ValueType": 3,
+						"DataLink": {
+							"BoardId": "00000000-0000-0000-0000-000000000000",
+							"ComponentId": "00000000-0000-0000-0000-000000000000",
+							"PinId": 0
+						}
+					}
+				],
+				"Description": "Another dumb message??"
+			}
+		],
+		"Model": "Arduino UNO WiFi",
+		"Description": ""
+	},
+	{
+		"IP": "32.226.1.0:8088",
+		"LastConnection": "2023-04-04T20:50:22.3121576",
+		"State": 1,
+		"Ping": 0.0,
+		"Id": "ff7e8a7f-3b67-4f4b-bbd1-2557a9d4cd96",
+		"Name": "Living Parameters",
+		"Components": [
+			{
+				"Id": "3eb6f3ad-cb78-4f53-8308-70c160d7b132",
+				"ComponentId": 1,
+				"ConnectedPins": [
+					{
+						"Id": 4,
+						"Mode": 0,
+						"Value": 454,
+						"ValueType": 1,
+						"DataLink": {
+							"BoardId": "00000000-0000-0000-0000-000000000000",
+							"ComponentId": "00000000-0000-0000-0000-000000000000",
+							"PinId": 0
+						}
+					}
+				],
+				"Description": ""
+			}
+		],
+		"Model": "Arduino UNO WiFi",
+		"Description": ""
+	},
+	{
+		"IP": "32.226.1.0:8088",
+		"LastConnection": "2023-04-04T20:50:22.3121663",
+		"State": 1,
+		"Ping": 0.0,
+		"Id": "07c41ef2-4164-4b6f-ae5c-d909bf8d0116",
+		"Name": "Living Parameters",
+		"Components": [
+			{
+				"Id": "8ea4e2e7-f555-4f9d-ae5f-67378c20761b",
+				"ComponentId": 1,
+				"ConnectedPins": [
+					{
+						"Id": 4,
+						"Mode": 0,
+						"Value": 454,
+						"ValueType": 1,
+						"DataLink": {
+							"BoardId": "00000000-0000-0000-0000-000000000000",
+							"ComponentId": "00000000-0000-0000-0000-000000000000",
+							"PinId": 0
+						}
+					}
+				],
+				"Description": ""
+			}
+		],
+		"Model": "Arduino UNO WiFi",
+		"Description": ""
+	},
+	{
+		"IP": "32.226.1.0:8088",
+		"LastConnection": "2023-04-04T20:50:22.3121678",
+		"State": 1,
+		"Ping": 0.0,
+		"Id": "d635529f-ac1f-4561-958a-7e646ab71f97",
+		"Name": "Living Parameters",
+		"Components": [
+			{
+				"Id": "d321af46-ea79-455c-9655-24083682ba81",
+				"ComponentId": 1,
+				"ConnectedPins": [
+					{
+						"Id": 4,
+						"Mode": 0,
+						"Value": 454,
+						"ValueType": 1,
+						"DataLink": {
+							"BoardId": "00000000-0000-0000-0000-000000000000",
+							"ComponentId": "00000000-0000-0000-0000-000000000000",
+							"PinId": 0
+						}
+					}
+				],
+				"Description": ""
+			}
+		],
+		"Model": "Arduino UNO WiFi",
+		"Description": ""
+	},
+	{
+		"IP": "32.226.1.0:8088",
+		"LastConnection": "2023-04-04T20:50:22.3121701",
+		"State": 1,
+		"Ping": 0.0,
+		"Id": "a04e16f4-2444-4f5c-b794-3b07e870790a",
+		"Name": "Living Parameters",
+		"Components": [
+			{
+				"Id": "d5523a21-9fa6-4a48-baec-06185233f307",
+				"ComponentId": 1,
+				"ConnectedPins": [
+					{
+						"Id": 4,
+						"Mode": 0,
+						"Value": 454,
+						"ValueType": 1,
+						"DataLink": {
+							"BoardId": "00000000-0000-0000-0000-000000000000",
+							"ComponentId": "00000000-0000-0000-0000-000000000000",
+							"PinId": 0
+						}
+					}
+				],
+				"Description": ""
+			}
+		],
+		"Model": "Arduino UNO WiFi",
+		"Description": ""
+	}
+]
