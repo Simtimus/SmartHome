@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SmartHome.Arduino.Application.Exceptions;
 using SmartHome.Arduino.Models;
 using System;
 using System.Collections.Generic;
@@ -31,39 +32,61 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
             return arduinoClients;
         }
 
-        public static ArduinoClient? ParseClient(string serializedObject)
+        public static ArduinoClient? ParseClient(string serializedObject, bool setNewGuid = false)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
 
-            ArduinoClient? client = GetClientFromJsonObject(jsonObject);
+            ArduinoClient? client = GetClientFromJsonObject(jsonObject, setNewGuid);
             if (ArduinoClient.IsNullOrEmpty(client))
                 return null;
 
-            JArray componentsArray = (JArray)jsonObject["Components"];
-            foreach (var jsonComponent in componentsArray)
+            JArray? componentsArray = (JArray?)jsonObject["Components"];
+            if (componentsArray != null)
             {
-                IGenericComponent? component = ParseComponent(jsonComponent.ToString());
-                if (component != null)
+                foreach (var jsonComponent in componentsArray)
                 {
-                    UpdateComponentChildrenReferences(component);
-                    component.ParentClient = client;
-                    client.Components.Add(component);
+                    IGenericComponent? component = ParseComponent(jsonComponent.ToString());
+                    if (component != null)
+                    {
+                        UpdateComponentChildrenReferences(component);
+                        component.ParentClient = client;
+                        client.Components.Add(component);
+                    }
                 }
             }
 
             return client;
         }
 
-        public static IGenericComponent? ParseComponent(string serializedObject)
+        public static IGenericComponent? ParseComponent(string serializedObject, bool setNewGuid = false)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
             GenericComponent.ComponentsId componentId = GenericComponent.GetIdByString(jsonObject["ComponentId"].ToString());
-            Type? componentType = GenericComponent.GetTypeById(componentId);
-            if (componentType is null)
+            IGenericComponent? component = GenericComponent.CreateById(componentId);
+            if (component != null)
+                UpdateModelByJsonObject(component, jsonObject, setNewGuid);
+            else
                 return null;
-            object? deserializedObject = JsonConvert.DeserializeObject(serializedObject, componentType);
 
-            return deserializedObject as IGenericComponent;
+            JArray? componentsArray = (JArray?)jsonObject["Components"];
+            if (componentsArray != null)
+            {
+                foreach (var jsonComponent in componentsArray)
+                {
+                    BoardPin? boardPin = ParseBoardPin(jsonComponent.ToString());
+                    if (boardPin != null)
+                    {
+                        component.ConnectedPins.Add(boardPin);
+                    }
+                }
+            }
+
+            return component;
+        }
+
+        public static BoardPin? ParseBoardPin(string serializedObject)
+        {
+            return (BoardPin?)JsonConvert.DeserializeObject(serializedObject);
         }
 
         private static void UpdateComponentChildrenReferences(IGenericComponent component)
@@ -74,22 +97,22 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
             }
         }
 
-        private static ArduinoClient? GetClientFromJsonObject(JObject jsonObject)
+        private static ArduinoClient? GetClientFromJsonObject(JObject jsonObject, bool setNewGuid)
         {
-            if (jsonObject["Id"] is null)
+            if (jsonObject["Id"] is null && !setNewGuid)
                 return null;
 
             ArduinoClient client = new();
-            UpdateClientByJsonObject(client, jsonObject);
+            UpdateModelByJsonObject(client, jsonObject, setNewGuid);
             client.State = ArduinoClient.ConnectionState.Offline;
             //client.State = (ArduinoClient.ConnectionState)Enum.Parse(typeof(ArduinoClient.ConnectionState), jsonObject["State"].ToString());
 
             return client;
         }
 
-        public static void UpdateClientByJsonObject(ArduinoClient client, JObject jsonObject)
+        public static void UpdateModelByJsonObject<T>(T model, JObject jsonObject, bool setNewGuid)
         {
-            Type clientType = typeof(ArduinoClient);
+            Type clientType = model.GetType();
             PropertyInfo[] properties = clientType.GetProperties();
 
             foreach (PropertyInfo property in properties)
@@ -100,13 +123,10 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
 
                     if (property.PropertyType == typeof(Guid))
                     {
-                        //  Checks if `client` has a GUID
-                        if (value.Type == JTokenType.Null)
-                        {
-                            client = new();
-                            break;
-                        }
-                        deserializedValue = Guid.Parse(value.ToString());
+                        if (setNewGuid)
+                            deserializedValue = Guid.NewGuid();
+                        else
+                            deserializedValue = Guid.Parse(value.ToString());
                     }
                     else if (property.PropertyType == typeof(IPEndPoint))
                     {
@@ -135,15 +155,10 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
                     {
                         deserializedValue = Enum.Parse(property.PropertyType, value.ToString());
                     }
-                    //else if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
-                    //{
-                    //    Type itemType = property.PropertyType.GetGenericArguments()[0];
-                    //    deserializedValue = JsonConvert.DeserializeObject(value.ToString(), typeof(List<>).MakeGenericType(itemType));
-                    //}
 
                     if (deserializedValue != null)
                     {
-                        property.SetValue(client, deserializedValue);
+                        property.SetValue(model, deserializedValue);
                     }
                 }
             }

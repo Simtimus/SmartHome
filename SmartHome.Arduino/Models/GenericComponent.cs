@@ -10,12 +10,12 @@ namespace SmartHome.Arduino.Models
 {
     public class GenericComponent
     {
-        public static object? CreateById(ComponentsId componentId)
+        public static IGenericComponent? CreateById(ComponentsId componentId)
         {
             Type? componentType = GetTypeById(componentId);
             if (componentType is null)
                 throw new ComponentNotFoundException(componentId);
-            return Activator.CreateInstance(componentType);
+            return Activator.CreateInstance(componentType) as IGenericComponent;
         }
 
         public static Type? GetTypeById(ComponentsId componentId)
