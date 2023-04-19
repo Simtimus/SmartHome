@@ -11,18 +11,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SmartHome.Arduino.Application.Modules.DataSaving
+namespace SmartHome.Arduino.Models.JsonProcessing
 {
     public static class JsonDataParser
     {
-        public static List<ArduinoClient> ParseClients(string serializedObject)
+        public static ReceivedData ParseReceivedData(ReceivedData receivedData)
+        {
+            JObject jsonObject = JObject.Parse(receivedData.Data);
+            UpdateModelByJsonObject(receivedData.Data, jsonObject);
+            return receivedData;
+        }
+
+        public static List<ArduinoClient> ParseClients(string serializedObject, bool setNewGuid)
         {
             List<ArduinoClient> arduinoClients = new();
 
             JArray jsonArray = JArray.Parse(serializedObject);
             foreach (var jsonClient in jsonArray)
             {
-                ArduinoClient? client = ParseClient(jsonClient.ToString());
+                ArduinoClient? client = ParseClient(jsonClient.ToString(), setNewGuid);
                 if (client != null)
                 {
                     arduinoClients.Add(client);
@@ -32,7 +39,18 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
             return arduinoClients;
         }
 
-        public static ArduinoClient? ParseClient(string serializedObject, bool setNewGuid = false)
+        public static ArduinoClient? ParseClientOnly(string serializedObject, bool setNewGuid)
+        {
+            JObject jsonObject = JObject.Parse(serializedObject);
+
+            ArduinoClient? client = GetClientFromJsonObject(jsonObject, setNewGuid);
+            if (ArduinoClient.IsNullOrEmpty(client))
+                return null;
+
+            return client;
+        }
+
+        public static ArduinoClient? ParseClient(string serializedObject, bool setNewGuid)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
 
@@ -45,7 +63,7 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
             {
                 foreach (var jsonComponent in componentsArray)
                 {
-                    IGenericComponent? component = ParseComponent(jsonComponent.ToString());
+                    IGeneralComponent? component = ParseComponent(jsonComponent.ToString(), setNewGuid);
                     if (component != null)
                     {
                         UpdateComponentChildrenReferences(component);
@@ -58,11 +76,11 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
             return client;
         }
 
-        public static IGenericComponent? ParseComponent(string serializedObject, bool setNewGuid = false)
+        public static IGeneralComponent? ParseComponent(string serializedObject, bool setNewGuid)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
-            GenericComponent.ComponentsId componentId = GenericComponent.GetIdByString(jsonObject["ComponentId"].ToString());
-            IGenericComponent? component = GenericComponent.CreateById(componentId);
+            GeneralComponent.ComponentsId componentId = GeneralComponent.GetIdByString(jsonObject["ComponentId"].ToString());
+            IGeneralComponent? component = GeneralComponent.CreateById(componentId);
             if (component != null)
                 UpdateModelByJsonObject(component, jsonObject, setNewGuid);
             else
@@ -89,7 +107,65 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
             return (BoardPin?)JsonConvert.DeserializeObject(serializedObject);
         }
 
-        private static void UpdateComponentChildrenReferences(IGenericComponent component)
+        public static void UpdateArduinoClient(ArduinoClient client, string serializedObject)
+        {
+            JObject jsonObject = JObject.Parse(serializedObject);
+            UpdateModelByJsonObject(client, jsonObject);
+            JArray? componentsArray = (JArray?)jsonObject["Components"];
+            if (componentsArray != null)
+            {           
+                for (int i = 0; i < client.Components.Count; i++)
+                {
+                    var idPropriety = client.Components[i].Id;
+                    JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, idPropriety);
+                    if (foundObject != null)
+                    {
+                        UpdateGeneralComponent(client.Components[i], foundObject);
+                    }
+                }
+            }
+        }
+
+        public static void UpdateGeneralComponent(IGeneralComponent component, JObject jsonObject)
+        {
+            UpdateModelByJsonObject(component, jsonObject);
+            JArray? componentsArray = (JArray?)jsonObject["Components"];
+            if (componentsArray != null)
+            {
+                for (int i = 0; i < component.ConnectedPins.Count; i++)
+                {
+                    var idPropriety = component.ConnectedPins[i].Id;
+                    JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, idPropriety);
+                    if (foundObject != null)
+                    {
+                        UpdateModelByJsonObject(component.ConnectedPins[i], foundObject);
+                    }
+                }
+            }
+        }
+
+        private static JObject? FindObjecInArrayByPropriety(JArray objectArray, object proprietyValue)
+        {
+            string proprietyName = nameof(proprietyValue);
+            Type proprietyType = proprietyValue.GetType();
+
+            foreach (var jsonComponent in objectArray)
+            {
+                JToken? propriety = jsonComponent[proprietyName];
+                if (propriety != null)
+                {
+                    object? value = propriety.ToObject(proprietyType);
+                    if (value != null)
+                    {
+                        if (value == proprietyValue)
+                            return JObject.Parse(jsonComponent.ToString());
+                    }
+                }
+            }
+            return null;
+        }
+
+        private static void UpdateComponentChildrenReferences(IGeneralComponent component)
         {
             foreach (BoardPin boardPin in component.ConnectedPins)
             {
@@ -110,7 +186,7 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
             return client;
         }
 
-        public static void UpdateModelByJsonObject<T>(T model, JObject jsonObject, bool setNewGuid)
+        public static void UpdateModelByJsonObject(object model, JObject jsonObject, bool setNewGuid = false)
         {
             Type clientType = model.GetType();
             PropertyInfo[] properties = clientType.GetProperties();

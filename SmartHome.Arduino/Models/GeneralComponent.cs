@@ -8,14 +8,14 @@ using SmartHome.Arduino.Application.Exceptions;
 
 namespace SmartHome.Arduino.Models
 {
-    public class GenericComponent
+    public class GeneralComponent
     {
-        public static IGenericComponent? CreateById(ComponentsId componentId)
+        public static IGeneralComponent? CreateById(ComponentsId componentId)
         {
             Type? componentType = GetTypeById(componentId);
             if (componentType is null)
                 throw new ComponentNotFoundException(componentId);
-            return Activator.CreateInstance(componentType) as IGenericComponent;
+            return Activator.CreateInstance(componentType) as IGeneralComponent;
         }
 
         public static Type? GetTypeById(ComponentsId componentId)

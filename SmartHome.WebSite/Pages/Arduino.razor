@@ -1,9 +1,10 @@
 ﻿@page "/arduino"
+@implements IDisposable
 @inject IJSRuntime JsRuntime
 @inject Models.SnackBar SnackBar
 @inject Models.WindowDimension WindowDimension
 @inject Server ArduinoServer
-@inject GenericComponent GenericComponent
+@inject GeneralComponent GenericComponent
 
 <div class="d-flex @WrapperState" id="wrapper">
     <!-- Sidebar -->
@@ -57,21 +58,11 @@
         await WindowDimension.GetDimensions(JsRuntime);
         try
         {
-            object? myObject = GenericComponent.CreateById(GenericComponent.ComponentsId.Unknown);
+            object? myObject = GeneralComponent.CreateById(GeneralComponent.ComponentsId.Unknown);
         }
         catch (ComponentNotFoundException)
         {
             await SnackBar.ShowMessage("Component not found");
-        }
-    }
-
-    async Task AutoRefresh()
-    {
-        await Task.Delay(1000);
-        while (true)
-        {
-            StateHasChanged();
-            await Task.Delay(500);
         }
     }
 
@@ -80,9 +71,19 @@
         SelectedClient = client;
     }
 
+    public void Dispose()
+    {
+        ClientEvents.OnClientChanged -= RefreshPage;
+    }
+    
+    private void RefreshPage()
+    {
+        InvokeAsync(() => { StateHasChanged(); });
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        AutoRefresh();
+        ClientEvents.OnClientChanged += RefreshPage;
         if (ClientManager.Clients.Count > 0)
         {
             //TODO: In case I want by default a Client to be selected

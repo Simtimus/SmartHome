@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartHome.Arduino.Application.Modules.DataLinking
+namespace SmartHome.Arduino.Models.DataProcessing
 {
     public class DataLinker
     {
-        public List<DataLink> DataLinks = new ();
+        public List<DataLink> DataLinks = new();
 
         public void LinkData(BoardPin from, BoardPin to)
         {

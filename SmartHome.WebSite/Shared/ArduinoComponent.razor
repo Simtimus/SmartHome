@@ -1,6 +1,6 @@
 ﻿@if (Component != null)
 {
-    Guid Description = Component.Id;
+    int Description = Component.Id;
     <div @ref="@Reference" class="item mt-3 mb-4" role="listitem" style="width: 400px">
         <div class="card">
             <div class="card-header">
@@ -18,7 +18,7 @@
 
 @code {
     [Parameter]
-    public IGenericComponent Component { get; set; }
+    public IGeneralComponent Component { get; set; }
 
     [Parameter]
     public ElementReference Reference { get; set; }

@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace SmartHome.Arduino.Application.Modules.DataSaving
+namespace SmartHome.Arduino.Models.JsonProcessing
 {
     public static class JsonDataManager
     {
@@ -20,7 +20,7 @@ namespace SmartHome.Arduino.Application.Modules.DataSaving
                 throw new ArgumentNullException(nameof(data));
             }
             string serializedObject = JsonConvert.SerializeObject(data);
-            using StreamWriter writer = new (filePath);
+            using StreamWriter writer = new(filePath);
             writer.Write(serializedObject);
         }
 

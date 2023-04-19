@@ -6,7 +6,7 @@
     <div class="row gutters-sm mt-3" role="list" style="margin-left: .75rem !important;">
         @for (int cols = 0; cols < Columns; cols++)
         {
-            <div class="@ColumnClass">
+            <div class="@ColumnClass column">
                 @for (int rows = 0; rows < Rows; rows++)
                 {
                     int index = rows * Columns + cols;
@@ -32,7 +32,7 @@
     private ArduinoClient _selectedClient { get; set; } = new ArduinoClient();
 
 
-    private Dictionary<Guid, ElementReference> ClientElement = new Dictionary<Guid, ElementReference>();
+    private Dictionary<int, ElementReference> ClientElement = new Dictionary<int, ElementReference>();
     private int Columns = 3;
     private int Rows = 0;
 
@@ -47,7 +47,7 @@
         "",
     };
 
-    public void CreateTable(List<IGenericComponent> components)
+    public void CreateTable(List<IGeneralComponent> components)
     {
         int elementsDivided = components.Count / Columns;
         Rows = components.Count % Columns == 0 ? elementsDivided : elementsDivided + 1;

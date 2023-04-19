@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
-using SmartHome.Arduino.Application.Modules.DataSaving;
+using SmartHome.Arduino.Application.Events;
 using SmartHome.Arduino.Models;
+using SmartHome.Arduino.Models.JsonProcessing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,13 @@ namespace SmartHome.Arduino.Application
         private static readonly string FileName = "ClientData.json";
         public static List<ArduinoClient> Clients { get; set; } = new List<ArduinoClient>();
 
-        public static bool ClientsUpdated = false;
-
         public static void AddNewClient(ArduinoClient client)
         {
             Clients.Add(client);
-            ClientsUpdated = true;
+            ClientEvents.TriggerClientChanged();
         }
 
-        public static void UpdateClient(ArduinoClient client)
+        public static void ReplaceClient(ArduinoClient client)
         {
             int index = Clients.FindIndex(c => c.Id == client.Id);
             if (index == -1)
@@ -40,7 +39,25 @@ namespace SmartHome.Arduino.Application
                     Clients[index].Ping = (int)Clients[index].LastConnection.Subtract(bufferClient.LastConnection).TotalMilliseconds;
                 }
             }
-            ClientsUpdated = true;
+            ClientEvents.TriggerClientChanged();
+        }
+
+        public static int GetClientIndexById(Guid clientId)
+        {
+            int index = Clients.FindIndex(c => c.Id == clientId);
+            return index;
+        }
+
+        public static int GetComponentIndexById(int clientIndex, int componentId)
+        {
+            int index = Clients[clientIndex].Components.FindIndex(c => c.Id == componentId);
+            return index;
+        }
+
+        public static int GetBoardPinIndexById(int clientIndex, int componentIndex, int boardPinId)
+        {
+            int index = Clients[clientIndex].Components[componentIndex].ConnectedPins.FindIndex(c => c.Id == boardPinId);
+            return index;
         }
 
         public static void SaveClientData()
@@ -59,7 +76,7 @@ namespace SmartHome.Arduino.Application
             if (string.IsNullOrEmpty(serializedObject)) return;
             try
             {
-                List<ArduinoClient>? arduinoClients = JsonDataParser.ParseClients(serializedObject);
+                List<ArduinoClient>? arduinoClients = JsonDataParser.ParseClients(serializedObject, false);
                 if (arduinoClients is not null)
                 {
                     Clients = arduinoClients;
@@ -68,17 +85,20 @@ namespace SmartHome.Arduino.Application
             catch (Exception) { }
         }
 
+
+        //  ----------  FOR TESTING  ----------  //
         public static List<ArduinoClient> TestDecoy = new()
         {
             new ArduinoClient()
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<IGenericComponent>()
+                Components = new List<IGeneralComponent>()
                 {
                     new Models.Components.LightSensor()
                     {
                         Id = Guid.NewGuid(),
+                        Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
                             new BoardPin()
@@ -94,6 +114,7 @@ namespace SmartHome.Arduino.Application
                     new Models.Components.Relay()
                     {
                         Id = Guid.NewGuid(),
+                        Sequence = 1,
                         ConnectedPins = new List<BoardPin>()
                         {
                             new BoardPin()
@@ -117,11 +138,12 @@ namespace SmartHome.Arduino.Application
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<IGenericComponent>()
+                Components = new List<IGeneralComponent>()
                 {
                     new Models.Components.LightSensor()
                     {
                         Id = Guid.NewGuid(),
+                        Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
                             new BoardPin()
@@ -145,11 +167,12 @@ namespace SmartHome.Arduino.Application
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<IGenericComponent>()
+                Components = new List<IGeneralComponent>()
                 {
-                    new Models.Components.LightSensor()
+                    new Models.Components.Relay()
                     {
                         Id = Guid.NewGuid(),
+                        Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
                             new BoardPin()
@@ -174,11 +197,12 @@ namespace SmartHome.Arduino.Application
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<IGenericComponent>()
+                Components = new List<IGeneralComponent>()
                 {
                     new Models.Components.LightSensor()
                     {
                         Id = Guid.NewGuid(),
+                        Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
                             new BoardPin()
@@ -202,11 +226,12 @@ namespace SmartHome.Arduino.Application
             {
                 Id = Guid.NewGuid(),
                 Name = "Living Parameters",
-                Components = new List<IGenericComponent>()
+                Components = new List<IGeneralComponent>()
                 {
-                    new Models.Components.LightSensor()
+                    new Models.Components.Relay()
                     {
                         Id = Guid.NewGuid(),
+                        Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
                             new BoardPin()

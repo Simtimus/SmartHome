@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
-using System.Net.NetworkInformation;
-using System.Diagnostics;
-using SmartHome.Arduino.Models;
-using SmartHome.Arduino.Application.Modules.DataSaving;
 using System.Runtime.CompilerServices;
+using SmartHome.Arduino.Models;
+using SmartHome.Arduino.Models.DataProcessing;
+using SmartHome.Arduino.Application.Events;
 
 namespace SmartHome.Arduino.Application
 {
@@ -35,7 +36,7 @@ namespace SmartHome.Arduino.Application
             ipHost = GetLocalIPv4(NetworkInterfaceType.Wireless80211);
             //Console.WriteLine(ipHost);
             //ClientManager.SaveClientTestData();
-            //ClientManager.RecoverClientData();
+            ClientManager.RecoverClientData();
             Task.Run(() => RecieveMessages());
             Task.Run(() => MonitorClients());
         }
@@ -73,7 +74,7 @@ namespace SmartHome.Arduino.Application
             if (offlineTime.Subtract(GetDTNow()).TotalSeconds <= 0)
             {
                 client.State = ArduinoClient.ConnectionState.Offline;
-                ClientManager.ClientsUpdated = true;
+                ClientEvents.TriggerClientChanged();
             }
         }
 
@@ -86,23 +87,14 @@ namespace SmartHome.Arduino.Application
                 byte[] data = server.Receive(ref recivedClientIP);
                 string message = Encoding.UTF8.GetString(data);
 
-                ArduinoClient arduinoClient = JsonDataParser.ParseClient(message) ?? new();
-                arduinoClient.IP = recivedClientIP;
-                arduinoClient.State = ArduinoClient.ConnectionState.Online;
-                arduinoClient.LastConnection = GetDTNow();
-
-                if (ArduinoClient.IsNullOrEmpty(arduinoClient))
-                    continue;
-
-                if (arduinoClient.Id == Guid.Empty)
+                ReceivedData receivedData = new()
                 {
-                    arduinoClient.Id = Guid.NewGuid();
-                    ClientManager.AddNewClient(arduinoClient);
-                }
-                else
-                {
-                    ClientManager.UpdateClient(arduinoClient);
-                }
+                    IP = recivedClientIP,
+                    LastConnection = GetDTNow(),
+                    Data = message,
+                };
+
+                DataManager.GetDataFromReceiver(receivedData);
             }
         }
 

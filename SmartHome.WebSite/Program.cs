@@ -15,7 +15,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<CustomTimeModule>();
 builder.Services.AddScoped<SnackBar>();
-builder.Services.AddSingleton<GenericComponent>();
+builder.Services.AddSingleton<GeneralComponent>();
 builder.Services.AddSingleton(new Server());
 builder.Services.AddSingleton(new WindowDimension());
 builder.Services.AddSingleton<ClipboardService>();

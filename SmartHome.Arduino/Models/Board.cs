@@ -10,9 +10,9 @@ namespace SmartHome.Arduino.Models
     public class Board
 	{
 		public Guid Id { get; set; }
-		public string Name { get; set; } = String.Empty;
-        public List<IGenericComponent> Components { get; set; } = new List<IGenericComponent>();
-		public string Model { get; set; } = String.Empty;
-		public string Description { get; set; } = String.Empty;
+		public string Name { get; set; } = string.Empty;
+        public List<IGeneralComponent> Components { get; set; } = new List<IGeneralComponent>();
+		public string Model { get; set; } = string.Empty;
+		public string Description { get; set; } = string.Empty;
 	}
 }
