@@ -28,18 +28,11 @@ namespace SmartHome.Arduino.Models
 
         public object? GetValue()
         {
-            bool clientFound = ClientManager.GetClientIndexById(BoardId, out int clientIndex);
-            bool componentFound = ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex);
-            bool pinFound = ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex);
+            if (ClientManager.GetClientIndexById(BoardId, out int clientIndex)) return null;
+            if (ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex)) return null;
+            if (ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex)) return null;
 
-            if (clientFound && componentFound && pinFound)
-            {
-                //ClientManager.Clients[clientIndex].
-                //    Components[componentIndex].
-                //    ConnectedPins[pinIndex]
-            }
-
-            return new();
+            return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Value;
         }
 
         public override string ToString() => $"{BoardId}.{ComponentId}.{PinId}";

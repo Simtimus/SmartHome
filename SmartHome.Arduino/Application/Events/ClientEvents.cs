@@ -10,10 +10,16 @@ namespace SmartHome.Arduino.Application.Events
     {
         public delegate void ClientChangedHandler();
         public static event ClientChangedHandler? OnClientChanged;
+        public static event ClientChangedHandler? OnNewClientAddedd;
 
         public static void TriggerClientChanged()
         {
             OnClientChanged?.Invoke();
+        }
+
+        public static void TriggerClientAdded()
+        {
+            OnNewClientAddedd?.Invoke();
         }
     }
 }

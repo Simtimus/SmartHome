@@ -74,17 +74,23 @@
     public void Dispose()
     {
         ClientEvents.OnClientChanged -= RefreshPage;
+        ClientEvents.OnNewClientAddedd -= NewArduinoClientAdded;
+    }
+
+    private void NewArduinoClientAdded()
+    {
+        InvokeAsync(async () => { await SnackBar.ShowMessage("New Arduino board connected"); });
     }
 
     private void RefreshPage()
     {
         InvokeAsync(() => { StateHasChanged(); });
-        InvokeAsync(async () => { await SnackBar.ShowMessage("New Arduino board connected"); });
     }
 
     protected override async Task OnInitializedAsync()
     {
         ClientEvents.OnClientChanged += RefreshPage;
+        ClientEvents.OnNewClientAddedd += NewArduinoClientAdded;
         if (ClientManager.Clients.Count > 0)
         {
             //TODO: In case I want by default a Client to be selected

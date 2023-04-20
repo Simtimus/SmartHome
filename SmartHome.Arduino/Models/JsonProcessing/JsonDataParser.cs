@@ -4,6 +4,7 @@ using SmartHome.Arduino.Application.Exceptions;
 using SmartHome.Arduino.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -86,7 +87,7 @@ namespace SmartHome.Arduino.Models.JsonProcessing
             else
                 return null;
 
-            JArray? componentsArray = (JArray?)jsonObject["Components"];
+            JArray? componentsArray = (JArray?)jsonObject["ConnectedPins"];
             if (componentsArray != null)
             {
                 foreach (var jsonComponent in componentsArray)
@@ -104,7 +105,15 @@ namespace SmartHome.Arduino.Models.JsonProcessing
 
         public static BoardPin? ParseBoardPin(string serializedObject)
         {
-            return (BoardPin?)JsonConvert.DeserializeObject(serializedObject);
+            JObject jsonObject = JObject.Parse(serializedObject);
+            if (jsonObject != null)
+            {
+                BoardPin? boardPin = new();
+                UpdateModelByJsonObject(boardPin, jsonObject, false); ;
+                return boardPin;
+            }
+            return null;
+            //return (BoardPin?)JsonConvert.DeserializeObject(serializedObject);
         }
 
         public static void UpdateArduinoClient(ArduinoClient client, string serializedObject)
@@ -129,7 +138,7 @@ namespace SmartHome.Arduino.Models.JsonProcessing
         public static void UpdateGeneralComponent(IGeneralComponent component, JObject jsonObject)
         {
             UpdateModelByJsonObject(component, jsonObject);
-            JArray? componentsArray = (JArray?)jsonObject["Components"];
+            JArray? componentsArray = (JArray?)jsonObject["ConnectedPins"];
             if (componentsArray != null)
             {
                 for (int i = 0; i < component.ConnectedPins.Count; i++)

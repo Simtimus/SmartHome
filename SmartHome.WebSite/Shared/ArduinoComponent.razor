@@ -4,12 +4,20 @@
     <div @ref="@Reference" class="item mt-3 mb-4" role="listitem" style="width: 400px">
         <div class="card">
             <div class="card-header">
-                <a>@Component.Description</a>
+                <h5>@Component.Description</h5>
             </div>
             <div class="card-body">
-                @foreach (BoardPin boardPin in Component.ConnectedPins)
+                @if (Component.ConnectedPins.Count > 0)
                 {
-                    <ArduinoBoardPin BoardPin="boardPin"></ArduinoBoardPin>
+                    <a>Connected pins: @Component.ConnectedPins.Count</a>
+                    @foreach (BoardPin boardPin in Component.ConnectedPins)
+                    {
+                        <ArduinoBoardPin BoardPin="boardPin"></ArduinoBoardPin>
+                    }
+                }
+                else
+                {
+                    <a>Component has no connected pins.</a>
                 }
                 @*<img src="@RandomImages[random.Next(0, 3)]" class="img-fluid">*@
             </div>

@@ -19,6 +19,7 @@ namespace SmartHome.Arduino.Application
         public static void AddNewClient(ArduinoClient client)
         {
             Clients.Add(client);
+            ClientEvents.TriggerClientAdded();
             ClientEvents.TriggerClientChanged();
         }
 

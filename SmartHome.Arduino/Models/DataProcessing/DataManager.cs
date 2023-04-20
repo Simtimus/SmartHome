@@ -30,6 +30,10 @@ namespace SmartHome.Arduino.Models.DataProcessing
                     break;
             }
 
+            if (!processState)
+            {
+                //TODO: Do some log
+            }
         }
 
         private static void ProcessEntireBoard(ReceivedData receivedData)
@@ -50,8 +54,7 @@ namespace SmartHome.Arduino.Models.DataProcessing
             }
             else
             {
-                bool clientFound = ClientManager.GetClientIndexById(arduinoClient.Id, out int clientIndex);
-                if (clientFound)
+                if (ClientManager.GetClientIndexById(arduinoClient.Id, out int clientIndex))
                 {
                     JsonProcessing.JsonDataParser.UpdateArduinoClient(ClientManager.Clients[clientIndex], receivedData.Data);
                 }
@@ -64,38 +67,30 @@ namespace SmartHome.Arduino.Models.DataProcessing
 
         private static bool ProcessSingleComponent(ReceivedData receivedData)
         {
-            bool clientFound = ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex);
-            bool componentFound = ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex);
+            if (ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex)) return false;
+            if (ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex)) return false;
 
-            if (clientFound && componentFound)
-            {
-                JObject jsonObject = JObject.Parse(receivedData.Data);
+            JObject jsonObject = JObject.Parse(receivedData.Data);
 
-                JsonProcessing.JsonDataParser.UpdateGeneralComponent(
-                    ClientManager.Clients[clientIndex].
-                    Components[componentIndex], jsonObject);
-                return true;
-            }
-            return false;
+            JsonProcessing.JsonDataParser.UpdateGeneralComponent(
+                ClientManager.Clients[clientIndex].
+                Components[componentIndex], jsonObject);
+            return true;
         }
 
         private static bool ProcessSingleBoardPin(ReceivedData receivedData)
         {
-            bool clientFound = ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex);
-            bool componentFound = ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex);
-            bool pinFound = ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, receivedData.PinId, out int pinIndex);
+            if (ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex)) return false;
+            if (ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex)) return false;
+            if (ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, receivedData.PinId, out int pinIndex)) return false;
 
-            if (clientFound && componentFound && pinFound)
-            {
-                JObject jsonObject = JObject.Parse(receivedData.Data);
+            JObject jsonObject = JObject.Parse(receivedData.Data);
+            JsonProcessing.JsonDataParser.UpdateModelByJsonObject(
+                ClientManager.Clients[clientIndex].
+                Components[componentIndex].
+                ConnectedPins[pinIndex], jsonObject);
 
-                JsonProcessing.JsonDataParser.UpdateModelByJsonObject(
-                    ClientManager.Clients[clientIndex].
-                    Components[componentIndex].
-                    ConnectedPins[pinIndex], jsonObject);
-                return true;
-            }
-            return false;
+            return true;
         }
     }
 }

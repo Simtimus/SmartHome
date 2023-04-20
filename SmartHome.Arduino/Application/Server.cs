@@ -18,7 +18,6 @@ namespace SmartHome.Arduino.Application
     {
         public string IpHost { get { return ipHost; } }
         private readonly string ipHost = "0.0.0.0";
-        private const int ArduinoCycleTime = 1000;
 
         private const int PortHost = 8080;
 
@@ -35,8 +34,8 @@ namespace SmartHome.Arduino.Application
         {
             ipHost = GetLocalIPv4(NetworkInterfaceType.Wireless80211);
             //Console.WriteLine(ipHost);
-            //ClientManager.SaveClientTestData();
-            //ClientManager.RecoverClientData();
+            ClientManager.SaveClientTestData();
+            ClientManager.RecoverClientData();
             Task.Run(() => RecieveMessages());
             Task.Run(() => MonitorClients());
         }

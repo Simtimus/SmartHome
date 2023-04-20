@@ -1,7 +1,10 @@
-﻿<h3>@BoardPin.Id</h3>
-<p>@Enum.GetName(typeof(BoardPin.PinMode), BoardPin.Mode)</p>
+﻿<div>
+	<a>Pin: @BoardPin.Id</a>
+	<p>@Enum.GetName(typeof(BoardPin.PinMode), BoardPin.Mode)</p>
+	<p>Value: "@BoardPin.GetValueString()"</p>
+</div>
 
 @code {
 	[Parameter]
-	public BoardPin BoardPin { get; set; }
+	public BoardPin BoardPin { get; set; } = new();
 }

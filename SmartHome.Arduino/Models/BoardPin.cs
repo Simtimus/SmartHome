@@ -31,9 +31,19 @@ namespace SmartHome.Arduino.Models
             Boolean,
 		}
 
+		public object? GetValue()
+		{
+			if (!DataLink.IsNullOrEmpty(DataLink))
+			{
+				return DataLink.GetValue();
+			}
+			return Value;
+		}
+
 		public string? GetValueString()
 		{
-			return Value is null ? string.Empty : Value.ToString();
+			object? value = GetValue();
+			return value is null ? string.Empty : value.ToString();
 		}
 
 		public override string ToString() => $"Pin {Id} [{Enum.GetName(typeof(PinMode), Mode)}]";
