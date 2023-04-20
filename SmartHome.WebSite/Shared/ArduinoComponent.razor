@@ -7,6 +7,10 @@
                 <a>@Component.Description</a>
             </div>
             <div class="card-body">
+                @foreach (BoardPin boardPin in Component.ConnectedPins)
+                {
+                    <ArduinoBoardPin BoardPin="boardPin"></ArduinoBoardPin>
+                }
                 @*<img src="@RandomImages[random.Next(0, 3)]" class="img-fluid">*@
             </div>
             <div class="card-footer">
