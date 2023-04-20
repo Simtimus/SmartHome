@@ -10,7 +10,7 @@ namespace SmartHome.Arduino.Models
     public class DataLink
     {
         public Guid BoardId { get; set; }
-        public Guid ComponentId { get; set; }
+        public int ComponentId { get; set; }
         public int PinId { get; set; }
 
         public DataLink() { }

@@ -36,7 +36,7 @@ namespace SmartHome.Arduino.Application
             ipHost = GetLocalIPv4(NetworkInterfaceType.Wireless80211);
             //Console.WriteLine(ipHost);
             //ClientManager.SaveClientTestData();
-            ClientManager.RecoverClientData();
+            //ClientManager.RecoverClientData();
             Task.Run(() => RecieveMessages());
             Task.Run(() => MonitorClients());
         }
