@@ -67,8 +67,8 @@ namespace SmartHome.Arduino.Models.DataProcessing
 
         private static bool ProcessSingleComponent(ReceivedData receivedData)
         {
-            if (ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex)) return false;
-            if (ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex)) return false;
+            if (!ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex)) return false;
+            if (!ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex)) return false;
 
             JObject jsonObject = JObject.Parse(receivedData.Data);
 
@@ -80,9 +80,9 @@ namespace SmartHome.Arduino.Models.DataProcessing
 
         private static bool ProcessSingleBoardPin(ReceivedData receivedData)
         {
-            if (ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex)) return false;
-            if (ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex)) return false;
-            if (ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, receivedData.PinId, out int pinIndex)) return false;
+            if (!ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex)) return false;
+            if (!ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex)) return false;
+            if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, receivedData.PinId, out int pinIndex)) return false;
 
             JObject jsonObject = JObject.Parse(receivedData.Data);
             JsonProcessing.JsonDataParser.UpdateModelByJsonObject(

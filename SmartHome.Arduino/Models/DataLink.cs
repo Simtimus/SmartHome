@@ -28,9 +28,9 @@ namespace SmartHome.Arduino.Models
 
         public object? GetValue()
         {
-            if (ClientManager.GetClientIndexById(BoardId, out int clientIndex)) return null;
-            if (ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex)) return null;
-            if (ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex)) return null;
+            if (!ClientManager.GetClientIndexById(BoardId, out int clientIndex)) return null;
+            if (!ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex)) return null;
+            if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex)) return null;
 
             return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Value;
         }
