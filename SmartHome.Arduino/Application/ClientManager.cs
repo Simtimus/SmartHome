@@ -42,22 +42,22 @@ namespace SmartHome.Arduino.Application
             ClientEvents.TriggerClientChanged();
         }
 
-        public static int GetClientIndexById(Guid clientId)
+        public static bool GetClientIndexById(Guid clientId, out int index)
         {
-            int index = Clients.FindIndex(c => c.Id == clientId);
-            return index;
+            index = Clients.FindIndex(c => c.Id == clientId);
+            return index != -1;
         }
 
-        public static int GetComponentIndexById(int clientIndex, int componentId)
+        public static bool GetComponentIndexById(int clientIndex, int componentId, out int index)
         {
-            int index = Clients[clientIndex].Components.FindIndex(c => c.Id == componentId);
-            return index;
+            index = Clients[clientIndex].Components.FindIndex(c => c.Id == componentId);
+            return index != -1;
         }
 
-        public static int GetBoardPinIndexById(int clientIndex, int componentIndex, int boardPinId)
+        public static bool GetBoardPinIndexById(int clientIndex, int componentIndex, int boardPinId, out int index)
         {
-            int index = Clients[clientIndex].Components[componentIndex].ConnectedPins.FindIndex(c => c.Id == boardPinId);
-            return index;
+            index = Clients[clientIndex].Components[componentIndex].ConnectedPins.FindIndex(c => c.Id == boardPinId);
+            return index != -1;
         }
 
         public static void SaveClientData()

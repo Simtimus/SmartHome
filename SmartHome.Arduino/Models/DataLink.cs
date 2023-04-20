@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using SmartHome.Arduino.Application;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +11,11 @@ namespace SmartHome.Arduino.Models
 {
     public class DataLink
     {
+        public Guid Id { get; set; }
         public Guid BoardId { get; set; }
         public int ComponentId { get; set; }
         public int PinId { get; set; }
+        public object? Value { get; set; }
 
         public DataLink() { }
 
@@ -20,6 +24,22 @@ namespace SmartHome.Arduino.Models
             BoardId = reference.ParentComponent.ParentClient.Id;
             ComponentId = reference.ParentComponent.Id;
             PinId = reference.Id;
+        }
+
+        public object? GetValue()
+        {
+            bool clientFound = ClientManager.GetClientIndexById(BoardId, out int clientIndex);
+            bool componentFound = ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex);
+            bool pinFound = ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex);
+
+            if (clientFound && componentFound && pinFound)
+            {
+                //ClientManager.Clients[clientIndex].
+                //    Components[componentIndex].
+                //    ConnectedPins[pinIndex]
+            }
+
+            return new();
         }
 
         public override string ToString() => $"{BoardId}.{ComponentId}.{PinId}";

@@ -14,7 +14,13 @@ namespace SmartHome.Arduino.Models.DataProcessing
         public void LinkData(BoardPin from, BoardPin to)
         {
             to.DataLink = new(from);
+            to.DataLink.Id = Guid.NewGuid();
             DataLinks.Add(to.DataLink);
+        }
+
+        public void RemoveLink(Guid Id)
+        {
+
         }
     }
 }

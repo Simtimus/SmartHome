@@ -16,7 +16,7 @@ namespace SmartHome.Arduino.Models
         public RecievingMode Mode { get; set; }
         public Guid BoardId { get; set; }
         public int ComponentId { get; set; } = -1;
-        public int BoardPinId { get; set; } = -1;
+        public int PinId { get; set; } = -1;
 
         public enum RecievingMode
         {
