@@ -97,7 +97,7 @@ namespace SmartHome.Arduino.Application
                 {
                     new Models.Components.LightSensor()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = 0,
                         Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
@@ -113,7 +113,7 @@ namespace SmartHome.Arduino.Application
                     },
                     new Models.Components.Relay()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = 1,
                         Sequence = 1,
                         ConnectedPins = new List<BoardPin>()
                         {
@@ -142,7 +142,7 @@ namespace SmartHome.Arduino.Application
                 {
                     new Models.Components.LightSensor()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = 0,
                         Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
@@ -171,7 +171,7 @@ namespace SmartHome.Arduino.Application
                 {
                     new Models.Components.Relay()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = 0,
                         Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
@@ -201,7 +201,7 @@ namespace SmartHome.Arduino.Application
                 {
                     new Models.Components.LightSensor()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = 0,
                         Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {
@@ -230,7 +230,7 @@ namespace SmartHome.Arduino.Application
                 {
                     new Models.Components.Relay()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = 0,
                         Sequence = 0,
                         ConnectedPins = new List<BoardPin>()
                         {

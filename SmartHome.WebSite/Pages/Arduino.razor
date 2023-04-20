@@ -75,10 +75,11 @@
     {
         ClientEvents.OnClientChanged -= RefreshPage;
     }
-    
+
     private void RefreshPage()
     {
         InvokeAsync(() => { StateHasChanged(); });
+        InvokeAsync(async () => { await SnackBar.ShowMessage("New Arduino board connected"); });
     }
 
     protected override async Task OnInitializedAsync()

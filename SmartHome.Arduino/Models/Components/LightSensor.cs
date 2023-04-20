@@ -12,7 +12,7 @@ namespace SmartHome.Arduino.Models.Components
 {
     public class LightSensor : IGeneralComponent
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public int Sequence { get; set; }
         public ComponentsId ComponentId { get; set; } = ComponentsId.LightSensor;
         public List<BoardPin> ConnectedPins { get; set; } = new List<BoardPin>();

@@ -10,7 +10,7 @@ namespace SmartHome.Arduino.Models.Components
 {
     public class Relay : IGeneralComponent
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public int Sequence { get; set; }
         public ComponentsId ComponentId { get; set; } = ComponentsId.Relay;
         public List<BoardPin> ConnectedPins { get; set; } = new List<BoardPin>();
