@@ -25,5 +25,10 @@ namespace SmartHome.Arduino.Models.Data.Received
             SingleComponent,
             SingleBoardPin,
         }
+
+        public override string ToString()
+        {
+            return $"{BoardId}.{ComponentId}.{PinId}";
+        }
     }
 }

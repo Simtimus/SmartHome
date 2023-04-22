@@ -12,6 +12,7 @@ using SmartHome.Arduino.Application.Events;
 using SmartHome.Arduino.Models.Arduino;
 using SmartHome.Arduino.Models.Data.Processing;
 using SmartHome.Arduino.Models.Data.Received;
+using SmartHome.Arduino.Application.Logging;
 
 namespace SmartHome.Arduino.Application
 {
@@ -35,6 +36,7 @@ namespace SmartHome.Arduino.Application
         {
             ipHost = GetLocalIPv4(NetworkInterfaceType.Wireless80211);
             //Console.WriteLine(ipHost);
+            LoggingService.GetAllLogs();
             ClientManager.SaveClientTestData();
             ClientManager.RecoverClientData();
             Task.Run(() => RecieveMessages());

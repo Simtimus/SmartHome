@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using SmartHome.Arduino.Application;
+using SmartHome.Arduino.Application.Logging;
 using SmartHome.Arduino.Models.Arduino;
 using SmartHome.Arduino.Models.Data.Received;
 using SmartHome.Arduino.Models.Json.Converting;
+using SmartHome.Arduino.Models.Logs;
 
 namespace SmartHome.Arduino.Models.Data.Processing
 {
@@ -34,7 +37,12 @@ namespace SmartHome.Arduino.Models.Data.Processing
 
             if (!processState)
             {
-                //TODO: Do some log
+                LoggingService.WarningLog(new ClassLog<ReceivedData>()
+                {
+                    Message = "\"HandleReceivedData\" failed to process \"receivedData\"",
+                    Class = receivedData,
+                    CodeSpace = "SmartHome.Arduino.Models.Data.Processing.DeviceDataProcessor"
+                }); ; ;
             }
         }
 
