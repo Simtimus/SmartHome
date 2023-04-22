@@ -1,7 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SmartHome.Arduino.Application.Exceptions;
-using SmartHome.Arduino.Models;
+using SmartHome.Arduino.Models.Interfaces;
+using SmartHome.Arduino.Models.Data.Received;
+using SmartHome.Arduino.Models.Arduino;
+using SmartHome.Arduino.Models.Components.Common;
+using SmartHome.Arduino.Models.Components.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,25 +16,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SmartHome.Arduino.Models.JsonProcessing
+namespace SmartHome.Arduino.Models.Json.Converting
 {
-    public static class JsonDataParser
+    public static class JsonDataConverting
     {
-        public static ReceivedData ParseReceivedData(ReceivedData receivedData)
+        public static ReceivedData ConvertReceivedData(ReceivedData receivedData)
         {
             JObject jsonObject = JObject.Parse(receivedData.Data);
-            UpdateModelByJsonObject(receivedData.Data, jsonObject);
+            UpdateModelFromJson(receivedData.Data, jsonObject);
             return receivedData;
         }
 
-        public static List<ArduinoClient> ParseClients(string serializedObject, bool setNewGuid)
+        public static List<ArduinoClient> ConvertClients(string serializedObject, bool setNewGuid)
         {
             List<ArduinoClient> arduinoClients = new();
 
             JArray jsonArray = JArray.Parse(serializedObject);
             foreach (var jsonClient in jsonArray)
             {
-                ArduinoClient? client = ParseClient(jsonClient.ToString(), setNewGuid);
+                ArduinoClient? client = ConvertClient(jsonClient.ToString(), setNewGuid);
                 if (client != null)
                 {
                     arduinoClients.Add(client);
@@ -40,7 +44,7 @@ namespace SmartHome.Arduino.Models.JsonProcessing
             return arduinoClients;
         }
 
-        public static ArduinoClient? ParseClientOnly(string serializedObject, bool setNewGuid)
+        public static ArduinoClient? ConvertClientOnly(string serializedObject, bool setNewGuid)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
 
@@ -51,7 +55,7 @@ namespace SmartHome.Arduino.Models.JsonProcessing
             return client;
         }
 
-        public static ArduinoClient? ParseClient(string serializedObject, bool setNewGuid)
+        public static ArduinoClient? ConvertClient(string serializedObject, bool setNewGuid)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
 
@@ -64,10 +68,10 @@ namespace SmartHome.Arduino.Models.JsonProcessing
             {
                 foreach (var jsonComponent in componentsArray)
                 {
-                    IGeneralComponent? component = ParseComponent(jsonComponent.ToString(), setNewGuid);
+                    IGeneralComponent? component = ConvertComponent(jsonComponent.ToString(), setNewGuid);
                     if (component != null)
                     {
-                        UpdateComponentChildrenReferences(component);
+                        UpdateComponentReferences(component);
                         component.ParentClient = client;
                         client.Components.Add(component);
                     }
@@ -77,13 +81,13 @@ namespace SmartHome.Arduino.Models.JsonProcessing
             return client;
         }
 
-        public static IGeneralComponent? ParseComponent(string serializedObject, bool setNewGuid)
+        public static IGeneralComponent? ConvertComponent(string serializedObject, bool setNewGuid)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
             GeneralComponent.ComponentsId componentId = GeneralComponent.GetIdByString(jsonObject["ComponentId"].ToString());
             IGeneralComponent? component = GeneralComponent.CreateById(componentId);
             if (component != null)
-                UpdateModelByJsonObject(component, jsonObject, setNewGuid);
+                UpdateModelFromJson(component, jsonObject, setNewGuid);
             else
                 return null;
 
@@ -92,7 +96,7 @@ namespace SmartHome.Arduino.Models.JsonProcessing
             {
                 foreach (var jsonComponent in componentsArray)
                 {
-                    BoardPin? boardPin = ParseBoardPin(jsonComponent.ToString());
+                    BoardPin? boardPin = ConvertBoardPin(jsonComponent.ToString());
                     if (boardPin != null)
                     {
                         component.ConnectedPins.Add(boardPin);
@@ -103,41 +107,41 @@ namespace SmartHome.Arduino.Models.JsonProcessing
             return component;
         }
 
-        public static BoardPin? ParseBoardPin(string serializedObject)
+        public static BoardPin? ConvertBoardPin(string serializedObject)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
             if (jsonObject != null)
             {
                 BoardPin? boardPin = new();
-                UpdateModelByJsonObject(boardPin, jsonObject, false); ;
+                UpdateModelFromJson(boardPin, jsonObject, false); ;
                 return boardPin;
             }
             return null;
             //return (BoardPin?)JsonConvert.DeserializeObject(serializedObject);
         }
 
-        public static void UpdateArduinoClient(ArduinoClient client, string serializedObject)
+        public static void UpdateClientFromJson(ArduinoClient client, string serializedObject)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
-            UpdateModelByJsonObject(client, jsonObject);
+            UpdateModelFromJson(client, jsonObject);
             JArray? componentsArray = (JArray?)jsonObject["Components"];
             if (componentsArray != null)
-            {           
+            {
                 for (int i = 0; i < client.Components.Count; i++)
                 {
                     var idPropriety = client.Components[i].Id;
                     JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, idPropriety);
                     if (foundObject != null)
                     {
-                        UpdateGeneralComponent(client.Components[i], foundObject);
+                        UpdateComponentFromJson(client.Components[i], foundObject);
                     }
                 }
             }
         }
 
-        public static void UpdateGeneralComponent(IGeneralComponent component, JObject jsonObject)
+        public static void UpdateComponentFromJson(IGeneralComponent component, JObject jsonObject)
         {
-            UpdateModelByJsonObject(component, jsonObject);
+            UpdateModelFromJson(component, jsonObject);
             JArray? componentsArray = (JArray?)jsonObject["ConnectedPins"];
             if (componentsArray != null)
             {
@@ -147,7 +151,7 @@ namespace SmartHome.Arduino.Models.JsonProcessing
                     JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, idPropriety);
                     if (foundObject != null)
                     {
-                        UpdateModelByJsonObject(component.ConnectedPins[i], foundObject);
+                        UpdateModelFromJson(component.ConnectedPins[i], foundObject);
                     }
                 }
             }
@@ -174,7 +178,7 @@ namespace SmartHome.Arduino.Models.JsonProcessing
             return null;
         }
 
-        private static void UpdateComponentChildrenReferences(IGeneralComponent component)
+        private static void UpdateComponentReferences(IGeneralComponent component)
         {
             foreach (BoardPin boardPin in component.ConnectedPins)
             {
@@ -188,14 +192,14 @@ namespace SmartHome.Arduino.Models.JsonProcessing
                 return null;
 
             ArduinoClient client = new();
-            UpdateModelByJsonObject(client, jsonObject, setNewGuid);
+            UpdateModelFromJson(client, jsonObject, setNewGuid);
             client.State = ArduinoClient.ConnectionState.Offline;
             //client.State = (ArduinoClient.ConnectionState)Enum.Parse(typeof(ArduinoClient.ConnectionState), jsonObject["State"].ToString());
 
             return client;
         }
 
-        public static void UpdateModelByJsonObject(object model, JObject jsonObject, bool setNewGuid = false)
+        public static void UpdateModelFromJson<T>(T model, JObject jsonObject, bool setNewGuid = false)
         {
             Type clientType = model.GetType();
             PropertyInfo[] properties = clientType.GetProperties();

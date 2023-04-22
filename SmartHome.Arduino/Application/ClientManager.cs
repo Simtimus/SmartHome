@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using SmartHome.Arduino.Application.Events;
-using SmartHome.Arduino.Models;
-using SmartHome.Arduino.Models.JsonProcessing;
+using SmartHome.Arduino.Models.Arduino;
+using SmartHome.Arduino.Models.Components.Common.Interfaces;
+using SmartHome.Arduino.Models.Json.Converting;
+using SmartHome.Arduino.Models.Json.FileStorage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,27 +65,23 @@ namespace SmartHome.Arduino.Application
 
         public static void SaveClientData()
         {
-            JsonDataManager.SaveObjectToFile(FileName, Clients);
+            FileDataStorage.SaveDataToJsonFile(Clients, FileName);
         }
 
         public static void SaveClientTestData()
         {
-            JsonDataManager.SaveObjectToFile(FileName, TestDecoy);
+            FileDataStorage.SaveDataToJsonFile(TestDecoy, FileName);
         }
 
         public static void RecoverClientData()
         {
-            string? serializedObject = JsonDataManager.GetObjectFromFile(FileName);
+            string? serializedObject = FileDataStorage.ReadStringFromFile(FileName);
             if (string.IsNullOrEmpty(serializedObject)) return;
-            try
+            List<ArduinoClient>? arduinoClients = JsonDataConverting.ConvertClients(serializedObject, false);
+            if (arduinoClients is not null)
             {
-                List<ArduinoClient>? arduinoClients = JsonDataParser.ParseClients(serializedObject, false);
-                if (arduinoClients is not null)
-                {
-                    Clients = arduinoClients;
-                }
+                Clients = arduinoClients;
             }
-            catch (Exception) { }
         }
 
 

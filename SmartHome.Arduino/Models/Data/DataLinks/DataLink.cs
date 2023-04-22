@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json.Linq;
 using SmartHome.Arduino.Application;
+using SmartHome.Arduino.Models.Arduino;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static SmartHome.Arduino.Models.BoardPin;
 
-namespace SmartHome.Arduino.Models
+namespace SmartHome.Arduino.Models.Data.DataLinks
 {
     public class DataLink
     {
@@ -37,11 +38,11 @@ namespace SmartHome.Arduino.Models
 
         public override string ToString() => $"{BoardId}.{ComponentId}.{PinId}";
 
-        public static bool IsNullOrEmpty(DataLink? dataLink)
+        public static bool IsNullOrEmpty([NotNullWhen(false)] DataLink? dataLink)
         {
             if (dataLink is null)
                 return true;
-            if (dataLink.Equals(new DataLink()))
+            if (dataLink.Equals(default))
                 return true;
             return false;
         }

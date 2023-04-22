@@ -6,7 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartHome.Arduino.Models
+namespace SmartHome.Arduino.Models.Json.Converting
 {
     public class IPAddressConverter : JsonConverter<IPEndPoint>
     {

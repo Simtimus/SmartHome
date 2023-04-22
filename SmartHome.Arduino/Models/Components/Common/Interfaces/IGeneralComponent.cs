@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json;
+using SmartHome.Arduino.Models.Arduino;
+using static SmartHome.Arduino.Models.Components.Common.GeneralComponent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using static SmartHome.Arduino.Models.GeneralComponent;
 
-namespace SmartHome.Arduino.Models
+namespace SmartHome.Arduino.Models.Components.Common.Interfaces
 {
     public interface IGeneralComponent
     {

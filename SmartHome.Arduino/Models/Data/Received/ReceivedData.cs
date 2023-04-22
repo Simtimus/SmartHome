@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace SmartHome.Arduino.Models
+namespace SmartHome.Arduino.Models.Data.Received
 {
     public class ReceivedData
     {

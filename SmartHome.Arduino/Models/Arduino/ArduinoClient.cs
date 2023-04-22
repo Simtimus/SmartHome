@@ -1,12 +1,14 @@
 ﻿using Newtonsoft.Json;
+using SmartHome.Arduino.Models.Json.Converting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartHome.Arduino.Models
+namespace SmartHome.Arduino.Models.Arduino
 {
     public class ArduinoClient : Board
     {
@@ -22,24 +24,13 @@ namespace SmartHome.Arduino.Models
             Online
         }
 
-        public static bool IsNullOrEmpty(ArduinoClient? client)
+        public static bool IsNullOrEmpty([NotNullWhen(false)] ArduinoClient? client)
         {
             if (client is null)
                 return true;
-            if (client.Equals(new ArduinoClient()))
+            if (client.Equals(default))
                 return true;
             return false;
-        }
-
-        public static ArduinoClient ParseFromJson(IPEndPoint ip, string serializedObject)
-        {
-            ArduinoClient? arduinoClient = JsonConvert.DeserializeObject<ArduinoClient>(serializedObject);
-            if (arduinoClient is not null)
-            {
-                arduinoClient.IP = ip;
-                return arduinoClient;
-            }
-            return new ArduinoClient();
         }
     }
 }

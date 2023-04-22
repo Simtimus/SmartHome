@@ -1,11 +1,11 @@
-﻿using SmartHome.Arduino.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmartHome.Arduino.Models.Arduino;
 
-namespace SmartHome.Arduino.Models.DataProcessing
+namespace SmartHome.Arduino.Models.Data.DataLinks
 {
     public class DataLinker
     {

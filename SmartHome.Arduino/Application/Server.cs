@@ -8,9 +8,10 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
-using SmartHome.Arduino.Models;
-using SmartHome.Arduino.Models.DataProcessing;
 using SmartHome.Arduino.Application.Events;
+using SmartHome.Arduino.Models.Arduino;
+using SmartHome.Arduino.Models.Data.Processing;
+using SmartHome.Arduino.Models.Data.Received;
 
 namespace SmartHome.Arduino.Application
 {
@@ -93,7 +94,7 @@ namespace SmartHome.Arduino.Application
                     Data = message,
                 };
 
-                DataManager.GetDataFromReceiver(receivedData);
+                DeviceDataProcessor.HandleReceivedData(receivedData);
             }
         }
 

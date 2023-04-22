@@ -6,7 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using static SmartHome.Arduino.Models.GeneralComponent;
+using SmartHome.Arduino.Models.Arduino;
+using SmartHome.Arduino.Models.Components.Common.Interfaces;
+using static SmartHome.Arduino.Models.Components.Common.GeneralComponent;
 
 namespace SmartHome.Arduino.Models.Components
 {

@@ -5,8 +5,9 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using SmartHome.Arduino.Application.Exceptions;
+using SmartHome.Arduino.Models.Components.Common.Interfaces;
 
-namespace SmartHome.Arduino.Models
+namespace SmartHome.Arduino.Models.Components.Common
 {
     public class GeneralComponent
     {
