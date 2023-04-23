@@ -11,7 +11,7 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
     {
         public List<DataLink> DataLinks = new();
 
-        public void LinkData(BoardPin from, BoardPin to)
+        public void LinkData(PortPin from, PortPin to)
         {
             to.DataLink = new(from)
             {

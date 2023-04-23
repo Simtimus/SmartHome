@@ -9,7 +9,7 @@ using SmartHome.Arduino.Models.Components.Common.Interfaces;
 
 namespace SmartHome.Arduino.Models.Arduino
 {
-    public class BoardPin
+    public class PortPin
     {
         public int Id { get; set; }
         public PinMode Mode { get; set; }

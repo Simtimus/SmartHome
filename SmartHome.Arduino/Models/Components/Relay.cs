@@ -15,7 +15,7 @@ namespace SmartHome.Arduino.Models.Components
         public int Id { get; set; }
         public int Sequence { get; set; }
         public ComponentsId ComponentId { get; set; } = ComponentsId.Relay;
-        public List<BoardPin> ConnectedPins { get; set; } = new List<BoardPin>();
+        public List<PortPin> ConnectedPins { get; set; } = new List<PortPin>();
         public string Description { get; set; } = string.Empty;
         [JsonIgnore] public ArduinoClient ParentClient { get; set; }
     }

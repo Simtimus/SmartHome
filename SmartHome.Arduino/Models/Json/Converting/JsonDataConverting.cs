@@ -20,11 +20,10 @@ namespace SmartHome.Arduino.Models.Json.Converting
 {
     public static class JsonDataConverting
     {
-        public static ReceivedData ConvertReceivedData(ReceivedData receivedData)
+        public static void ConvertReceivedData(ReceivedData receivedData)
         {
             JObject jsonObject = JObject.Parse(receivedData.Data);
-            UpdateModelFromJson(receivedData.Data, jsonObject);
-            return receivedData;
+            UpdateModelFromJson(receivedData, jsonObject);
         }
 
         public static List<ArduinoClient> ConvertClients(string serializedObject, bool setNewGuid)
@@ -44,15 +43,31 @@ namespace SmartHome.Arduino.Models.Json.Converting
             return arduinoClients;
         }
 
-        public static ArduinoClient? ConvertClientOnly(string serializedObject, bool setNewGuid)
+        public static ArduinoClient? ConvertClientOnly(JObject jsonObject, bool setNewGuid)
         {
-            JObject jsonObject = JObject.Parse(serializedObject);
-
             ArduinoClient? client = GetClientFromJsonObject(jsonObject, setNewGuid);
             if (ArduinoClient.IsNullOrEmpty(client))
                 return null;
 
             return client;
+        }
+
+        public static void ConvertClientComponents(ArduinoClient client, JObject jsonObject, bool setNewGuid)
+        {
+            JArray? componentsArray = (JArray?)jsonObject["Components"];
+            if (componentsArray != null)
+            {
+                foreach (var jsonComponent in componentsArray)
+                {
+                    IGeneralComponent? component = ConvertComponent(jsonComponent.ToString(), setNewGuid);
+                    if (component != null)
+                    {
+                        UpdateComponentReferences(component);
+                        component.ParentClient = client;
+                        client.Components.Add(component);
+                    }
+                }
+            }
         }
 
         public static ArduinoClient? ConvertClient(string serializedObject, bool setNewGuid)
@@ -96,7 +111,7 @@ namespace SmartHome.Arduino.Models.Json.Converting
             {
                 foreach (var jsonComponent in componentsArray)
                 {
-                    BoardPin? boardPin = ConvertBoardPin(jsonComponent.ToString());
+                    PortPin? boardPin = ConvertBoardPin(jsonComponent.ToString());
                     if (boardPin != null)
                     {
                         component.ConnectedPins.Add(boardPin);
@@ -107,12 +122,12 @@ namespace SmartHome.Arduino.Models.Json.Converting
             return component;
         }
 
-        public static BoardPin? ConvertBoardPin(string serializedObject)
+        public static PortPin? ConvertBoardPin(string serializedObject)
         {
             JObject jsonObject = JObject.Parse(serializedObject);
             if (jsonObject != null)
             {
-                BoardPin? boardPin = new();
+                PortPin? boardPin = new();
                 UpdateModelFromJson(boardPin, jsonObject, false); ;
                 return boardPin;
             }
@@ -180,7 +195,7 @@ namespace SmartHome.Arduino.Models.Json.Converting
 
         private static void UpdateComponentReferences(IGeneralComponent component)
         {
-            foreach (BoardPin boardPin in component.ConnectedPins)
+            foreach (PortPin boardPin in component.ConnectedPins)
             {
                 boardPin.ParentComponent = component;
             }
@@ -219,22 +234,25 @@ namespace SmartHome.Arduino.Models.Json.Converting
                     }
                     else if (property.PropertyType == typeof(IPEndPoint))
                     {
-                        if (value != null)
+                        if (value != null && !string.IsNullOrEmpty(value.ToString()))
                         {
                             deserializedValue = IPEndPoint.Parse(value.ToString());
                         }
                     }
                     else if (property.PropertyType == typeof(DateTime))
                     {
-                        deserializedValue = DateTime.Parse(value.ToString());
+                        DateTime.TryParse(value.ToString(), out DateTime dateTimeValue);
+                        if (dateTimeValue != default) { deserializedValue = dateTimeValue; }
                     }
                     else if (property.PropertyType == typeof(int))
                     {
-                        deserializedValue = int.Parse(value.ToString());
+                        int.TryParse(value.ToString(), out int intValue);
+                        deserializedValue = intValue;
                     }
                     else if (property.PropertyType == typeof(double))
                     {
-                        deserializedValue = double.Parse(value.ToString());
+                        double.TryParse(value.ToString(), out double doubleValue);
+                        deserializedValue = doubleValue;
                     }
                     else if (property.PropertyType == typeof(string))
                     {

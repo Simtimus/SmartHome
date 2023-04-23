@@ -13,6 +13,7 @@ using SmartHome.Arduino.Models.Arduino;
 using SmartHome.Arduino.Models.Data.Processing;
 using SmartHome.Arduino.Models.Data.Received;
 using SmartHome.Arduino.Application.Logging;
+using SmartHome.Arduino.Models.Logs;
 
 namespace SmartHome.Arduino.Application
 {
@@ -21,12 +22,13 @@ namespace SmartHome.Arduino.Application
         public string IpHost { get { return ipHost; } }
         private readonly string ipHost = "0.0.0.0";
 
-        private const int PortHost = 8080;
+        public int PortHost { get { return portHost; } }
+        public const int portHost = 8080;
 
         private const int secondsUntilOffline = 60;
         private const int secondsBetweenSaves = 30;
 
-        private readonly UdpClient server = new(PortHost);
+        private readonly UdpClient server = new(portHost);
 
         private static readonly TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time");
 
@@ -37,7 +39,7 @@ namespace SmartHome.Arduino.Application
             ipHost = GetLocalIPv4(NetworkInterfaceType.Wireless80211);
             //Console.WriteLine(ipHost);
             LoggingService.GetAllLogs();
-            ClientManager.SaveClientTestData();
+            //ClientManager.SaveClientTestData();
             ClientManager.RecoverClientData();
             Task.Run(() => RecieveMessages());
             Task.Run(() => MonitorClients());
@@ -96,7 +98,18 @@ namespace SmartHome.Arduino.Application
                     Data = message,
                 };
 
-                DeviceDataProcessor.HandleReceivedData(receivedData);
+                try
+                {
+                    // Process Received Data from Arduino
+                    DeviceDataProcessor.HandleReceivedData(receivedData);
+                }
+                catch(Exception ex)
+                {
+                    LoggingService.WarningLog(new MessageLog()
+                    {
+                        Message = ex.Message,
+                    });
+                }
             }
         }
 

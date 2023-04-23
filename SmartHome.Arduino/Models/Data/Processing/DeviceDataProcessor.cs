@@ -19,8 +19,19 @@ namespace SmartHome.Arduino.Models.Data.Processing
     {
         public static void HandleReceivedData(ReceivedData receivedData)
         {
-            receivedData = JsonDataConverting.ConvertReceivedData(receivedData);
             bool processState = true;
+            try
+            {
+                JsonDataConverting.ConvertReceivedData(receivedData);
+            }
+            catch(Exception ex)
+            {
+                LoggingService.WarningLog(new MessageLog()
+                {
+                    Message = ex.Message,
+                });
+                processState = false;
+            }
 
             switch (receivedData.Mode)
             {
@@ -48,9 +59,12 @@ namespace SmartHome.Arduino.Models.Data.Processing
 
         private static void ProcessFullDevice(ReceivedData receivedData)
         {
-            ArduinoClient? arduinoClient = JsonDataConverting.ConvertClientOnly(receivedData.Data, false);
+            JObject jsonObject = JObject.Parse(receivedData.Data);
+            ArduinoClient? arduinoClient = JsonDataConverting.ConvertClientOnly(jsonObject, false);
 
             if (ArduinoClient.IsNullOrEmpty(arduinoClient)) { return; }
+
+            JsonDataConverting.ConvertClientComponents(arduinoClient, jsonObject, false);
 
             arduinoClient.IP = receivedData.IP;
             arduinoClient.State = ArduinoClient.ConnectionState.Online;

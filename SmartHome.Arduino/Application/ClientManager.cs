@@ -98,14 +98,14 @@ namespace SmartHome.Arduino.Application
                     {
                         Id = 0,
                         Sequence = 0,
-                        ConnectedPins = new List<BoardPin>()
+                        ConnectedPins = new List<PortPin>()
                         {
-                            new BoardPin()
+                            new PortPin()
                             {
                                 Id = 4,
-                                Mode = BoardPin.PinMode.Read,
+                                Mode = PortPin.PinMode.Read,
                                 Value = 454,
-                                ValueType = BoardPin.ObjectValueType.Integer,
+                                ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
                         Description = "Some dumb message",
@@ -114,14 +114,14 @@ namespace SmartHome.Arduino.Application
                     {
                         Id = 1,
                         Sequence = 1,
-                        ConnectedPins = new List<BoardPin>()
+                        ConnectedPins = new List<PortPin>()
                         {
-                            new BoardPin()
+                            new PortPin()
                             {
                                 Id = 6,
-                                Mode = BoardPin.PinMode.Read,
+                                Mode = PortPin.PinMode.Read,
                                 Value = true,
-                                ValueType = BoardPin.ObjectValueType.Boolean,
+                                ValueType = PortPin.ObjectValueType.Boolean,
                             }
                         },
                         Description = "Another dumb message??",
@@ -143,14 +143,14 @@ namespace SmartHome.Arduino.Application
                     {
                         Id = 0,
                         Sequence = 0,
-                        ConnectedPins = new List<BoardPin>()
+                        ConnectedPins = new List<PortPin>()
                         {
-                            new BoardPin()
+                            new PortPin()
                             {
                                 Id = 4,
-                                Mode = BoardPin.PinMode.Read,
+                                Mode = PortPin.PinMode.Read,
                                 Value = 454,
-                                ValueType = BoardPin.ObjectValueType.Integer,
+                                ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
                         Description = string.Empty,
@@ -172,14 +172,14 @@ namespace SmartHome.Arduino.Application
                     {
                         Id = 0,
                         Sequence = 0,
-                        ConnectedPins = new List<BoardPin>()
+                        ConnectedPins = new List<PortPin>()
                         {
-                            new BoardPin()
+                            new PortPin()
                             {
                                 Id = 4,
-                                Mode = BoardPin.PinMode.Read,
+                                Mode = PortPin.PinMode.Read,
                                 Value = 454,
-                                ValueType = BoardPin.ObjectValueType.Integer,
+                                ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
                         Description = string.Empty,
@@ -202,14 +202,14 @@ namespace SmartHome.Arduino.Application
                     {
                         Id = 0,
                         Sequence = 0,
-                        ConnectedPins = new List<BoardPin>()
+                        ConnectedPins = new List<PortPin>()
                         {
-                            new BoardPin()
+                            new PortPin()
                             {
                                 Id = 4,
-                                Mode = BoardPin.PinMode.Read,
+                                Mode = PortPin.PinMode.Read,
                                 Value = 454,
-                                ValueType = BoardPin.ObjectValueType.Integer,
+                                ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
                         Description = string.Empty,
@@ -231,14 +231,14 @@ namespace SmartHome.Arduino.Application
                     {
                         Id = 0,
                         Sequence = 0,
-                        ConnectedPins = new List<BoardPin>()
+                        ConnectedPins = new List<PortPin>()
                         {
-                            new BoardPin()
+                            new PortPin()
                             {
                                 Id = 4,
-                                Mode = BoardPin.PinMode.Read,
+                                Mode = PortPin.PinMode.Read,
                                 Value = 454,
-                                ValueType = BoardPin.ObjectValueType.Integer,
+                                ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
                         Description = string.Empty,
@@ -253,3 +253,6 @@ namespace SmartHome.Arduino.Application
         };
     }
 }
+
+
+

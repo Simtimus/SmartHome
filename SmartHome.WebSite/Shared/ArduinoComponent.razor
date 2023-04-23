@@ -10,7 +10,7 @@
                 @if (Component.ConnectedPins.Count > 0)
                 {
                     <a>Connected pins: @Component.ConnectedPins.Count</a>
-                    @foreach (BoardPin boardPin in Component.ConnectedPins)
+                    @foreach (PortPin boardPin in Component.ConnectedPins)
                     {
                         <ArduinoBoardPin BoardPin="boardPin"></ArduinoBoardPin>
                     }

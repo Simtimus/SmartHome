@@ -20,7 +20,7 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
 
         public DataLink() { }
 
-        public DataLink(BoardPin reference)
+        public DataLink(PortPin reference)
         {
             BoardId = reference.ParentComponent.ParentClient.Id;
             ComponentId = reference.ParentComponent.Id;

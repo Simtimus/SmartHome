@@ -14,6 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="ReceivedData.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Pages\Arduino.razor.css" />
     <Content Include="Shared\ArduinoComponent.razor.css" />
     <Content Include="Shared\ArduinoDataTable.razor.css" />

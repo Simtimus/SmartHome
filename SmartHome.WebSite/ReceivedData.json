@@ -1,0 +1,62 @@
+{
+	"IP": "32.226.1.0:8088",
+	"LastConnection": "2023-04-22T12:37:13",
+	"Mode": 0,
+	"BoardId": "00000000-0000-0000-0000-000000000000",
+	"ComponentId": -1,
+	"PinId": -1,
+	"Data": {
+		"IP": "32.226.1.0:8088",
+		"LastConnection": "2023-04-22T12:37:13",
+		"State": 0,
+		"Ping": 0,
+		"Id": "00000000-0000-0000-0000-000000000000",
+		"Name": "Living Parameters",
+		"Components": [
+			{
+				"Id": 0,
+				"Sequence": 0,
+				"ComponentId": 1,
+				"ConnectedPins": [
+					{
+						"Id": 4,
+						"Mode": 0,
+						"Value": null,
+						"ValueType": 1,
+						"DataLink": {
+							"Id": "00000000-0000-0000-0000-000000000000",
+							"BoardId": "00000000-0000-0000-0000-000000000000",
+							"ComponentId": 0,
+							"PinId": 0,
+							"Value": null
+						}
+					}
+				],
+				"Description": "Some dumb message"
+			},
+			{
+				"Id": 1,
+				"Sequence": 1,
+				"ComponentId": 2,
+				"ConnectedPins": [
+					{
+						"Id": 6,
+						"Mode": 0,
+						"Value": null,
+						"ValueType": 3,
+						"DataLink": {
+							"Id": "00000000-0000-0000-0000-000000000000",
+							"BoardId": "00000000-0000-0000-0000-000000000000",
+							"ComponentId": 0,
+							"PinId": 0,
+							"Value": null
+						}
+					}
+				],
+				"Description": "Another dumb message??"
+			}
+		],
+		"Model": "Arduino UNO WiFi",
+		"Description": ""
+	}
+}

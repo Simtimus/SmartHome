@@ -28,22 +28,25 @@ namespace SmartHome.Arduino.Application.Logging
         public static void InfoLog(ILog log)
         {
             LogEntries.Add(log);
-            SaveLogsToFile();
+            log.LogState = LogStates.Info;
+            Task.Run(async () => { await SaveLogsToFile(); });
         }
 
         public static void ErrorLog(ILog log)
         {
             LogEntries.Add(log);
-            SaveLogsToFile();
+            log.LogState = LogStates.Error;
+            Task.Run(async () => { await SaveLogsToFile(); });
         }
 
         public static void WarningLog(ILog log)
         {
             LogEntries.Add(log);
-            SaveLogsToFile();
+            log.LogState = LogStates.Warning;
+            Task.Run(async () => { await SaveLogsToFile(); });
         }
 
-        private static void SaveLogsToFile()
+        private static async Task SaveLogsToFile()
         {
             FileDataStorage.SaveDataToJsonFile(LogEntries, LogsFileName);
         }
