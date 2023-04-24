@@ -41,7 +41,7 @@ namespace SmartHome.Arduino.Application
             LoggingService.GetAllLogs();
             //ClientManager.SaveClientTestData();
             ClientManager.RecoverClientData();
-            Task.Run(() => RecieveMessages());
+            Task.Run(() => ReceiveAndProcessMessages());
             Task.Run(() => MonitorClients());
         }
 
@@ -82,7 +82,7 @@ namespace SmartHome.Arduino.Application
             }
         }
 
-        private void RecieveMessages()
+        private void ReceiveAndProcessMessages()
         {
             IPEndPoint? recivedClientIP;
             while (true)
@@ -111,6 +111,15 @@ namespace SmartHome.Arduino.Application
                     });
                 }
             }
+        }
+
+        public int SendMessageToClientById(Guid id, string message)
+        {
+            ClientManager.GetClientIndexById(id, out int index);
+            if (index == -1) return 0;
+
+            byte[] byteMsg = Encoding.UTF8.GetBytes(message);
+            return server.Send(byteMsg, byteMsg.Length, ClientManager.Clients[index].IP);
         }
 
         public static DateTime GetDTNow()
