@@ -1,10 +1,30 @@
-﻿<div>
-	<a>Pin: @BoardPin.Id</a>
-	<p>@Enum.GetName(typeof(PortPin.PinMode), BoardPin.Mode) Mode</p>
-	<p>Value: "@BoardPin.GetValueString()"</p>
+﻿<div class="card mt-3 @Style">
+	<div class="card-header">
+		<a>@Style</a>
+	</div>
+	<div class="card-body">
+		<a>Pin: @BoardPin.Id</a>
+		<a> | </a>
+		<a>@Enum.GetName(typeof(PortPin.PinMode), BoardPin.Mode) Mode</a>
+		<a> | </a>
+		<a>Value: "@BoardPin.GetValueString()"</a>
+	</div>
 </div>
 
 @code {
 	[Parameter]
 	public PortPin BoardPin { get; set; } = new();
+
+	private string Style = string.Empty;
+
+	private void SetStyles()
+	{
+		Style = Enum.GetName(typeof(PortPin.ObjectValueType), BoardPin.ValueType).ToLower();
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		SetStyles();
+		StateHasChanged();
+	}
 }

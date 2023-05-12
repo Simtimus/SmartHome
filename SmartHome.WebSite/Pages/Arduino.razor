@@ -1,102 +1,146 @@
 ﻿@page "/arduino"
 @implements IDisposable
 @inject IJSRuntime JsRuntime
-@inject Models.SnackBar SnackBar
-@inject Models.WindowDimension WindowDimension
+@inject SnackBar SnackBar
+@inject WindowDimension WindowDimension
 @inject Server ArduinoServer
 @inject GeneralComponent GenericComponent
 
 <div class="d-flex @WrapperState" id="wrapper">
-    <!-- Sidebar -->
-    <ArduinoSidebar Clients="@ClientManager.Clients" ClientClick="@OnClientClick"></ArduinoSidebar>
-    <!-- /#sidebar-wrapper -->
-    <!-- Page Content -->
-    <div id="page-content-wrapper">
-        <nav class="navbar navbar-expand-lg navbar-light border-bottom">
-            <button class="btn btn-primary" id="menu-toggle" @onclick="ToggleWrapper">Toggle Menu</button>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-                    <li class="nav-item active">
-                        <a class="nav-link text-white">@ArduinoServer.IpHost : @ArduinoServer.PortHost</a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link text-white" href="arduino/#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="arduino/#">Link</a>
-                    </li>
-                </ul>
-            </div>
-            <button class="btn btn-primary" id="menu-toggle" @onclick="RunTest">Test</button>
-        </nav>
-        <div class="container-fluid">
-            <h1 class="mt-4">Simple Sidebar</h1>
-            <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
-            <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>. The top navbar is optional, and just for demonstration. Just create an element with the <code>#menu-toggle</code> ID which will toggle the menu when clicked.</p>
-            <ArduinoDataTable SelectedClient="@SelectedClient" WrapperState="@WrapperState"/>
-        </div>
-    </div>
-    <!-- /#page-content-wrapper -->
+	<!-- Sidebar -->
+	<ArduinoSidebar Clients="@ClientManager.Clients" ClientClick="@OnClientClick"></ArduinoSidebar>
+	<!-- /#sidebar-wrapper -->
+	<!-- Page Content -->
+	<div id="page-content-wrapper">
+		<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+			<button class="btn btn-primary" id="menu-toggle" @onclick="ToggleWrapper">Toggle Menu</button>
+			<a class="nav-link text-white">@ArduinoServer.IpHost : @ArduinoServer.PortHost</a>
+			@*Empty div is part of design*@
+			<div class="collapse navbar-collapse"></div>
+			<div><a>@WindowDimension.Width</a></div>
+			<button class="btn btn-primary" @onclick="ShowModal">Open Modal</button>
+			<button class="btn btn-primary"  @onclick="RunTest">Test</button>
+		</nav>
+		<ul class="nav nav-tabs">
+			<li class="nav-item">
+				<a class="nav-link disabled" tabindex="-1" aria-disabled="true">Arduino Tabs:</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link @ComponentTabClass" @onclick="() => ActivateTab(0)">Components</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link @LogicBlocksTabClass" @onclick="() => ActivateTab(1)">Logic Blocks</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link @ProgramLogsTabClass" @onclick="() => ActivateTab(2)">Program Logs</a>
+			</li>
+		</ul>
+		<ModalPage @ref="myModal" @bind-IsVisible="isModalVisible">
+			<h2>Modal Title</h2>
+			<p>Some text in the Modal..</p>
+			<button @onclick="HideModal">Close</button>
+		</ModalPage>
+		<div class="container-fluid">
+			@if (activeTab == 0)
+			{
+				<ArduinoDataTable SelectedClient="@SelectedClient" WrapperState="@WrapperState" WebWidth="@WindowDimension.Width" />
+			}
+			else if (activeTab == 1)
+			{
+				
+			}
+		</div>
+	</div>
+	<!-- /#page-content-wrapper -->
 </div>
 <PageSnackBar SnackBarMessage="@SnackBar.Message"></PageSnackBar>
 
 @code {
-    private string WrapperState = String.Empty;
-    private ArduinoClient SelectedClient { get; set; } = new ArduinoClient();
-    private int LastClientsCount = 0;
+	private string WrapperState = String.Empty;
+	private ArduinoClient SelectedClient { get; set; } = new ArduinoClient();
+	private int LastClientsCount = 0;
 
-    void ToggleWrapper()
-    {
-        if (WrapperState == String.Empty)
-            WrapperState = "toggled";
-        else
-            WrapperState = String.Empty;
-    }
 
-    async Task RunTest()
-    {
-        await WindowDimension.GetDimensions(JsRuntime);
-        try
-        {
-            object? myObject = GeneralComponent.CreateById(GeneralComponent.ComponentsId.Unknown);
-        }
-        catch (ComponentNotFoundException)
-        {
-            await SnackBar.ShowMessage("Component not found");
-        }
-    }
+	int activeTab = 0;
 
-    private void OnClientClick(ArduinoClient client)
-    {
-        SelectedClient = client;
-    }
+	string ComponentTabClass => activeTab == 0 ? "active" : "";
+	string LogicBlocksTabClass => activeTab == 1 ? "active" : "";
+	string ProgramLogsTabClass => activeTab == 2 ? "active" : "";
 
-    public void Dispose()
-    {
-        ClientEvents.OnClientChanged -= RefreshPage;
-        ClientEvents.OnNewClientAddedd -= NewArduinoClientAdded;
-    }
+	private ModalPage myModal;
+	private bool isModalVisible;
 
-    private void NewArduinoClientAdded()
-    {
-        InvokeAsync(async () => { await SnackBar.ShowMessage("New Arduino board connected"); });
-    }
+	private void ShowModal()
+	{
+		isModalVisible = true;
+	}
 
-    private void RefreshPage()
-    {
-        InvokeAsync(() => { StateHasChanged(); });
-    }
+	private void HideModal()
+	{
+		isModalVisible = false;
+	}
 
-    protected override async Task OnInitializedAsync()
-    {
-        ClientEvents.OnClientChanged += RefreshPage;
-        ClientEvents.OnNewClientAddedd += NewArduinoClientAdded;
-        if (ClientManager.Clients.Count > 0)
-        {
-            //TODO: In case I want by default a Client to be selected
-        }
-    }
+	void ActivateTab(int tabName)
+	{
+		activeTab = tabName;
+	}
+
+	void ToggleWrapper()
+	{
+		if (WrapperState == String.Empty)
+			WrapperState = "toggled";
+		else
+			WrapperState = String.Empty;
+	}
+
+	async Task RunTest()
+	{
+		await WindowDimension.GetDimensions(JsRuntime);
+	}
+
+	private void OnClientClick(ArduinoClient client)
+	{
+		SelectedClient = client;
+	}
+
+	public void Dispose()
+	{
+		ClientEvents.OnClientChanged -= RefreshPage;
+		ClientEvents.OnNewClientAddedd -= NewArduinoClientAdded;
+	}
+
+	private void NewArduinoClientAdded()
+	{
+		InvokeAsync(async () => { await SnackBar.ShowMessage("New Arduino board connected"); });
+	}
+
+	private void RefreshPage()
+	{
+		InvokeAsync(() => { StateHasChanged(); });
+	}
+
+	private async Task RefreshPageSize()
+	{
+		await Task.Delay(1000);
+		while(true)
+		{
+			try
+			{
+				await WindowDimension.GetDimensions(JsRuntime);
+			}
+			catch (Exception ex) { }
+			await Task.Delay(500);
+		}
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		ClientEvents.OnClientChanged += RefreshPage;
+		ClientEvents.OnNewClientAddedd += NewArduinoClientAdded;
+		Task.Run(() => RefreshPageSize());
+		if (ClientManager.Clients.Count > 0)
+		{
+			//TODO: In case I want by default a Client to be selected
+		}
+	}
 }

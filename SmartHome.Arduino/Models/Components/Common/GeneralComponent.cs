@@ -11,7 +11,7 @@ namespace SmartHome.Arduino.Models.Components.Common
 {
     public class GeneralComponent
     {
-        public static IGeneralComponent? CreateById(ComponentsId componentId)
+        public static IGeneralComponent? CreateById(ComponentTypes componentId)
         {
             Type? componentType = GetTypeById(componentId);
             if (componentType is null)
@@ -19,20 +19,20 @@ namespace SmartHome.Arduino.Models.Components.Common
             return Activator.CreateInstance(componentType) as IGeneralComponent;
         }
 
-        public static Type? GetTypeById(ComponentsId componentId)
+        public static Type? GetTypeById(ComponentTypes componentId)
         {
-            string componentName = Enum.GetName(typeof(ComponentsId), componentId) ?? string.Empty;
+            string componentName = Enum.GetName(typeof(ComponentTypes), componentId) ?? string.Empty;
             if (string.IsNullOrEmpty(componentName))
                 throw new ComponentNotFoundException(componentId);
             return Type.GetType($"SmartHome.Arduino.Models.Components.{componentName}");
         }
 
-        public static ComponentsId GetIdByString(string componentName)
+        public static ComponentTypes GetTypeByString(string componentName)
         {
-            return (ComponentsId)Enum.Parse(typeof(ComponentsId), componentName);
+            return (ComponentTypes)Enum.Parse(typeof(ComponentTypes), componentName);
         }
 
-        public enum ComponentsId
+        public enum ComponentTypes
         {
             Unknown,
             LightSensor,

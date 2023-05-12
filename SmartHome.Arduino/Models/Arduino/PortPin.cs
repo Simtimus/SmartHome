@@ -13,7 +13,7 @@ namespace SmartHome.Arduino.Models.Arduino
     {
         public int Id { get; set; }
         public PinMode Mode { get; set; }
-        public object? Value { get; set; }
+        public string Value { get; set; } = string.Empty;
         public ObjectValueType ValueType { get; set; }
         public DataLink DataLink { get; set; } = new DataLink();
         [JsonIgnore] public IGeneralComponent? ParentComponent { get; set; }
@@ -33,14 +33,51 @@ namespace SmartHome.Arduino.Models.Arduino
             Boolean,
         }
 
+
+
         public object? GetValue()
         {
-            if (!DataLink.IsNullOrEmpty(DataLink))
+            string stringData;
+
+            stringData = DataLink.GetValue();
+
+            if (string.IsNullOrEmpty(stringData))
             {
-                return DataLink.GetValue();
+                stringData = Value;
             }
-            return Value;
-        }
+
+			if (ValueType == PortPin.ObjectValueType.String)
+			{
+				return stringData;
+			}
+			else if (ValueType == PortPin.ObjectValueType.Integer)
+			{
+				return int.Parse(stringData);
+			}
+			else if (ValueType == PortPin.ObjectValueType.Float)
+			{
+				return float.Parse(stringData);
+			}
+			else if (ValueType == PortPin.ObjectValueType.Boolean)
+			{
+                if (bool.TryParse(stringData, out bool boolValue))
+                { 
+                    return boolValue;
+                }
+                else
+                {
+					if (stringData == "1")
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+			}
+            return null;
+		}
 
         public string? GetValueString()
         {

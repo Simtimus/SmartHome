@@ -14,9 +14,9 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
     {
         public Guid Id { get; set; }
         public Guid BoardId { get; set; }
-        public int ComponentId { get; set; }
-        public int PinId { get; set; }
-        public object? Value { get; set; }
+        public int ComponentId { get; set; } = -1;
+        public int PinId { get; set; } = -1;
+        public string Value { get; set; } = string.Empty;
 
         public DataLink() { }
 
@@ -27,11 +27,11 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
             PinId = reference.Id;
         }
 
-        public object? GetValue()
+        public string GetValue()
         {
-            if (!ClientManager.GetClientIndexById(BoardId, out int clientIndex)) return null;
-            if (!ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex)) return null;
-            if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex)) return null;
+            if (!ClientManager.GetClientIndexById(BoardId, out int clientIndex)) return string.Empty;
+            if (!ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex)) return string.Empty;
+            if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex)) return string.Empty;
 
             return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Value;
         }

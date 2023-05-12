@@ -11,6 +11,7 @@ namespace SmartHome.Arduino.Models.Logs
 {
     public class MessageLog : ILog
     {
+        public LoggingService.LogTypes LogType { get; set; } = LoggingService.LogTypes.MessageLog;
         public DateTime Time { get; set; } = DateTime.Now;
         public string Message { get; set; } = string.Empty;
         public LoggingService.LogStates LogState { get; set; }

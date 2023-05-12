@@ -13,8 +13,7 @@ namespace SmartHome.Arduino.Models.Components
     public class Relay : IGeneralComponent
     {
         public int Id { get; set; }
-        public int Sequence { get; set; }
-        public ComponentsId ComponentId { get; set; } = ComponentsId.Relay;
+        public ComponentTypes ComponentType { get; set; } = ComponentTypes.Relay;
         public List<PortPin> ConnectedPins { get; set; } = new List<PortPin>();
         public string Description { get; set; } = string.Empty;
         [JsonIgnore] public ArduinoClient ParentClient { get; set; }

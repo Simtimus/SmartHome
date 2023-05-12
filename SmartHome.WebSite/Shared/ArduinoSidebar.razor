@@ -9,8 +9,12 @@
         {
             <button @onclick="() => OnClientClick(client)" class="list-group-item list-group-item-action">
                 <div>@client.Name</div>
+                <div>Model: @client.Model</div>
                 <div>@client.State | Ping: @client.Ping</div>
-                <div>@client.Id</div>
+                <div>@client.Description</div>
+                <div>
+                    @client.IP
+                </div>
             </button>
         }
     </div>

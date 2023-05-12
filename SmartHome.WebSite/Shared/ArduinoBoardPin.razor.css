@@ -1,1 +1,27 @@
-﻿
+﻿.card {
+	border-radius: 10px;
+}
+
+.string {
+	color: #E2E063;
+	background-color: #F2F4E8;
+	border-color: #F2F4E8;
+}
+
+.integer {
+	color: #609B99;
+	background-color: #E2F4F5;
+	border-color: #E2F4F5;
+}
+
+.float {
+	color: #E66256;
+	background-color: #FFF3F1;
+	border-color: #FFF3F1;
+}
+
+.boolean {
+	color: #4C4571;
+	background-color: #F6F4FC;
+	border-color: #F6F4FC;
+}

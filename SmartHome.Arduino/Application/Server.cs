@@ -10,10 +10,14 @@ using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using SmartHome.Arduino.Application.Events;
 using SmartHome.Arduino.Models.Arduino;
-using SmartHome.Arduino.Models.Data.Processing;
 using SmartHome.Arduino.Models.Data.Received;
 using SmartHome.Arduino.Application.Logging;
 using SmartHome.Arduino.Models.Logs;
+using SmartHome.Arduino.Models.Data.DataBoxs;
+using SmartHome.Arduino.Models.Data.Transmited;
+using SmartHome.Arduino.Models.Json.Converting;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace SmartHome.Arduino.Application
 {
@@ -29,37 +33,38 @@ namespace SmartHome.Arduino.Application
         private const int secondsBetweenSaves = 30;
 
         private readonly UdpClient server = new(portHost);
-
+        private DataTransmittingManager transmittingManager;
+        private ArduinoDataProcessor dataProcessor;
         private static readonly TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time");
-
         private static DateTime LastSave = new();
 
         public Server()
         {
             ipHost = GetLocalIPv4(NetworkInterfaceType.Wireless80211);
+            transmittingManager = new(server);
+            dataProcessor = new(transmittingManager);
             //Console.WriteLine(ipHost);
             LoggingService.GetAllLogs();
             //ClientManager.SaveClientTestData();
             ClientManager.RecoverClientData();
             Task.Run(() => ReceiveAndProcessMessages());
-            Task.Run(() => MonitorClients());
+            Task.Run(async () => await MonitorClients());
         }
 
         private static async Task MonitorClients()
         {
             while (true)
             {
-                DateTime currentTime = GetDTNow();
                 foreach (var client in ClientManager.Clients)
                 {
                     MonitorClientState(client, client.LastConnection.AddSeconds(secondsUntilOffline));
                     if (client.State != ArduinoClient.ConnectionState.Offline)
-                        MonitorClientPing(client, currentTime);
+                        MonitorClientPing(client, GetDTNow());
                 }
-                if (currentTime >= LastSave.AddSeconds(secondsBetweenSaves))
+                if (GetDTNow() >= LastSave.AddSeconds(secondsBetweenSaves))
                 {
                     ClientManager.SaveClientData();
-                    LastSave = currentTime;
+                    LastSave = GetDTNow();
                 }
                 await Task.Delay(1000);
             }
@@ -69,12 +74,11 @@ namespace SmartHome.Arduino.Application
         {
             double timeDelta = currentTime.Subtract(client.LastConnection).TotalMilliseconds;
             client.Ping = (int)timeDelta;
+            ClientEvents.TriggerClientChanged();
         }
 
         private static void MonitorClientState(ArduinoClient client, DateTime offlineTime)
         {
-            offlineTime.AddSeconds(secondsUntilOffline);
-
             if (offlineTime.Subtract(GetDTNow()).TotalSeconds <= 0)
             {
                 client.State = ArduinoClient.ConnectionState.Offline;
@@ -84,16 +88,16 @@ namespace SmartHome.Arduino.Application
 
         private void ReceiveAndProcessMessages()
         {
-            IPEndPoint? recivedClientIP;
+            IPEndPoint? receivedClientIP;
             while (true)
             {
-                recivedClientIP = null;
-                byte[] data = server.Receive(ref recivedClientIP);
+                receivedClientIP = null;
+                byte[] data = server.Receive(ref receivedClientIP);
                 string message = Encoding.UTF8.GetString(data);
 
-                ReceivedData receivedData = new()
+                ArduinoDataPacket receivedData = new()
                 {
-                    IP = recivedClientIP,
+                    IP = receivedClientIP,
                     LastConnection = GetDTNow(),
                     Data = message,
                 };
@@ -101,7 +105,7 @@ namespace SmartHome.Arduino.Application
                 try
                 {
                     // Process Received Data from Arduino
-                    DeviceDataProcessor.HandleReceivedData(receivedData);
+                    dataProcessor.ProcessArduinoData(receivedData);
                 }
                 catch(Exception ex)
                 {
@@ -111,15 +115,6 @@ namespace SmartHome.Arduino.Application
                     });
                 }
             }
-        }
-
-        public int SendMessageToClientById(Guid id, string message)
-        {
-            ClientManager.GetClientIndexById(id, out int index);
-            if (index == -1) return 0;
-
-            byte[] byteMsg = Encoding.UTF8.GetBytes(message);
-            return server.Send(byteMsg, byteMsg.Length, ClientManager.Clients[index].IP);
         }
 
         public static DateTime GetDTNow()

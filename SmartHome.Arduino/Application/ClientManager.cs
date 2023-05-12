@@ -1,45 +1,45 @@
-﻿using Newtonsoft.Json;
-using SmartHome.Arduino.Application.Events;
+﻿using SmartHome.Arduino.Application.Events;
 using SmartHome.Arduino.Models.Arduino;
 using SmartHome.Arduino.Models.Components.Common.Interfaces;
 using SmartHome.Arduino.Models.Json.Converting;
 using SmartHome.Arduino.Models.Json.FileStorage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartHome.Arduino.Application
 {
     public static class ClientManager
     {
-        private static readonly string FileName = "ClientData.json";
+        private static readonly string FileName = "ArduinoDataPacket.json";
         public static List<ArduinoClient> Clients { get; set; } = new List<ArduinoClient>();
+        private static readonly object _lock = new object();
 
         public static void AddNewClient(ArduinoClient client)
         {
-            Clients.Add(client);
+            lock (_lock)
+            {
+                Clients.Add(client);
+            }
             ClientEvents.TriggerClientAdded();
             ClientEvents.TriggerClientChanged();
         }
 
         public static void ReplaceClient(ArduinoClient client)
         {
-            int index = Clients.FindIndex(c => c.Id == client.Id);
-            if (index == -1)
+            lock (_lock)
             {
-                AddNewClient(client);
-            }
-            else
-            {
-                ArduinoClient bufferClient = Clients[index];
-                Clients[index] = client;
-                Clients[index].Id = bufferClient.Id;
-                if (bufferClient.State == ArduinoClient.ConnectionState.Online)
+                bool clientFound = GetClientIndexById(client.Id, out int index);
+                if (!clientFound)
                 {
-                    Clients[index].Ping = (int)Clients[index].LastConnection.Subtract(bufferClient.LastConnection).TotalMilliseconds;
+                    AddNewClient(client);
+                }
+                else
+                {
+                    ArduinoClient bufferClient = Clients[index];
+                    Clients[index] = client;
+                    Clients[index].Id = bufferClient.Id;
+                    if (bufferClient.State == ArduinoClient.ConnectionState.Online)
+                    {
+                        Clients[index].Ping = (int)Clients[index].LastConnection.Subtract(bufferClient.LastConnection).TotalMilliseconds;
+                    }
                 }
             }
             ClientEvents.TriggerClientChanged();
@@ -47,40 +47,58 @@ namespace SmartHome.Arduino.Application
 
         public static bool GetClientIndexById(Guid clientId, out int index)
         {
-            index = Clients.FindIndex(c => c.Id == clientId);
+            lock (_lock)
+            {
+                index = Clients.FindIndex(c => c.Id == clientId);
+            }
             return index != -1;
         }
 
         public static bool GetComponentIndexById(int clientIndex, int componentId, out int index)
         {
-            index = Clients[clientIndex].Components.FindIndex(c => c.Id == componentId);
+            lock (_lock)
+            {
+                index = Clients[clientIndex].Components.FindIndex(c => c.Id == componentId);
+            }
             return index != -1;
         }
 
         public static bool GetBoardPinIndexById(int clientIndex, int componentIndex, int boardPinId, out int index)
         {
-            index = Clients[clientIndex].Components[componentIndex].ConnectedPins.FindIndex(c => c.Id == boardPinId);
+            lock (_lock)
+            {
+                index = Clients[clientIndex].Components[componentIndex].ConnectedPins.FindIndex(c => c.Id == boardPinId);
+            }
             return index != -1;
         }
 
         public static void SaveClientData()
         {
-            FileDataStorage.SaveDataToJsonFile(Clients, FileName);
+            lock (_lock)
+            {
+                FileDataStorage.SaveDataToJsonFile(Clients, FileName);
+            }
         }
 
         public static void SaveClientTestData()
         {
-            FileDataStorage.SaveDataToJsonFile(TestDecoy, FileName);
+            lock (_lock)
+            {
+                FileDataStorage.SaveDataToJsonFile(TestDecoy, FileName);
+            }
         }
 
         public static void RecoverClientData()
         {
-            string? serializedObject = FileDataStorage.ReadStringFromFile(FileName);
-            if (string.IsNullOrEmpty(serializedObject)) return;
-            List<ArduinoClient>? arduinoClients = JsonDataConverting.ConvertClients(serializedObject, false);
-            if (arduinoClients is not null)
+            lock (_lock)
             {
-                Clients = arduinoClients;
+                string? serializedObject = FileDataStorage.ReadStringFromFile(FileName);
+                if (string.IsNullOrEmpty(serializedObject)) return;
+                List<ArduinoClient>? arduinoClients = JsonDataConverting.ConvertClients(serializedObject, false);
+                if (arduinoClients is not null)
+                {
+                    Clients = arduinoClients;
+                }
             }
         }
 
@@ -97,14 +115,13 @@ namespace SmartHome.Arduino.Application
                     new Models.Components.LightSensor()
                     {
                         Id = 0,
-                        Sequence = 0,
                         ConnectedPins = new List<PortPin>()
                         {
                             new PortPin()
                             {
                                 Id = 4,
                                 Mode = PortPin.PinMode.Read,
-                                Value = 454,
+                                Value = "454",
                                 ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
@@ -113,14 +130,13 @@ namespace SmartHome.Arduino.Application
                     new Models.Components.Relay()
                     {
                         Id = 1,
-                        Sequence = 1,
                         ConnectedPins = new List<PortPin>()
                         {
                             new PortPin()
                             {
                                 Id = 6,
                                 Mode = PortPin.PinMode.Read,
-                                Value = true,
+                                Value = "true",
                                 ValueType = PortPin.ObjectValueType.Boolean,
                             }
                         },
@@ -142,14 +158,13 @@ namespace SmartHome.Arduino.Application
                     new Models.Components.LightSensor()
                     {
                         Id = 0,
-                        Sequence = 0,
                         ConnectedPins = new List<PortPin>()
                         {
                             new PortPin()
                             {
                                 Id = 4,
                                 Mode = PortPin.PinMode.Read,
-                                Value = 454,
+                                Value = "454",
                                 ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
@@ -171,14 +186,13 @@ namespace SmartHome.Arduino.Application
                     new Models.Components.Relay()
                     {
                         Id = 0,
-                        Sequence = 0,
                         ConnectedPins = new List<PortPin>()
                         {
                             new PortPin()
                             {
                                 Id = 4,
                                 Mode = PortPin.PinMode.Read,
-                                Value = 454,
+                                Value = "454",
                                 ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
@@ -201,14 +215,13 @@ namespace SmartHome.Arduino.Application
                     new Models.Components.LightSensor()
                     {
                         Id = 0,
-                        Sequence = 0,
                         ConnectedPins = new List<PortPin>()
                         {
                             new PortPin()
                             {
                                 Id = 4,
                                 Mode = PortPin.PinMode.Read,
-                                Value = 454,
+                                Value = "454",
                                 ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },
@@ -230,14 +243,13 @@ namespace SmartHome.Arduino.Application
                     new Models.Components.Relay()
                     {
                         Id = 0,
-                        Sequence = 0,
                         ConnectedPins = new List<PortPin>()
                         {
                             new PortPin()
                             {
                                 Id = 4,
                                 Mode = PortPin.PinMode.Read,
-                                Value = 454,
+                                Value = "454",
                                 ValueType = PortPin.ObjectValueType.Integer,
                             }
                         },

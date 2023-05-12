@@ -9,6 +9,7 @@ namespace SmartHome.Arduino.Models.Interfaces
 {
     public interface ILog
     {
+        public LoggingService.LogTypes LogType { get; set; }
         public DateTime Time { get; set; }
         public string Message { get; set; }
         public LoggingService.LogStates LogState { get; set; }

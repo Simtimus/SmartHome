@@ -15,8 +15,7 @@ namespace SmartHome.Arduino.Models.Components
     public class LightSensor : IGeneralComponent
     {
         public int Id { get; set; }
-        public int Sequence { get; set; }
-        public ComponentsId ComponentId { get; set; } = ComponentsId.LightSensor;
+        public ComponentTypes ComponentType { get; set; } = ComponentTypes.LightSensor;
         public List<PortPin> ConnectedPins { get; set; } = new List<PortPin>();
         public string Description { get; set; } = string.Empty;
         [JsonIgnore] public ArduinoClient ParentClient { get; set; }

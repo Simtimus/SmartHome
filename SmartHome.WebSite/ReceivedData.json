@@ -1,7 +1,5 @@
 {
-	"IP": "32.226.1.0:8088",
-	"LastConnection": "2023-04-22T12:37:13",
-	"Mode": 0,
+	"ContentType": 2,
 	"BoardId": "00000000-0000-0000-0000-000000000000",
 	"ComponentId": -1,
 	"PinId": -1,
@@ -16,7 +14,7 @@
 			{
 				"Id": 0,
 				"Sequence": 0,
-				"ComponentId": 1,
+				"ComponentType": 1,
 				"ConnectedPins": [
 					{
 						"Id": 4,
@@ -37,7 +35,7 @@
 			{
 				"Id": 1,
 				"Sequence": 1,
-				"ComponentId": 2,
+				"ComponentType": 2,
 				"ConnectedPins": [
 					{
 						"Id": 6,

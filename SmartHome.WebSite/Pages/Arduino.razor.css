@@ -59,4 +59,8 @@
 	#wrapper.toggled #sidebar-wrapper {
 		margin-left: -15rem;
 	}
+
+	.container-fluid{
+		align-content: center;
+	}
 }
