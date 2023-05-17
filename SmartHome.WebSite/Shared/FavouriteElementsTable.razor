@@ -1,0 +1,155 @@
+﻿@inject IJSRuntime JsRuntime
+@inject WindowDimension WindowsDimension
+
+@if (favouriteElements.Count > 0)
+{
+	<div class="row gutters-sm mt-3" role="list" style="margin-left: @Margin !important; margin-right: @Margin !important;">
+		@for (int cols = 0; cols < Columns; cols++)
+		{
+			<div class="@ColumnClass column">
+				@for (int rows = 0; rows < Rows; rows++)
+				{
+					int index = rows * Columns + cols;
+					if (index >= favouriteElements.Count)
+						break;
+
+					if (favouriteElements[index].PortPinId != -1)
+					{
+						<FavouritePortPin FavPortPin="favouriteElements[index]"/>
+					}
+					else
+					{
+						<FavouriteComponent FavComponent="favouriteElements[index]"/>
+					}
+				}
+			</div>
+		}
+	</div>
+}
+else
+{
+	<div class="inline" style="margin-top: 13%">
+		<img src="img/sticker/click-to-favorite.png" />
+	</div>
+}
+
+@code {
+	[Parameter]
+	public List<ArduinoClient> Clients { get; set; } = new();
+
+	[Parameter]
+	public double WebWidth { get; set; } = 1980;
+
+	private List<ArduinoClient> _clients { get; set; } = new();
+	private List<FavouriteElement> favouriteElements = new();
+
+	private Dictionary<int, ElementReference> ClientElement = new Dictionary<int, ElementReference>();
+	private int Columns = 3;
+	private int Rows = 3;
+
+	public Random random = new Random();
+	private string ColumnClass = "col-md-4";
+	private string Margin = "0px";
+
+	public void GetFavouriteElements()
+	{
+		favouriteElements = new();
+		foreach (ArduinoClient client in _clients)
+		{
+			foreach (IGeneralComponent component in client.Components)
+			{
+				if (component.Favorite)
+				{
+					favouriteElements.Add(new()
+					{
+						ClientId = Guid.Parse(client.Id.ToString()),
+						ComponentId = component.Id
+					});
+				}
+				else
+				{
+					foreach (PortPin portPin in component.ConnectedPins)
+					{
+						if (portPin.Favorite)
+						{
+							favouriteElements.Add(new()
+							{
+								ClientId = Guid.Parse(client.Id.ToString()),
+								ComponentId = component.Id,
+								PortPinId = portPin.Id
+							});
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public void CreateTable()
+	{
+		int elementsDivided = favouriteElements.Count / Columns;
+		Rows = favouriteElements.Count % Columns == 0 ? elementsDivided : elementsDivided + 1;
+
+		//for (int rows = 0; rows < Rows; rows++)
+		//{
+		//	for (int cols = 0; cols < Columns; cols++)
+		//	{
+		//		int index = rows * Columns + cols;
+		//		if (index < components.Count)
+		//		{
+		//			ClientElement[components[index].Id] = new ElementReference();
+		//		}
+		//	}
+		//}
+	}
+
+	private void GetListDimmensions()
+	{
+		// Correcting the appearence when Server is Starting
+		if (WebWidth == 0)
+			WebWidth = 1366;
+
+
+		if (WebWidth < 890)
+		{
+			ColumnClass = "col-md-12";
+			Columns = 1;
+			Margin = $"{(int)(WebWidth - 440 * Columns) / 2}px";
+		}
+		else if (WebWidth < 1310)
+		{
+			ColumnClass = "col-md-6";
+			Columns = 2;
+			Margin = $"{(int)(WebWidth - 440 * Columns) / 2}px";
+		}
+		else if (WebWidth < 1735)
+		{
+			ColumnClass = "col-md-4";
+			Columns = 3;
+			Margin = $"{(int)(WebWidth - 435 * Columns) / 2}px";
+		}
+		else
+		{
+			ColumnClass = "col-md-3";
+			Columns = 4;
+			Margin = $"{(int)(WebWidth - 430 * Columns) / 2}px";
+		}
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		GetListDimmensions();
+
+		_clients = Clients;
+
+		GetFavouriteElements();
+		if (favouriteElements.Count > 0)
+			CreateTable();
+		else
+		{
+			//TODO: Do some sht
+		}
+
+		StateHasChanged();
+	}
+}

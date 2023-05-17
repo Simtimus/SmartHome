@@ -1,7 +1,7 @@
 ﻿@if (IsVisible)
 {
     <div class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="width: @WidthVal;">
             <span class="close" @onclick="Hide">&times;</span>
             @ChildContent
         </div>
@@ -29,6 +29,25 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
+    [Parameter]
+    public string Width { get; set; }
+
+    private string WidthVal = "80%";
+
     public void Show() => IsVisible = true;
     public void Hide() => IsVisible = false;
+
+    private void UpdateWidth()
+    {
+        if (!string.IsNullOrEmpty(Width))
+        {
+            WidthVal = Width;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        UpdateWidth();
+        StateHasChanged();
+    }
 }

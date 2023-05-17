@@ -46,32 +46,3 @@
 	background-color: #EEECF4;
 	border-color: #EEECF4;
 }
-
-.round-btn-img {
-	width: 15px;
-	height: 15px;
-}
-
-.round-button {
-	border-radius: 30px;
-}
-
-.button-string {
-	background-color: #CFF4D0;
-	border-color: #CFF4D0;
-}
-
-.button-integer {
-	background-color: #C0EDED;
-	border-color: #C0EDED;
-}
-
-.button-float {
-	background-color: #FFCECE;
-	border-color: #FFCECE;
-}
-
-.button-boolean {
-	background-color: #CECEF4;
-	border-color: #CECEF4;
-}

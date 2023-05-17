@@ -33,10 +33,15 @@ namespace SmartHome.Arduino.Models.Components.Common
         }
 
         public enum ComponentTypes
-        {
-            Unknown,
-            LightSensor,
-            Relay,
-        }
+		{
+			Undefined,
+			LightSensor,
+			Relay,
+			Button,
+			LedDiode,
+			HumiditySensor,
+			GasSensor,
+            InfraredSensor
+		}
     }
 }

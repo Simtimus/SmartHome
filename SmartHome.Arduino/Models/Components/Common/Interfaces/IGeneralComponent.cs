@@ -16,6 +16,7 @@ namespace SmartHome.Arduino.Models.Components.Common.Interfaces
         public ComponentTypes ComponentType { get; set; }
         public List<PortPin> ConnectedPins { get; set; }
         public string Description { get; set; }
-        [JsonIgnore] public ArduinoClient ParentClient { get; set; }
+		public bool Favorite { get; set; }
+		[JsonIgnore] public ArduinoClient ParentClient { get; set; }
     }
 }

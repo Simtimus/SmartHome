@@ -1,7 +1,7 @@
 ﻿@if (Component is not null)
 {
     int Description = Component.Id;
-    <div @ref="@Reference" class="item mt-3 mb-4" role="listitem" style="width: 400px">
+    <div class="item mt-3 mb-4" role="listitem" style="width: 400px">
         <div class="card">
             <div class="card-body">
                 <div class="inline space-between row gutters-sm">
@@ -25,7 +25,7 @@
                     <a>Connected pins: @Component.ConnectedPins.Count</a>
                     @foreach (PortPin boardPin in Component.ConnectedPins)
                     {
-                        <ArduinoBoardPin PortPin="boardPin"></ArduinoBoardPin>
+                        <FavouritePortPinSmall PortPin="boardPin"></FavouritePortPinSmall>
                     }
                 }
                 else
@@ -39,13 +39,15 @@
 
 @code {
     [Parameter]
-    public IGeneralComponent Component { get; set; }
+    public FavouriteElement FavComponent { get; set; } = new();
 
-    [Parameter]
-    public ElementReference Reference { get; set; }
+    private IGeneralComponent? Component = null;
 
     private void ChangeFavouriteState()
     {
+        if (Component is null)
+            return;
+
         if (!ClientManager.GetClientIndexById(Component.ParentClient.Id, out int clientIndex)) return;
         if (!ClientManager.GetComponentIndexById(clientIndex, Component.Id, out int componentIndex)) return;
 
@@ -54,6 +56,10 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        if (!ClientManager.GetClientIndexById(FavComponent.ClientId, out int clientIndex)) return;
+        if (!ClientManager.GetComponentIndexById(clientIndex, FavComponent.ComponentId, out int componentIndex)) return;
+
+        Component = ClientManager.Clients[clientIndex].Components[componentIndex];
         StateHasChanged();
     }
 }

@@ -1,0 +1,66 @@
+﻿@if (PortPin is not null)
+{
+	<div class="card mt-3 mb-4 @Style" style="width: 400px">
+		<div class="card-header ">
+			<div class="inline space-between row gutters-sm">
+				<div class="col-md-10">
+					<a>Pin: @PortPin.Id - @Style</a>
+				</div>
+				<div class="col-md-2">
+					@if (PortPin.Favorite)
+					{
+						<img src="/img/favourite-check.png" class="btn-img" @onclick="() => ChangeFavouriteState()">
+					}
+					else
+					{
+						<img src="/img/favourite-uncheck.png" class="btn-img" @onclick="() => ChangeFavouriteState()">
+					}
+				</div>
+
+			</div>
+		</div>
+		<div class="card-body">
+			<a>@Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode) Mode | Value: "@PortPin.GetValueString()"</a>
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public FavouriteElement FavPortPin { get; set; } = new();
+
+	private PortPin? PortPin = null;
+
+	private string Style = string.Empty;
+
+	private void SetStyles()
+	{
+		Style = Enum.GetName(typeof(PortPin.ObjectValueType), PortPin.ValueType).ToLower();
+
+	}
+
+	private void ChangeFavouriteState()
+	{
+		if (PortPin is null)
+			return;
+
+		IGeneralComponent component = PortPin.ParentComponent;
+		if (!ClientManager.GetClientIndexById(component.ParentClient.Id, out int clientIndex)) return;
+		if (!ClientManager.GetComponentIndexById(clientIndex, component.Id, out int componentIndex)) return;
+		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PortPin.Id, out int pinIndex)) return;
+
+		ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Favorite = !PortPin.Favorite;
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (!ClientManager.GetClientIndexById(FavPortPin.ClientId, out int clientIndex)) return;
+		if (!ClientManager.GetComponentIndexById(clientIndex, FavPortPin.ComponentId, out int componentIndex)) return;
+		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, FavPortPin.PortPinId, out int pinIndex)) return;
+
+		PortPin = ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex];
+
+		SetStyles();
+		StateHasChanged();
+	}
+}

@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using SmartHome.Arduino.Models.Data.DataBoxs;
 using SmartHome.Arduino.Models.Data.Transmited;
 using SmartHome.Arduino.Application.Logging;
+using SmartHome.Arduino.Models.Data.DataLinks;
 
 namespace SmartHome.Arduino.Models.Json.Converting
 {
@@ -233,9 +234,9 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			return client;
 		}
 
-		public static List<ILog> ConvertILogs(string serializedObject)
+		public static void ConvertILogs(string serializedObject, out List<ILog> logList)
 		{
-			List<ILog> logList = new List<ILog>();
+			logList = new();
 
 			JArray componentsArray = JArray.Parse(serializedObject);
 			if (componentsArray != null)
@@ -252,8 +253,23 @@ namespace SmartHome.Arduino.Models.Json.Converting
 					}
 				}
 			}
+		}
 
-			return logList;
+		public static void ConvertDataLinks(string serializedObject, out List<DataLink> dataLinks)
+		{
+			dataLinks = new();
+
+			JArray componentsArray = JArray.Parse(serializedObject);
+			if (componentsArray != null)
+			{
+				foreach (var jsonComponent in componentsArray)
+				{
+					DataLink dataLink = new();
+					JObject jsonObject = JObject.Parse(jsonComponent.ToString());
+					UpdateModelFromJson(dataLink, jsonObject, false);
+					dataLinks.Add(dataLink);
+				}
+			}
 		}
 
 		public static void UpdateModelFromJson<T>(T model, JObject jsonObject, bool setNewGuid = false)
@@ -299,6 +315,11 @@ namespace SmartHome.Arduino.Models.Json.Converting
 					else if (property.PropertyType == typeof(string))
 					{
 						deserializedValue = value.ToString();
+					}
+					else if (property.PropertyType == typeof(bool))
+					{
+						bool.TryParse(value.ToString(), out bool boolValue);
+						deserializedValue = boolValue;
 					}
 					else if (property.PropertyType.IsEnum)
 					{

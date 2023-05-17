@@ -1,188 +1,105 @@
 [
 	{
-		"IP": "32.226.1.0:8088",
-		"LastConnection": "2023-04-22T12:37:13",
-		"State": 0,
-		"Ping": 0,
-		"Id": "f0cb2f99-acef-4e3b-bce5-fcaf729bc293",
-		"Name": "Living Parameters",
+		"IP": "192.168.126.90:4210",
+		"LastConnection": "2023-05-14T02:10:24.7097886",
+		"State": 1,
+		"Ping": 54322,
+		"Id": "a3685765-037d-44f7-8b72-5853ab54218f",
+		"Name": "First Board",
 		"Components": [
 			{
 				"Id": 0,
-				"Sequence": 0,
-				"ComponentId": 1,
+				"ComponentType": 1,
 				"ConnectedPins": [
 					{
-						"Id": 4,
+						"Id": 18,
+						"Type": 0,
 						"Mode": 0,
-						"Value": null,
+						"Value": "0",
 						"ValueType": 1,
 						"DataLink": {
 							"Id": "00000000-0000-0000-0000-000000000000",
 							"BoardId": "00000000-0000-0000-0000-000000000000",
-							"ComponentId": 0,
-							"PinId": 0,
-							"Value": null
+							"ComponentId": -1,
+							"PinId": -1,
+							"Value": ""
 						}
 					}
 				],
-				"Description": "Some dumb message"
+				"Description": "Room light"
 			},
 			{
 				"Id": 1,
-				"Sequence": 1,
-				"ComponentId": 2,
+				"ComponentType": 2,
 				"ConnectedPins": [
 					{
-						"Id": 6,
-						"Mode": 0,
-						"Value": null,
+						"Id": 4,
+						"Type": 0,
+						"Mode": 1,
+						"Value": "0",
 						"ValueType": 3,
 						"DataLink": {
 							"Id": "00000000-0000-0000-0000-000000000000",
 							"BoardId": "00000000-0000-0000-0000-000000000000",
-							"ComponentId": 0,
-							"PinId": 0,
-							"Value": null
+							"ComponentId": -1,
+							"PinId": -1,
+							"Value": ""
 						}
-					}
-				],
-				"Description": "Another dumb message??"
-			}
-		],
-		"Model": "Arduino UNO WiFi",
-		"Description": ""
-	},
-	{
-		"IP": "32.226.1.0:8088",
-		"LastConnection": "2023-04-22T12:37:13",
-		"State": 0,
-		"Ping": 0,
-		"Id": "92564f01-dd67-42b9-8557-825d22259593",
-		"Name": "Living Parameters",
-		"Components": [
-			{
-				"Id": 0,
-				"Sequence": 0,
-				"ComponentId": 1,
-				"ConnectedPins": [
+					},
 					{
-						"Id": 4,
+						"Id": 5,
+						"Type": 0,
 						"Mode": 0,
-						"Value": null,
-						"ValueType": 1,
+						"Value": "1",
+						"ValueType": 3,
 						"DataLink": {
 							"Id": "00000000-0000-0000-0000-000000000000",
 							"BoardId": "00000000-0000-0000-0000-000000000000",
-							"ComponentId": 0,
-							"PinId": 0,
-							"Value": null
+							"ComponentId": -1,
+							"PinId": -1,
+							"Value": ""
 						}
 					}
 				],
-				"Description": ""
-			}
-		],
-		"Model": "Arduino UNO WiFi",
-		"Description": ""
-	},
-	{
-		"IP": "32.226.1.0:8088",
-		"LastConnection": "2023-04-22T12:37:13",
-		"State": 0,
-		"Ping": 0,
-		"Id": "0f76e10e-7f1b-44d4-a5c4-ce001e876d44",
-		"Name": "Living Parameters",
-		"Components": [
+				"Description": "Controls room lamp"
+			},
 			{
-				"Id": 0,
-				"Sequence": 0,
-				"ComponentId": 2,
+				"Id": 2,
+				"ComponentType": 5,
 				"ConnectedPins": [
 					{
-						"Id": 4,
+						"Id": 100,
+						"Type": 1,
 						"Mode": 0,
-						"Value": null,
-						"ValueType": 1,
+						"Value": "0",
+						"ValueType": 2,
 						"DataLink": {
 							"Id": "00000000-0000-0000-0000-000000000000",
 							"BoardId": "00000000-0000-0000-0000-000000000000",
-							"ComponentId": 0,
-							"PinId": 0,
-							"Value": null
+							"ComponentId": -1,
+							"PinId": -1,
+							"Value": ""
 						}
-					}
-				],
-				"Description": ""
-			}
-		],
-		"Model": "Arduino UNO WiFi",
-		"Description": ""
-	},
-	{
-		"IP": "32.226.1.0:8088",
-		"LastConnection": "2023-04-22T12:37:13",
-		"State": 0,
-		"Ping": 0,
-		"Id": "54de0454-ed3b-47c0-950e-79e68438e265",
-		"Name": "Living Parameters",
-		"Components": [
-			{
-				"Id": 0,
-				"Sequence": 0,
-				"ComponentId": 1,
-				"ConnectedPins": [
+					},
 					{
-						"Id": 4,
+						"Id": 101,
+						"Type": 1,
 						"Mode": 0,
-						"Value": null,
-						"ValueType": 1,
+						"Value": "0",
+						"ValueType": 2,
 						"DataLink": {
 							"Id": "00000000-0000-0000-0000-000000000000",
 							"BoardId": "00000000-0000-0000-0000-000000000000",
-							"ComponentId": 0,
-							"PinId": 0,
-							"Value": null
+							"ComponentId": -1,
+							"PinId": -1,
+							"Value": ""
 						}
 					}
 				],
-				"Description": ""
+				"Description": "Room temperature and humidity"
 			}
 		],
-		"Model": "Arduino UNO WiFi",
-		"Description": ""
-	},
-	{
-		"IP": "32.226.1.0:8088",
-		"LastConnection": "2023-04-22T12:37:13",
-		"State": 0,
-		"Ping": 0,
-		"Id": "d399f6d3-562c-4c53-ae27-5fb1202a92fe",
-		"Name": "Living Parameters",
-		"Components": [
-			{
-				"Id": 0,
-				"Sequence": 0,
-				"ComponentId": 2,
-				"ConnectedPins": [
-					{
-						"Id": 4,
-						"Mode": 0,
-						"Value": null,
-						"ValueType": 1,
-						"DataLink": {
-							"Id": "00000000-0000-0000-0000-000000000000",
-							"BoardId": "00000000-0000-0000-0000-000000000000",
-							"ComponentId": 0,
-							"PinId": 0,
-							"Value": null
-						}
-					}
-				],
-				"Description": ""
-			}
-		],
-		"Model": "Arduino UNO WiFi",
-		"Description": ""
+		"Model": "ESP32",
+		"Description": "Room Light Manager"
 	}
 ]

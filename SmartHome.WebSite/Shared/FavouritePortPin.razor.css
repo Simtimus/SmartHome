@@ -1,5 +1,5 @@
 ﻿.card {
-	border-radius: 10px;
+	border-radius: 20px;
 }
 
 .inline {
@@ -9,9 +9,9 @@
 }
 
 .btn-img {
-	margin-right: 5px;
-	width: 20px;
-	height: 20px;
+	margin-left: 10px;
+	width: 21px;
+	height: 21px;
 }
 
 .space-between {
@@ -20,7 +20,7 @@
 }
 
 .card-header {
-	border-radius: 10px 10px 0px 0px;
+	border-radius: 20px 20px 0px 0px;
 }
 
 .string {
@@ -45,33 +45,4 @@
 	color: #4C4571;
 	background-color: #EEECF4;
 	border-color: #EEECF4;
-}
-
-.round-btn-img {
-	width: 15px;
-	height: 15px;
-}
-
-.round-button {
-	border-radius: 30px;
-}
-
-.button-string {
-	background-color: #CFF4D0;
-	border-color: #CFF4D0;
-}
-
-.button-integer {
-	background-color: #C0EDED;
-	border-color: #C0EDED;
-}
-
-.button-float {
-	background-color: #FFCECE;
-	border-color: #FFCECE;
-}
-
-.button-boolean {
-	background-color: #CECEF4;
-	border-color: #CECEF4;
 }

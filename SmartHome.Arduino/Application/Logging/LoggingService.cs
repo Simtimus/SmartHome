@@ -18,15 +18,16 @@ namespace SmartHome.Arduino.Application.Logging
     {
         private const string LogsFileName = "ProgramLogs.json";
         
-        public static List<ILog> LogEntries { get; } = new();
+        public static List<ILog> LogEntries { get; set; } = new();
 
-        public static List<ILog>? GetAllLogs()
+        public static void RecoverAllLogs()
         {
             string? recoveredData = FileDataStorage.ReadStringFromFile(LogsFileName);
             if (string.IsNullOrEmpty(recoveredData))
-                return null;
+                return;
 
-            return JsonDataConverting.ConvertILogs(recoveredData);
+			JsonDataConverting.ConvertILogs(recoveredData, out List<ILog> logs);
+            LogEntries = logs;
         }
 
         public static LogTypes GetTypeByString(string logType)

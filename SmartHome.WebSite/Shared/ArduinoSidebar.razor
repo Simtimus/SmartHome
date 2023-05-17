@@ -2,22 +2,48 @@
 @inject Models.ClipboardService ClipboardService
 
 <div class="bg-arduinolist border-right vh-100" id="sidebar-wrapper">
-    <div class="sidebar-heading">Smart Home</div>
-    <div class="list-group list-group-flush overflow-auto h-100">
-        <a href="arduino/#" class="list-group-item list-group-item-action bg-light disabled">Connected Arduino</a>
+
+    <div class="list-group list-group-flush overflow-auto" style="margin: 20px; height: 97%">
         @foreach (var client in Clients)
         {
-            <button @onclick="() => OnClientClick(client)" class="list-group-item list-group-item-action">
-                <div>@client.Name</div>
-                <div>Model: @client.Model</div>
-                <div>@client.State | Ping: @client.Ping</div>
-                <div>@client.Description</div>
-                <div>
-                    @client.IP
-                </div>
-            </button>
+            string style = "idle";
+            @if (client.Id.Equals(SelectedClient.Id))
+            {
+                style = "active";
+            }
+            <div class="card mb-3 @style">
+                <button @onclick="() => OnClientClick(client)" class="button-transparent">
+                    <div class="card-body">
+                        <div class="inline">
+                            @if (client.State == ArduinoClient.ConnectionState.Online)
+                            {
+                                <img src="/img/online-circle.png" class="activity-img">
+                            }
+                            else
+                            {
+                                <img src="/img/offline-circle.png" class="activity-img">
+                            }
+                            <div>@client.Name</div>
+                        </div>
+                        @if (client.Id.Equals(SelectedClient.Id))
+                        {
+                            <div>Latency: @client.Ping ms</div>
+                            <div>@client.IP</div>
+                        }
+                    </div>
+                </button>
+            </div>
         }
     </div>
+
+   @* <div class="card mt-3">
+        <button class="button-transparent">
+            <div class="card-body card-button">
+                <img src="/img/home.png" class="button-img" />
+                <h5 class="mt-2">Some button</h5>
+            </div>
+        </button>
+    </div>*@
 </div>
 
 @code {
@@ -26,6 +52,8 @@
 
     [Parameter]
     public EventCallback<ArduinoClient> ClientClick { get; set; }
+
+    private ArduinoClient SelectedClient = new();
 
     public Guid[,] ClientsTable = new Guid[,] { };
 
@@ -39,6 +67,7 @@
 
     private async Task OnClientClick(ArduinoClient client)
     {
+        SelectedClient = client;
         await ClipboardService.CopyToClipboard(JSRuntime, client.Id.ToString());
         await ClientClick.InvokeAsync(client);
     }

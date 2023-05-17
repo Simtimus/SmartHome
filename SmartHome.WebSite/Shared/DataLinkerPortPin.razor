@@ -1,0 +1,66 @@
+﻿<div class="card main-card @Style" style="height: 315px">
+	@if (PortPin is not null)
+	{
+		<div class="card-body">
+			<div class="card child-card">
+				<div class="card-body space-between inline">
+					<b>Id:</b>
+					<h6>@PortPin.Id</h6>
+				</div>
+			</div>
+			<div class="card child-card mt-3">
+				<div class="card-body space-between inline">
+					<b>Pin Type:</b>
+					<h6>@PinType</h6>
+				</div>
+			</div>
+			<div class="card child-card mt-3">
+				<div class="card-body space-between inline">
+					<b>Pin Mode:</b>
+					<h6>@PinMode</h6>
+				</div>
+			</div>
+			<div class="card child-card mt-3">
+				<div class="card-body space-between inline">
+					<b>Value Type:</b>
+					<h6>@ValueType</h6>
+				</div>
+			</div>
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter]
+	public PortPin PortPin { get; set; }
+
+	private string PinType = string.Empty;
+
+	private string PinMode = string.Empty;
+
+	private string ValueType = string.Empty;
+
+	private string Style = string.Empty;
+
+	private void GetValues()
+	{
+		PinType = Enum.GetName(typeof(PortPin.PinType), PortPin.Type);
+		PinMode = Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode);
+		ValueType = Enum.GetName(typeof(PortPin.ObjectValueType), PortPin.ValueType);
+	}
+
+	private void SetStyles()
+	{
+		Style = ValueType.ToLower();
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		@if (PortPin is not null)
+		{
+			GetValues();
+			SetStyles();
+		}
+		StateHasChanged();
+	}
+}

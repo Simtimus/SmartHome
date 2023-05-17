@@ -2,6 +2,20 @@
 	overflow-x: hidden;
 }
 
+button {
+	margin-right: 10px;
+}
+
+.btn-img {
+	width: 15px;
+	height: 15px;
+}
+
+.txt-img {
+	width: 40px;
+	height: 40px;
+}
+
 .navbar {
 	background-color: #08151D;
 	padding-left: 0.5rem;
@@ -57,7 +71,7 @@
 	}
 
 	#wrapper.toggled #sidebar-wrapper {
-		margin-left: -15rem;
+		margin-left: -17.5rem;
 	}
 
 	.container-fluid{

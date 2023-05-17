@@ -1,9 +1,90 @@
 ﻿@page "/"
+@implements IDisposable
+@inject IJSRuntime JsRuntime
+@inject SnackBar SnackBar
+@inject WindowDimension WindowDimension
+@inject Server ArduinoServer
+@inject GeneralComponent GenericComponent
 
-<PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<div>
+	<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+		<a href="/arduino">
+			<button class="btn btn-primary">
+				<img src="img/settings.png" class="btn-img" />
+			</button>
+		</a>
+		<a class="nav-link text-white">@ArduinoServer.IpHost : @ArduinoServer.PortHost</a>
+		<img src="img/ip-server.png" class="txt-img" />
+		@*Empty div is part of design*@
+		<div class="collapse navbar-collapse"></div>
+		<div><a>@WindowDimension.Width</a></div>
+		<button class="btn btn-primary" @onclick="ShowModal">Open Modal</button>
+	</nav>
+	<ModalPage @ref="myModal" @bind-IsVisible="isModalVisible">
+		<h2>Modal Title</h2>
+		<p>Some text in the Modal..</p>
+		<button @onclick="HideModal">Close</button>
+	</ModalPage>
+	<div class="container-fluid">
+		<FavouriteElementsTable Clients="ClientManager.Clients" WebWidth="WindowDimension.Width"/>
+	</div>
+</div>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+
+	private ModalPage myModal;
+	private bool isModalVisible;
+
+	private void ShowModal()
+	{
+		isModalVisible = true;
+	}
+
+	private void HideModal()
+	{
+		isModalVisible = false;
+	}
+
+	public void Dispose()
+	{
+		ClientEvents.OnClientChanged -= RefreshPage;
+		ClientEvents.OnNewClientAddedd -= NewArduinoClientAdded;
+	}
+
+	private void NewArduinoClientAdded()
+	{
+		InvokeAsync(async () => { await SnackBar.ShowMessage("New Arduino board connected"); });
+	}
+
+	private void RefreshPage()
+	{
+		InvokeAsync(() => { StateHasChanged(); });
+	}
+
+	private async Task RefreshPageSize()
+	{
+		await Task.Delay(1000);
+		while (true)
+		{
+			try
+			{
+				await WindowDimension.GetDimensions(JsRuntime);
+			}
+			catch (Exception ex) { }
+			await Task.Delay(500);
+		}
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		ClientEvents.OnClientChanged += RefreshPage;
+		ClientEvents.OnNewClientAddedd += NewArduinoClientAdded;
+		Task.Run(() => RefreshPageSize());
+		if (ClientManager.Clients.Count > 0)
+		{
+			//TODO: In case I want by default a Client to be selected
+		}
+	}
+}

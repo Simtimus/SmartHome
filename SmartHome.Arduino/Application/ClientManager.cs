@@ -67,12 +67,12 @@ namespace SmartHome.Arduino.Application
         {
             lock (_lock)
             {
-                index = Clients[clientIndex].Components[componentIndex].ConnectedPins.FindIndex(c => c.Id == boardPinId);
+				index = Clients[clientIndex].Components[componentIndex].ConnectedPins.FindIndex(c => c.Id == boardPinId);
             }
             return index != -1;
-        }
+		}
 
-        public static void SaveClientData()
+		public static void SaveClientData()
         {
             lock (_lock)
             {
@@ -102,168 +102,8 @@ namespace SmartHome.Arduino.Application
             }
         }
 
-
-        //  ----------  FOR TESTING  ----------  //
-        public static List<ArduinoClient> TestDecoy = new()
-        {
-            new ArduinoClient()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Living Parameters",
-                Components = new List<IGeneralComponent>()
-                {
-                    new Models.Components.LightSensor()
-                    {
-                        Id = 0,
-                        ConnectedPins = new List<PortPin>()
-                        {
-                            new PortPin()
-                            {
-                                Id = 4,
-                                Mode = PortPin.PinMode.Read,
-                                Value = "454",
-                                ValueType = PortPin.ObjectValueType.Integer,
-                            }
-                        },
-                        Description = "Some dumb message",
-                    },
-                    new Models.Components.Relay()
-                    {
-                        Id = 1,
-                        ConnectedPins = new List<PortPin>()
-                        {
-                            new PortPin()
-                            {
-                                Id = 6,
-                                Mode = PortPin.PinMode.Read,
-                                Value = "true",
-                                ValueType = PortPin.ObjectValueType.Boolean,
-                            }
-                        },
-                        Description = "Another dumb message??",
-                    }
-                },
-                Model = "Arduino UNO WiFi",
-                Description = string.Empty,
-                IP = new System.Net.IPEndPoint(123424, 8088),
-                LastConnection = Server.GetDTNow(),
-                State = ArduinoClient.ConnectionState.Online
-            },
-            new ArduinoClient()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Living Parameters",
-                Components = new List<IGeneralComponent>()
-                {
-                    new Models.Components.LightSensor()
-                    {
-                        Id = 0,
-                        ConnectedPins = new List<PortPin>()
-                        {
-                            new PortPin()
-                            {
-                                Id = 4,
-                                Mode = PortPin.PinMode.Read,
-                                Value = "454",
-                                ValueType = PortPin.ObjectValueType.Integer,
-                            }
-                        },
-                        Description = string.Empty,
-                    }
-                },
-                Model = "Arduino UNO WiFi",
-                Description = string.Empty,
-                IP = new System.Net.IPEndPoint(123424, 8088),
-                LastConnection = Server.GetDTNow(),
-                State = ArduinoClient.ConnectionState.Online
-            },
-            new ArduinoClient()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Living Parameters",
-                Components = new List<IGeneralComponent>()
-                {
-                    new Models.Components.Relay()
-                    {
-                        Id = 0,
-                        ConnectedPins = new List<PortPin>()
-                        {
-                            new PortPin()
-                            {
-                                Id = 4,
-                                Mode = PortPin.PinMode.Read,
-                                Value = "454",
-                                ValueType = PortPin.ObjectValueType.Integer,
-                            }
-                        },
-                        Description = string.Empty,
-                    }
-                },
-                Model = "Arduino UNO WiFi",
-                Description = string.Empty,
-                IP = new System.Net.IPEndPoint(123424, 8088),
-                LastConnection = Server.GetDTNow(),
-                State = ArduinoClient.ConnectionState.Online
-            },
-
-            new ArduinoClient()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Living Parameters",
-                Components = new List<IGeneralComponent>()
-                {
-                    new Models.Components.LightSensor()
-                    {
-                        Id = 0,
-                        ConnectedPins = new List<PortPin>()
-                        {
-                            new PortPin()
-                            {
-                                Id = 4,
-                                Mode = PortPin.PinMode.Read,
-                                Value = "454",
-                                ValueType = PortPin.ObjectValueType.Integer,
-                            }
-                        },
-                        Description = string.Empty,
-                    }
-                },
-                Model = "Arduino UNO WiFi",
-                Description = string.Empty,
-                IP = new System.Net.IPEndPoint(123424, 8088),
-                LastConnection = Server.GetDTNow(),
-                State = ArduinoClient.ConnectionState.Online
-            },
-            new ArduinoClient()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Living Parameters",
-                Components = new List<IGeneralComponent>()
-                {
-                    new Models.Components.Relay()
-                    {
-                        Id = 0,
-                        ConnectedPins = new List<PortPin>()
-                        {
-                            new PortPin()
-                            {
-                                Id = 4,
-                                Mode = PortPin.PinMode.Read,
-                                Value = "454",
-                                ValueType = PortPin.ObjectValueType.Integer,
-                            }
-                        },
-                        Description = string.Empty,
-                    }
-                },
-                Model = "Arduino UNO WiFi",
-                Description = string.Empty,
-                IP = new System.Net.IPEndPoint(123424, 8088),
-                LastConnection = Server.GetDTNow(),
-                State = ArduinoClient.ConnectionState.Online
-            },
-        };
-    }
+        public static List<ArduinoClient> TestDecoy = new();
+	}
 }
 
 

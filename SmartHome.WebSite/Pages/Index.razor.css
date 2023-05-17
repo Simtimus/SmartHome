@@ -1,0 +1,41 @@
+﻿body {
+	overflow-x: hidden;
+}
+
+.txt-img {
+	width: 40px;
+	height: 40px;
+}
+
+button {
+	margin-right: 10px;
+}
+
+.btn-img {
+	width: 15px;
+	height: 15px;
+}
+
+.navbar {
+	background-color: #08151D;
+	padding-left: 0.5rem;
+}
+
+.sidebar {
+	height: 100%;
+	overflow-y: auto;
+}
+
+.list-group {
+	margin-bottom: 0;
+}
+
+.list-group-item {
+	border-radius: 0;
+}
+
+@media (min-width: 768px) {
+	.container-fluid {
+		align-content: center;
+	}
+}

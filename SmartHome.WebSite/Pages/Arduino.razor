@@ -8,13 +8,21 @@
 
 <div class="d-flex @WrapperState" id="wrapper">
 	<!-- Sidebar -->
-	<ArduinoSidebar Clients="@ClientManager.Clients" ClientClick="@OnClientClick"></ArduinoSidebar>
+	<ArduinoSidebar Clients="ClientManager.Clients" ClientClick="@OnClientClick"></ArduinoSidebar>
 	<!-- /#sidebar-wrapper -->
 	<!-- Page Content -->
 	<div id="page-content-wrapper">
 		<nav class="navbar navbar-expand-lg navbar-light border-bottom">
-			<button class="btn btn-primary" id="menu-toggle" @onclick="ToggleWrapper">Toggle Menu</button>
+			<button class="btn btn-primary" id="menu-toggle" @onclick="ToggleWrapper">
+				<img src="img/list-text.png" class="btn-img"/>
+			</button>
+			<a href="/">
+				<button class="btn btn-primary">
+						<img src="img/home.png" class="btn-img" />
+				</button>
+			</a>
 			<a class="nav-link text-white">@ArduinoServer.IpHost : @ArduinoServer.PortHost</a>
+			<img src="img/ip-server.png" class="txt-img"/>
 			@*Empty div is part of design*@
 			<div class="collapse navbar-collapse"></div>
 			<div><a>@WindowDimension.Width</a></div>
@@ -47,7 +55,7 @@
 			}
 			else if (activeTab == 1)
 			{
-				
+				<DataLinkTable WrapperState="@WrapperState" WebWidth="@WindowDimension.Width" />
 			}
 		</div>
 	</div>

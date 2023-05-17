@@ -1,7 +1,7 @@
 ﻿@inject IJSRuntime JsRuntime
 @inject WindowDimension WindowsDimension
 
-@if (_selectedClient.Components.Count > 0)
+@if (DataLinker.DataLinks.Count > 0)
 {
 	<div class="row gutters-sm mt-3" role="list" style="margin-left: @Margin !important; margin-right: @Margin !important;">
 		@for (int cols = 0; cols < Columns; cols++)
@@ -10,68 +10,32 @@
 				@for (int rows = 0; rows < Rows; rows++)
 				{
 					int index = rows * Columns + cols;
-					if (index >= _selectedClient.Components.Count)
+					if (index >= DataLinker.DataLinks.Count)
 						continue;
 
-					var component = _selectedClient.Components[index];
-
-					<ArduinoComponent Component="@component" Reference="@ClientElement[component.Id]"></ArduinoComponent>
+					
 				}
 			</div>
 		}
-	</div>
-}
-else
-{
-	<div class="inline" style="margin-top: 20%">
-		<img src="img/sticker/choose-client.png"/>
 	</div>
 }
 
 @code {
 	[Parameter]
 	public string WrapperState { get; set; } = String.Empty;
-
-	[Parameter]
-	public ArduinoClient SelectedClient { get; set; } = new();
-
 	[Parameter]
 	public double WebWidth { get; set; } = 1980;
 
-	private ArduinoClient _selectedClient { get; set; } = new();
-
-	private Dictionary<int, ElementReference> ClientElement = new Dictionary<int, ElementReference>();
 	private int Columns = 3;
 	private int Rows = 0;
 
-	public Random random = new Random();
 	private string ColumnClass = "col-md-4";
 	private string Margin = "0px";
 
-	string[] RandomImages = new string[]
+	public void CreateTable(List<DataLink> dataLinks)
 	{
-		"https://wallpapercave.com/wp/wp2722942.jpg",
-		"https://images.unsplash.com/photo-1512850183-6d7990f42385?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dmVydGljYWwlMjB3YWxscGFwZXJ8ZW58MHx8MHx8&w=1000&q=80",
-		"https://wallpaperaccess.com/full/1642272.jpg",
-		"",
-	};
-
-	public void CreateTable(List<IGeneralComponent> components)
-	{
-		int elementsDivided = components.Count / Columns;
-		Rows = components.Count % Columns == 0 ? elementsDivided : elementsDivided + 1;
-
-		for (int rows = 0; rows < Rows; rows++)
-		{
-			for (int cols = 0; cols < Columns; cols++)
-			{
-				int index = rows * Columns + cols;
-				if (index < components.Count)
-				{
-					ClientElement[components[index].Id] = new ElementReference();
-				}
-			}
-		}
+		int elementsDivided = dataLinks.Count / Columns;
+		Rows = dataLinks.Count % Columns == 0 ? elementsDivided : elementsDivided + 1;
 	}
 
 	private void GetListDimmensions()
@@ -135,21 +99,7 @@ else
 	protected override async Task OnParametersSetAsync()
 	{
 		GetListDimmensions();
-
-		if (!ArduinoClient.IsNullOrEmpty(SelectedClient))
-		{
-			_selectedClient = SelectedClient;
-			if (_selectedClient.Components.Count > 0)
-				CreateTable(_selectedClient.Components);
-			else
-			{
-				//TODO: Do some sht
-			}
-		}
-		else
-		{
-			//TODO: Show some text template ~Client has no Data~
-		}
+		CreateTable(DataLinker.DataLinks);
 		StateHasChanged();
 	}
 }

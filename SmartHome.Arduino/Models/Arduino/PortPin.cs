@@ -12,17 +12,24 @@ namespace SmartHome.Arduino.Models.Arduino
     public class PortPin
     {
         public int Id { get; set; }
+        public PinType Type { get; set; }
         public PinMode Mode { get; set; }
         public string Value { get; set; } = string.Empty;
         public ObjectValueType ValueType { get; set; }
         public DataLink DataLink { get; set; } = new DataLink();
+        public bool Favorite { get; set; }
         [JsonIgnore] public IGeneralComponent? ParentComponent { get; set; }
+
+        public enum PinType
+        {
+            Real,
+            Virtual,    // Conventional -> Id >= 100
+		}
 
         public enum PinMode
         {
             Read,
             Write,
-            Virtual,    // Conventional -> Id >= 100
         }
 
         public enum ObjectValueType

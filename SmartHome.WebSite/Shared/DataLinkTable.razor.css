@@ -21,8 +21,8 @@
 	margin-top: 10px;
 }
 
-.inline {
+.center-both {
 	display: flex;
-	align-items: center;
 	justify-content: center;
+	align-items: center;
 }

@@ -1,0 +1,44 @@
+﻿@inject WindowDimension WindowsDimension
+
+@if (ReceivedPin is not null)
+{
+	<div>
+		<div class="row gutters-sm">
+			<div>
+				@*Link Status*@
+			</div>
+		</div>
+		<div class="row gutters-sm" style="padding-left: 5%; padding-right: 5%;">
+			@*Link From PortPin*@
+			<div class="col-md-6">
+				<DataLinkerPortPin PortPin="LinkFrom"></DataLinkerPortPin>
+			</div>
+
+			@*Link To PortPin*@
+			<div class="col-md-6">
+				<DataLinkerPortPin PortPin="LinkTo"></DataLinkerPortPin>
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public PortPin? ReceivedPin { get; set; }
+
+	private PortPin? LinkFrom;
+	private PortPin? LinkTo;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (ReceivedPin.Mode == PortPin.PinMode.Write)
+		{
+			LinkFrom = ReceivedPin;
+		}
+		else
+		{
+			LinkTo = ReceivedPin;
+		}
+		StateHasChanged();
+	}
+}

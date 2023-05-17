@@ -18,6 +18,7 @@ using SmartHome.Arduino.Models.Data.Transmited;
 using SmartHome.Arduino.Models.Json.Converting;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using SmartHome.Arduino.Models.Data.DataLinks;
 
 namespace SmartHome.Arduino.Application
 {
@@ -44,9 +45,10 @@ namespace SmartHome.Arduino.Application
             transmittingManager = new(server);
             dataProcessor = new(transmittingManager);
             //Console.WriteLine(ipHost);
-            LoggingService.GetAllLogs();
+            LoggingService.RecoverAllLogs();
             //ClientManager.SaveClientTestData();
             ClientManager.RecoverClientData();
+            DataLinker.RecoverDataLinks();
             Task.Run(() => ReceiveAndProcessMessages());
             Task.Run(async () => await MonitorClients());
         }

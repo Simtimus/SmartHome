@@ -1,11 +1,5 @@
-﻿@inject WindowDimension WindowsDimension
-
-@if (PortPin is not null)
+﻿@if (PortPin is not null)
 {
-	<ModalPage @ref="linkingMenuModal" Width="@Width" @bind-IsVisible="isModalVisible">
-		<DataLinkerPage ReceivedPin="PortPin"></DataLinkerPage>
-	</ModalPage>
-
 	<div class="card mt-3 @Style">
 		<div class="card-header ">
 			<div class="inline space-between">
@@ -22,12 +16,7 @@
 			</div>
 		</div>
 		<div class="card-body">
-			<div class="space-between inline">
-				<a>@Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode) Mode | Value: "@PortPin.GetValueString()"</a>
-				<button class="btn btn-primary round-button button-@Style" @onclick="() => OpenLinkingMenu()">
-					<img src="img/link.png" class="round-btn-img" />
-				</button>
-			</div>
+			<a>@Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode) Mode | Value: "@PortPin.GetValueString()"</a>
 		</div>
 	</div>
 }
@@ -36,16 +25,12 @@
 	[Parameter]
 	public PortPin PortPin { get; set; } = new();
 
-	private ModalPage linkingMenuModal;
-	private bool isModalVisible;
-
 	private string Style = string.Empty;
-
-	private string Width = "960px";
 
 	private void SetStyles()
 	{
 		Style = Enum.GetName(typeof(PortPin.ObjectValueType), PortPin.ValueType).ToLower();
+
 	}
 
 	private void ChangeFavouriteState()
@@ -56,11 +41,6 @@
 		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PortPin.Id, out int pinIndex)) return;
 
 		ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Favorite = !PortPin.Favorite;
-	}
-
-	private void OpenLinkingMenu()
-	{
-		isModalVisible = true;
 	}
 
 	protected override async Task OnParametersSetAsync()
