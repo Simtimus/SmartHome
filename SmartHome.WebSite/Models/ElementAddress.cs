@@ -1,6 +1,6 @@
 ﻿namespace SmartHome.WebSite.Models
 {
-	public class FavouriteElement
+	public class ElementAddress
 	{
 		public Guid ClientId { get; set; }
 		public int ComponentId { get; set; } = -1;

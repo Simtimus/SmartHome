@@ -3,7 +3,7 @@
 @if (PortPin is not null)
 {
 	<ModalPage @ref="linkingMenuModal" Width="@Width" @bind-IsVisible="isModalVisible">
-		<DataLinkerPage ReceivedPin="PortPin"></DataLinkerPage>
+		<DataLinkerPage IsModalVisible="HideModal" ReceivedPin="PortPin" ></DataLinkerPage>
 	</ModalPage>
 
 	<div class="card mt-3 @Style">
@@ -56,6 +56,11 @@
 		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PortPin.Id, out int pinIndex)) return;
 
 		ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Favorite = !PortPin.Favorite;
+	}
+
+	private void HideModal(bool value)
+	{
+		isModalVisible = value;
 	}
 
 	private void OpenLinkingMenu()

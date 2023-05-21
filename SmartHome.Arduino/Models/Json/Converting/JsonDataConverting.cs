@@ -18,6 +18,7 @@ using SmartHome.Arduino.Models.Data.DataBoxs;
 using SmartHome.Arduino.Models.Data.Transmited;
 using SmartHome.Arduino.Application.Logging;
 using SmartHome.Arduino.Models.Data.DataLinks;
+using System.Globalization;
 
 namespace SmartHome.Arduino.Models.Json.Converting
 {
@@ -150,8 +151,8 @@ namespace SmartHome.Arduino.Models.Json.Converting
 				{
 					for (int i = 0; i < client.Components.Count; i++)
 					{
-						var idPropriety = client.Components[i].Id;
-						JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, idPropriety);
+						string proprietyName = "Id";
+						JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, proprietyName, client.Components[i].Id);
 						if (foundObject != null)
 						{
 							UpdateComponentFromJson(client.Components[i], foundObject);
@@ -182,8 +183,8 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			{
 				for (int i = 0; i < component.ConnectedPins.Count; i++)
 				{
-					var idPropriety = component.ConnectedPins[i].Id;
-					JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, idPropriety);
+					string proprietyName = "Id";
+					JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, proprietyName, component.ConnectedPins[i].Id);
 					if (foundObject != null)
 					{
 						UpdateModelFromJson(component.ConnectedPins[i], foundObject);
@@ -192,10 +193,9 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			}
 		}
 
-		private static JObject? FindObjecInArrayByPropriety(JArray objectArray, object proprietyValue)
+		private static JObject? FindObjecInArrayByPropriety(JArray objectArray, string proprietyName, object Value)
 		{
-			string proprietyName = nameof(proprietyValue);
-			Type proprietyType = proprietyValue.GetType();
+			Type proprietyType = Value.GetType();
 
 			foreach (var jsonComponent in objectArray)
 			{
@@ -205,7 +205,7 @@ namespace SmartHome.Arduino.Models.Json.Converting
 					object? value = propriety.ToObject(proprietyType);
 					if (value != null)
 					{
-						if (value == proprietyValue)
+						if (value.ToString() == Value.ToString())
 							return JObject.Parse(jsonComponent.ToString());
 					}
 				}
@@ -309,7 +309,7 @@ namespace SmartHome.Arduino.Models.Json.Converting
 					}
 					else if (property.PropertyType == typeof(double))
 					{
-						double.TryParse(value.ToString(), out double doubleValue);
+						double.TryParse(value.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue);
 						deserializedValue = doubleValue;
 					}
 					else if (property.PropertyType == typeof(string))

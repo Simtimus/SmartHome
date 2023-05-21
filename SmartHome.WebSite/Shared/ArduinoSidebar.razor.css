@@ -2,6 +2,11 @@
 	overflow-x: hidden;
 }
 
+button {
+	background-color: #354047;
+	border-color: #354047;
+}
+
 .navbar {
 	padding-left: 0.5rem;
 }
@@ -87,6 +92,15 @@
 
 .active {
 	background-color: #202C34;
+}
+
+.round-btn-img {
+	width: 25px;
+	height: 25px;
+}
+
+.round-button {
+	border-radius: 30px;
 }
 
 

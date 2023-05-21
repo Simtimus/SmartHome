@@ -19,6 +19,7 @@ using SmartHome.Arduino.Models.Json.Converting;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using SmartHome.Arduino.Models.Data.DataLinks;
+using SmartHome.Arduino.Models.Components.Common.Interfaces;
 
 namespace SmartHome.Arduino.Application
 {
@@ -53,9 +54,10 @@ namespace SmartHome.Arduino.Application
             Task.Run(async () => await MonitorClients());
         }
 
-        private static async Task MonitorClients()
+        private async Task MonitorClients()
         {
-            while (true)
+			ClientEvents.OnClientChanged += SendUpdatedValues;
+			while (true)
             {
                 foreach (var client in ClientManager.Clients)
                 {
@@ -69,6 +71,34 @@ namespace SmartHome.Arduino.Application
                     LastSave = GetDTNow();
                 }
                 await Task.Delay(1000);
+            }
+        }
+
+        private void SendUpdatedValues()
+        {
+            TransmitedData transmitedData;
+			foreach (ArduinoClient client in ClientManager.Clients)
+            {
+                transmitedData = new()
+                {
+                    BoardId = Guid.Parse(client.Id.ToString()),
+                };
+                foreach (IGeneralComponent component in client.Components)
+                {
+                    foreach (PortPin portPin in component.ConnectedPins)
+                    {
+                        if (portPin.Mode == PortPin.PinMode.Write)
+                        {
+                            TransmitedCommand command = new();
+                            command.Action = TransmitedCommand.CommandAction.SetValue;
+                            command.ComponentId = component.Id;
+                            command.PinId = portPin.Id;
+                            command.Value = portPin.GetValueString();
+                            transmitedData.Commands.Add(command);
+                        }
+                    }    
+                }
+                transmittingManager.TransmitData(transmitedData);
             }
         }
 

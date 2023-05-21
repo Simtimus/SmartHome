@@ -9,7 +9,7 @@ namespace SmartHome.WebSite.Models
 
         public async Task GetDimensions(IJSRuntime js)
         {
-            var dimension = await js.InvokeAsync<WindowDimension>("getDimensions");
+			var dimension = await js.InvokeAsync<WindowDimension>("getDimensions");
             Width = dimension.Width;
             Height = dimension.Height;
         }

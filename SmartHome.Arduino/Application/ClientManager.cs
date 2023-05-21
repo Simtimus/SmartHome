@@ -3,6 +3,8 @@ using SmartHome.Arduino.Models.Arduino;
 using SmartHome.Arduino.Models.Components.Common.Interfaces;
 using SmartHome.Arduino.Models.Json.Converting;
 using SmartHome.Arduino.Models.Json.FileStorage;
+using System.ComponentModel;
+using System.Reflection.Metadata.Ecma335;
 
 namespace SmartHome.Arduino.Application
 {
@@ -72,6 +74,35 @@ namespace SmartHome.Arduino.Application
             return index != -1;
 		}
 
+        public static ArduinoClient? GetClientById(Guid clientId)
+        {
+            lock ( _lock)
+            {
+			    if (!GetClientIndexById(clientId, out int clientIndex)) return null;
+                return Clients[clientIndex];
+            }
+		}
+
+        public static IGeneralComponent? GetComponentById(Guid clientId, int componentId)
+		{
+			lock (_lock)
+			{
+				if (!GetClientIndexById(clientId, out int clientIndex)) return null;
+				if (!GetComponentIndexById(clientIndex, componentId, out int componentIndex)) return null;
+                return Clients[clientIndex].Components[componentIndex];
+			}
+		}
+        public static PortPin? GetPortPinById(Guid clientId, int componentId, int portPinId)
+		{
+			lock (_lock)
+			{
+				if (!GetClientIndexById(clientId, out int clientIndex)) return null;
+				if (!GetComponentIndexById(clientIndex, componentId, out int componentIndex)) return null;
+				if (!GetBoardPinIndexById(clientIndex, componentIndex, portPinId, out int pinIndex)) return null;
+                return Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex];
+			}
+		}
+
 		public static void SaveClientData()
         {
             lock (_lock)
@@ -99,6 +130,14 @@ namespace SmartHome.Arduino.Application
                 {
                     Clients = arduinoClients;
                 }
+            }
+        }
+
+        public static void RemoveClient(ArduinoClient client)
+        {
+            lock (_lock)
+            {
+                Clients.Remove(client);
             }
         }
 

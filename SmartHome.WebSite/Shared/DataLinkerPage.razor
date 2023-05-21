@@ -1,37 +1,137 @@
-﻿@inject WindowDimension WindowsDimension
+﻿@inject SnackBar SnackBar
+@inject WindowDimension WindowsDimension
 
 @if (ReceivedPin is not null)
 {
 	<div>
 		<div class="row gutters-sm">
-			<div>
-				@*Link Status*@
+			<div class="col-md-12 link-state">
+				<div class="card @LinkState">
+					<div class="card-body">
+						<h5 class="text-center" style="margin-bottom: -2px">Data Link State</h5>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="row gutters-sm" style="padding-left: 5%; padding-right: 5%;">
+		<div class="row gutters-sm mt-3" style="padding-left: 5%; padding-right: 5%;">
 			@*Link From PortPin*@
 			<div class="col-md-6">
-				<DataLinkerPortPin PortPin="LinkFrom"></DataLinkerPortPin>
+				<h5 class="mb-3">Link Data From</h5>
+				@if (LinkFrom is not null)
+				{
+					<DataLinkerPortPin PortPin="LinkFrom"></DataLinkerPortPin>
+				}
+				else
+				{
+					<DropDownSelectMenu PortPinId="PortPinId" OnPortPinReady="GetPortPin"></DropDownSelectMenu>
+				}
 			</div>
 
 			@*Link To PortPin*@
 			<div class="col-md-6">
-				<DataLinkerPortPin PortPin="LinkTo"></DataLinkerPortPin>
-			</div>
+				<h5 class="mb-3">Link Data To</h5>
+				@if (LinkTo is not null)
+				{
+					<DataLinkerPortPin PortPin="LinkTo"></DataLinkerPortPin>
+				}
+				else
+				{
+					<DropDownSelectMenu PortPinId="PortPinId"  OnPortPinReady="GetPortPin"></DropDownSelectMenu>
+				}
+			</div>	
+		</div>
+		<div class="mt-3 mb-3 text-center" style="padding-left: 5%; padding-right: 5%;">
+			<button class="btn btn-primary" style="margin-right: 10px" @onclick="() => ResetPortPinId()">
+				<lable>Try Again</lable>
+			</button>
+
+			<button class="btn btn-primary" @onclick="() => CreateDataLink()">
+				<lable>Create Link</lable>
+			</button>
 		</div>
 	</div>
+	<PageSnackBar SnackBarMessage="@SnackBar.Message"></PageSnackBar>
 }
 
 @code {
+	[Parameter]
+	public EventCallback<bool> IsModalVisible { get; set; }
+
 	[Parameter]
 	public PortPin? ReceivedPin { get; set; }
 
 	private PortPin? LinkFrom;
 	private PortPin? LinkTo;
+	private string PortPinId = string.Empty;
+
+	private string LinkState = "impossible";
+
+	private void ResetPortPinId()
+	{
+		PortPinId = string.Empty;
+		if (ReceivedPin.Mode == PortPin.PinMode.Read)
+		{
+			LinkTo = null;
+		}
+		else
+		{
+			LinkFrom = null;
+		}
+	}
+
+	private async Task CreateDataLink()
+	{
+		if (LinkFrom is null) return;
+		if (LinkTo is null) return;
+
+		DataLinker.LinkData(ref LinkFrom, ref LinkTo);
+		await IsModalVisible.InvokeAsync(false);
+		await SnackBar.ShowMessage("Data Link Created");
+	}
+
+	private void GetDataLinkState()
+	{
+		if (LinkFrom is null || LinkTo is null)
+		{
+			LinkState = "impossible";
+		}
+		else
+		{
+			if (LinkFrom.Mode == LinkTo.Mode)
+			{
+				LinkState = "impossible";
+			}
+			else if (LinkFrom.ValueType == LinkTo.ValueType)
+			{
+				LinkState = "possible";
+			}
+			else if (LinkFrom.ValueType == PortPin.ObjectValueType.Float && LinkTo.ValueType == PortPin.ObjectValueType.Integer)
+			{
+				LinkState = "partial";
+			}
+		}
+	}
+
+	private void GetPortPin(ElementAddress elementAddress)
+	{
+		if (!ClientManager.GetClientIndexById(elementAddress.ClientId, out int clientIndex)) return;
+		if (!ClientManager.GetComponentIndexById(clientIndex, elementAddress.ComponentId, out int componentIndex)) return;
+		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, elementAddress.PortPinId, out int pinIndex)) return;
+
+		if (LinkFrom is null)
+		{
+			LinkFrom = ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex];
+		}
+		else if (LinkTo is null)
+		{
+			LinkTo = ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex];
+		}
+		GetDataLinkState();
+	}
 
 	protected override async Task OnParametersSetAsync()
 	{
-		if (ReceivedPin.Mode == PortPin.PinMode.Write)
+		if (ReceivedPin.Mode == PortPin.PinMode.Read)
 		{
 			LinkFrom = ReceivedPin;
 		}
@@ -39,6 +139,7 @@
 		{
 			LinkTo = ReceivedPin;
 		}
+		GetDataLinkState();
 		StateHasChanged();
 	}
 }

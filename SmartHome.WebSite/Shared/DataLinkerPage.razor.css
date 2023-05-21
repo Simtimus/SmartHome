@@ -1,1 +1,24 @@
-﻿
+﻿.link-state {
+	padding-left: 56px;
+	padding-right: 56px;
+}
+
+.card {
+	color: #FFF8CA;
+	border-radius: 30px;
+}
+
+.impossible {
+	border-color: #FF0000;
+	background-color: #FF0000;
+}
+
+.partial {
+	border-color: #FFCC00;
+	background-color: #FFCC00;
+}
+
+.possible {
+	border-color: #699755;
+	background-color: #699755;
+}

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SmartHome.Arduino.Models.Data.DataLinks;
 using SmartHome.Arduino.Models.Components.Common.Interfaces;
+using System.Globalization;
 
 namespace SmartHome.Arduino.Models.Arduino
 {
@@ -47,25 +48,25 @@ namespace SmartHome.Arduino.Models.Arduino
             string stringData;
 
             stringData = DataLink.GetValue();
-
+            
             if (string.IsNullOrEmpty(stringData))
             {
                 stringData = Value;
             }
 
-			if (ValueType == PortPin.ObjectValueType.String)
+			if (ValueType == ObjectValueType.String)
 			{
 				return stringData;
 			}
-			else if (ValueType == PortPin.ObjectValueType.Integer)
+			else if (ValueType == ObjectValueType.Integer)
 			{
 				return int.Parse(stringData);
 			}
-			else if (ValueType == PortPin.ObjectValueType.Float)
+			else if (ValueType == ObjectValueType.Float)
 			{
-				return float.Parse(stringData);
+				return float.Parse(stringData, CultureInfo.InvariantCulture);
 			}
-			else if (ValueType == PortPin.ObjectValueType.Boolean)
+			else if (ValueType == ObjectValueType.Boolean)
 			{
                 if (bool.TryParse(stringData, out bool boolValue))
                 { 
@@ -91,7 +92,5 @@ namespace SmartHome.Arduino.Models.Arduino
             object? value = GetValue();
             return value is null ? string.Empty : value.ToString();
         }
-
-        public override string ToString() => $"Pin {Id} [{Enum.GetName(typeof(PinMode), Mode)}]";
     }
 }

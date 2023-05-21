@@ -1,38 +1,54 @@
 ﻿@inject IJSRuntime JSRuntime
+@inject SnackBar SnackBar
 @inject Models.ClipboardService ClipboardService
 
 <div class="bg-arduinolist border-right vh-100" id="sidebar-wrapper">
 
     <div class="list-group list-group-flush overflow-auto" style="margin: 20px; height: 97%">
-        @foreach (var client in Clients)
+        @if (Clients.Count > 0)
         {
-            string style = "idle";
-            @if (client.Id.Equals(SelectedClient.Id))
+            @foreach (var client in Clients)
             {
-                style = "active";
-            }
-            <div class="card mb-3 @style">
-                <button @onclick="() => OnClientClick(client)" class="button-transparent">
-                    <div class="card-body">
-                        <div class="inline">
-                            @if (client.State == ArduinoClient.ConnectionState.Online)
+                string style = "idle";
+                @if (client.Id.Equals(SelectedClient.Id))
+                {
+                    style = "active";
+                }
+                <div class="card mb-3 @style">
+                    <button @onclick="() => OnClientClick(client)" class="button-transparent">
+                        <div class="card-body">
+                            <div class="row gutters-sm">
+                                <div class="col-sm-8 inline">
+                                    @if (client.State == ArduinoClient.ConnectionState.Online)
+                                    {
+                                        <img src="/img/online-circle.png" class="activity-img">
+                                    }
+                                    else
+                                    {
+                                        <img src="/img/offline-circle.png" class="activity-img">
+                                    }
+                                    <div>@client.Name</div>
+                                </div>
+                                @if (client.Id.Equals(SelectedClient.Id))
+                                {
+                                    <div class="col-sm-2">
+                                        <button class="btn btn-primary round-button" @onclick="() => DeleteClient(client)">
+                                            <img src="img/trash.png" class="round-btn-img" />
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                            @if (client.Id.Equals(SelectedClient.Id))
                             {
-                                <img src="/img/online-circle.png" class="activity-img">
+                                <div class="mt-2">
+                                    <div>Delay: @client.Ping ms</div>
+                                    <div>@client.IP</div>
+                                </div>
                             }
-                            else
-                            {
-                                <img src="/img/offline-circle.png" class="activity-img">
-                            }
-                            <div>@client.Name</div>
                         </div>
-                        @if (client.Id.Equals(SelectedClient.Id))
-                        {
-                            <div>Latency: @client.Ping ms</div>
-                            <div>@client.IP</div>
-                        }
-                    </div>
-                </button>
-            </div>
+                    </button>
+                </div>
+            }
         }
     </div>
 
@@ -45,6 +61,8 @@
         </button>
     </div>*@
 </div>
+
+<PageSnackBar SnackBarMessage="@SnackBar.Message"></PageSnackBar>
 
 @code {
     [Parameter]
@@ -63,6 +81,12 @@
         {
 
         }
+    }
+
+    private void DeleteClient(ArduinoClient client)
+    {
+        ClientManager.RemoveClient(client);
+        SnackBar.ShowMessage("Client Deleted Successfully");
     }
 
     private async Task OnClientClick(ArduinoClient client)

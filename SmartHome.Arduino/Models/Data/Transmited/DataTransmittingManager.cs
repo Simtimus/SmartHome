@@ -28,7 +28,7 @@ namespace SmartHome.Arduino.Models.Data.Transmited
                 {
                     new TransmitedCommand()
                     {
-                        Value = String.Empty,
+                        Value = string.Empty,
                         Action = TransmitedCommand.CommandAction.Empty,
                     }
                 }
@@ -53,9 +53,15 @@ namespace SmartHome.Arduino.Models.Data.Transmited
             };
             string transmitedPacket = JsonConvert.SerializeObject(transmitedData);
             SendMessageToClientById(transmitedData.BoardId, transmitedPacket);
-        }
+		}
 
-        public int SendMessageToClientById(Guid id, string message)
+		public void TransmitData(TransmitedData transmitedData)
+		{
+			string transmitedPacket = JsonConvert.SerializeObject(transmitedData);
+			SendMessageToClientById(transmitedData.BoardId, transmitedPacket);
+		}
+
+		public int SendMessageToClientById(Guid id, string message)
         {
             ClientManager.GetClientIndexById(id, out int index);
             if (index == -1) return 0;

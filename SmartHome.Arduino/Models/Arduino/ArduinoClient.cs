@@ -32,5 +32,5 @@ namespace SmartHome.Arduino.Models.Arduino
                 return true;
             return false;
         }
-    }
+	}
 }

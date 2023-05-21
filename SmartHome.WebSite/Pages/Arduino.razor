@@ -65,7 +65,7 @@
 
 @code {
 	private string WrapperState = String.Empty;
-	private ArduinoClient SelectedClient { get; set; } = new ArduinoClient();
+	private ArduinoClient SelectedClient { get; set; } = new();
 	private int LastClientsCount = 0;
 
 
@@ -132,12 +132,16 @@
 		await Task.Delay(1000);
 		while(true)
 		{
-			try
-			{
-				await WindowDimension.GetDimensions(JsRuntime);
-			}
-			catch (Exception ex) { }
+			await WindowDimension.GetDimensions(JsRuntime);
 			await Task.Delay(500);
+		}
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await RefreshPageSize();
 		}
 	}
 
@@ -145,7 +149,6 @@
 	{
 		ClientEvents.OnClientChanged += RefreshPage;
 		ClientEvents.OnNewClientAddedd += NewArduinoClientAdded;
-		Task.Run(() => RefreshPageSize());
 		if (ClientManager.Clients.Count > 0)
 		{
 			//TODO: In case I want by default a Client to be selected

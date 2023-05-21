@@ -13,5 +13,5 @@ namespace SmartHome.Arduino.Models.Components
         public string Description { get; set; } = string.Empty;
 		public bool Favorite { get; set; }
 		[JsonIgnore] public ArduinoClient ParentClient { get; set; }
-    }
+	}
 }

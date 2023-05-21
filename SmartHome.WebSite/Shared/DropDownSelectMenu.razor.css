@@ -1,0 +1,35 @@
+﻿h6 {
+	margin-bottom: -0.25rem;
+}
+
+select {
+	font-size: 18px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	border-radius: 10px;
+}
+
+label {
+	margin-left: 5px;
+}
+
+.card {
+	border-color: #E8E8E8;
+	background-color: #E8E8E8;
+}
+
+.inline {
+	display: flex;
+	align-items: center; /* vertically aligns the items to the center */
+	justify-content: flex-start; /* aligns the items to the start horizontally, you can change this as needed */
+}
+
+.space-between {
+	display: flex;
+	justify-content: space-between;
+}
+
+.main-card {
+	width: 400px;
+	border-radius: 20px;
+}

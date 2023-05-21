@@ -41,7 +41,7 @@ else
 	public double WebWidth { get; set; } = 1980;
 
 	private List<ArduinoClient> _clients { get; set; } = new();
-	private List<FavouriteElement> favouriteElements = new();
+	private List<ElementAddress> favouriteElements = new();
 
 	private Dictionary<int, ElementReference> ClientElement = new Dictionary<int, ElementReference>();
 	private int Columns = 3;
