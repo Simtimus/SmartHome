@@ -2,7 +2,7 @@
 @implements IDisposable
 @inject IJSRuntime JsRuntime
 @inject SnackBar SnackBar
-@inject WindowDimension WindowDimension
+@inject WindowDimension WindowDimensions
 @inject Server ArduinoServer
 @inject GeneralComponent GenericComponent
 
@@ -21,26 +21,26 @@
 						<img src="img/home.png" class="btn-img" />
 				</button>
 			</a>
-			<a class="nav-link text-white">@ArduinoServer.IpHost : @ArduinoServer.PortHost</a>
+			<a class="nav-link text-white">@ArduinoServer.IpHost : @Server.PortHost</a>
 			<img src="img/ip-server.png" class="txt-img"/>
 			@*Empty div is part of design*@
 			<div class="collapse navbar-collapse"></div>
-			<div><a>@WindowDimension.Width</a></div>
+			<div><a>@WindowDimensions.Width</a></div>
 			<button class="btn btn-primary" @onclick="ShowModal">Open Modal</button>
 			<button class="btn btn-primary"  @onclick="RunTest">Test</button>
 		</nav>
 		<ul class="nav nav-tabs">
 			<li class="nav-item">
-				<a class="nav-link disabled" tabindex="-1" aria-disabled="true">Arduino Tabs:</a>
+				<button class="nav-link disabled" tabindex="-1" aria-disabled="true">Arduino Tabs:</button>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link @ComponentTabClass" @onclick="() => ActivateTab(0)">Components</a>
+				<button class="nav-link @ComponentTabClass" @onclick="() => ActivateTab(0)">Components</button>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link @LogicBlocksTabClass" @onclick="() => ActivateTab(1)">Logic Blocks</a>
+				<button class="nav-link @LogicBlocksTabClass" @onclick="() => ActivateTab(1)">Logic Blocks</button>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link @ProgramLogsTabClass" @onclick="() => ActivateTab(2)">Program Logs</a>
+				<button class="nav-link @ProgramLogsTabClass" @onclick="() => ActivateTab(2)">Program Logs</button>
 			</li>
 		</ul>
 		<ModalPage @ref="myModal" @bind-IsVisible="isModalVisible">
@@ -51,11 +51,11 @@
 		<div class="container-fluid">
 			@if (activeTab == 0)
 			{
-				<ArduinoDataTable SelectedClient="@SelectedClient" WrapperState="@WrapperState" WebWidth="@WindowDimension.Width" />
+				<ArduinoDataTable SelectedClient="@SelectedClient" WrapperState="@WrapperState" WebWidth="@WindowDimensions.Width" />
 			}
 			else if (activeTab == 1)
 			{
-				<DataLinkTable WrapperState="@WrapperState" WebWidth="@WindowDimension.Width" />
+				<DataLinkTable DataLinks="DataLinker.DataLinks" WrapperState="@WrapperState" WebWidth="@WindowDimensions.Width" />
 			}
 		</div>
 	</div>
@@ -103,7 +103,7 @@
 
 	async Task RunTest()
 	{
-		await WindowDimension.GetDimensions(JsRuntime);
+		await WindowDimensions.GetDimensions(JsRuntime);
 	}
 
 	private void OnClientClick(ArduinoClient client)
@@ -130,9 +130,10 @@
 	private async Task RefreshPageSize()
 	{
 		await Task.Delay(1000);
-		while(true)
+		while (true)
 		{
-			await WindowDimension.GetDimensions(JsRuntime);
+			await WindowDimensions.GetDimensions(JsRuntime);
+			StateHasChanged();
 			await Task.Delay(500);
 		}
 	}
@@ -145,10 +146,12 @@
 		}
 	}
 
+
 	protected override async Task OnInitializedAsync()
 	{
 		ClientEvents.OnClientChanged += RefreshPage;
 		ClientEvents.OnNewClientAddedd += NewArduinoClientAdded;
+		Task.Run(() => RefreshPageSize());
 		if (ClientManager.Clients.Count > 0)
 		{
 			//TODO: In case I want by default a Client to be selected

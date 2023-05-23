@@ -134,10 +134,25 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			{
 				PortPin? boardPin = new();
 				UpdateModelFromJson(boardPin, jsonObject, false);
+				boardPin.DataLink = ConvertDataLink(jsonObject["DataLink"].ToString());
 				return boardPin;
 			}
 			return null;
-			//return (BoardPin?)JsonConvert.DeserializeObject(serializedObject);
+		}
+
+		public static DataLink ConvertDataLink(string? serializedObject)
+		{
+			DataLink dataLink = new();
+
+			if (string.IsNullOrEmpty(serializedObject)) return dataLink;
+			JObject jsonObject = JObject.Parse(serializedObject);
+
+			if (jsonObject != null)
+			{
+				UpdateModelFromJson(dataLink, jsonObject, false);
+			}
+
+			return dataLink;
 		}
 
 		public static void UpdateClientFromJson(ArduinoClient client, string serializedObject)
@@ -218,6 +233,10 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			foreach (PortPin boardPin in component.ConnectedPins)
 			{
 				boardPin.ParentComponent = component;
+				if (boardPin.DataLink != default)
+				{
+					boardPin.DataLink.ParentPortPin = boardPin;
+				}
 			}
 		}
 

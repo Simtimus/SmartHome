@@ -84,6 +84,12 @@
 		if (LinkFrom is null) return;
 		if (LinkTo is null) return;
 
+		if (LinkState == "impossible")
+		{
+			await SnackBar.ShowMessage($"DataLink is {LinkState}");
+			return;
+		}
+
 		DataLinker.LinkData(ref LinkFrom, ref LinkTo);
 		await IsModalVisible.InvokeAsync(false);
 		await SnackBar.ShowMessage("Data Link Created");

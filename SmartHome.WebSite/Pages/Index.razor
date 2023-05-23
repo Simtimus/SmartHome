@@ -2,7 +2,7 @@
 @implements IDisposable
 @inject IJSRuntime JsRuntime
 @inject SnackBar SnackBar
-@inject WindowDimension WindowDimension
+@inject WindowDimension WindowDimensions
 @inject Server ArduinoServer
 @inject GeneralComponent GenericComponent
 
@@ -14,11 +14,11 @@
 				<img src="img/settings.png" class="btn-img" />
 			</button>
 		</a>
-		<a class="nav-link text-white">@ArduinoServer.IpHost : @ArduinoServer.PortHost</a>
+		<a class="nav-link text-white">@ArduinoServer.IpHost : @Server.PortHost</a>
 		<img src="img/ip-server.png" class="txt-img" />
 		@*Empty div is part of design*@
 		<div class="collapse navbar-collapse"></div>
-		<div><a>@WindowDimension.Width</a></div>
+		<div><a>@WindowDimensions.Width</a></div>
 		<button class="btn btn-primary" @onclick="ShowModal">Open Modal</button>
 	</nav>
 	<ModalPage @ref="myModal" @bind-IsVisible="isModalVisible">
@@ -27,7 +27,7 @@
 		<button @onclick="HideModal">Close</button>
 	</ModalPage>
 	<div class="container-fluid">
-		<FavouriteElementsTable Clients="ClientManager.Clients" WebWidth="WindowDimension.Width"/>
+		<FavouriteElementsTable Clients="ClientManager.Clients" WebWidth="WindowDimensions.Width"/>
 	</div>
 </div>
 
@@ -68,7 +68,8 @@
 		await Task.Delay(1000);
 		while (true)
 		{
-			await WindowDimension.GetDimensions(JsRuntime);
+			await WindowDimensions.GetDimensions(JsRuntime);
+			StateHasChanged();
 			await Task.Delay(500);
 		}
 	}

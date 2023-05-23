@@ -1,6 +1,6 @@
 ﻿<div class="card main-card p-3" style="height: 315px">
 	<div>
-		<select class="form-select form-select-lg" @bind="ClientId">
+		<select id="client_id" class="form-select form-select-lg" @bind="ClientId">
 			<option disabled selected value="@string.Empty">-</option>
 			@foreach (ArduinoClient client in ClientManager.Clients)
 			{

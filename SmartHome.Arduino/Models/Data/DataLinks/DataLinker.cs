@@ -15,14 +15,15 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
 {
 	public static class DataLinker
 	{
-		public static List<DataLink> DataLinks = new();
-		private static readonly object _lock = new object();
+		public static List<DataLink> DataLinks { get; set; } = new();
+		private static readonly object _lock = new();
 
 		public static void LinkData(ref PortPin from, ref PortPin to)
 		{
 			to.DataLink = new(from)
 			{
-				Id = Guid.NewGuid()
+				Id = Guid.NewGuid(),
+				ParentPortPin = to
 			};
 			lock (_lock)
 			{
@@ -34,13 +35,9 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
 		{
 			lock (_lock)
 			{
-				DataLink? dataLink = DataLinks.Find(x => x.Id == Id);
-				if (dataLink == null)
-				{
-					dataLink = new();
-					DataLinks.Remove(dataLink);
+				int deletedItems = DataLinks.RemoveAll(link => link.Id == Id);
+				if (deletedItems > 0)
 					return true;
-				}
 			}
 			return false;
 		}

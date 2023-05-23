@@ -12,7 +12,7 @@ namespace SmartHome.Arduino.Application
     {
         private static readonly string FileName = "ArduinoDataPacket.json";
         public static List<ArduinoClient> Clients { get; set; } = new List<ArduinoClient>();
-        private static readonly object _lock = new object();
+        private static readonly object _lock = new();
 
         public static void AddNewClient(ArduinoClient client)
         {
@@ -141,7 +141,7 @@ namespace SmartHome.Arduino.Application
             }
         }
 
-        public static List<ArduinoClient> TestDecoy = new();
+        public static List<ArduinoClient> TestDecoy { get; set; } = new();
 	}
 }
 

@@ -28,17 +28,18 @@ namespace SmartHome.Arduino.Application
         public string IpHost { get { return ipHost; } }
         private readonly string ipHost = "0.0.0.0";
 
-        public int PortHost { get { return portHost; } }
+        public static int PortHost { get { return portHost; } }
         public const int portHost = 8080;
 
         private const int secondsUntilOffline = 60;
         private const int secondsBetweenSaves = 30;
 
         private readonly UdpClient server = new(portHost);
-        private DataTransmittingManager transmittingManager;
-        private ArduinoDataProcessor dataProcessor;
+        private readonly DataTransmittingManager transmittingManager;
+        private readonly ArduinoDataProcessor dataProcessor;
         private static readonly TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time");
         private static DateTime LastSave = new();
+        private static DateTime LastCycleRun = new();
 
         public Server()
         {
@@ -51,7 +52,7 @@ namespace SmartHome.Arduino.Application
             ClientManager.RecoverClientData();
             DataLinker.RecoverDataLinks();
             Task.Run(() => ReceiveAndProcessMessages());
-            Task.Run(async () => await MonitorClients());
+            Task.Run(() => MonitorClients());
         }
 
         private async Task MonitorClients()
@@ -89,12 +90,14 @@ namespace SmartHome.Arduino.Application
                     {
                         if (portPin.Mode == PortPin.PinMode.Write)
                         {
-                            TransmitedCommand command = new();
-                            command.Action = TransmitedCommand.CommandAction.SetValue;
-                            command.ComponentId = component.Id;
-                            command.PinId = portPin.Id;
-                            command.Value = portPin.GetValueString();
-                            transmitedData.Commands.Add(command);
+							TransmitedCommand command = new()
+							{
+								Action = TransmitedCommand.CommandAction.SetValue,
+								ComponentId = component.Id,
+								PinId = portPin.Id,
+								Value = portPin.GetValueString()
+							};
+							transmitedData.Commands.Add(command);
                         }
                     }    
                 }

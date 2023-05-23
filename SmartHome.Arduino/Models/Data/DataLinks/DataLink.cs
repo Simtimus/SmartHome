@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace SmartHome.Arduino.Models.Data.DataLinks
 {
@@ -17,6 +18,7 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
         public int ComponentId { get; set; } = -1;
         public int PinId { get; set; } = -1;
         public string Value { get; set; } = string.Empty;
+		[JsonIgnore] public PortPin ParentPortPin { get; set; }
 
         public DataLink() { }
 
