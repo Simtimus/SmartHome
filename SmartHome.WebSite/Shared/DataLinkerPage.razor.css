@@ -22,3 +22,24 @@
 	border-color: #699755;
 	background-color: #699755;
 }
+
+.main-card {
+	border-radius: 20px;
+	color: #000;
+	border-color: #E8E8E8;
+	background-color: #E8E8E8;
+}
+
+input {
+	color: #fff;
+	background-color: #08151D;
+	border-color: #08151D;
+	border-radius: 10px;
+}
+
+	input:focus {
+		color: #fff;
+		background-color: #08151D;
+		border-color: #08151D;
+		border-radius: 10px;
+	}

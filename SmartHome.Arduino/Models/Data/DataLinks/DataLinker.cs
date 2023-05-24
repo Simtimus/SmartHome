@@ -18,12 +18,14 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
 		public static List<DataLink> DataLinks { get; set; } = new();
 		private static readonly object _lock = new();
 
-		public static void LinkData(ref PortPin from, ref PortPin to)
+		public static void LinkData(ref PortPin from, ref PortPin to, DataLink.ValueOperations valueOperation, string value)
 		{
 			to.DataLink = new(from)
 			{
 				Id = Guid.NewGuid(),
-				ParentPortPin = to
+				ParentPortPin = to,
+				Value = value,
+				ValueOperation = valueOperation,
 			};
 			lock (_lock)
 			{

@@ -12,6 +12,7 @@ button {
 }
 
 .btn-img {
+	cursor: pointer;
 	width: 15px;
 	height: 15px;
 }

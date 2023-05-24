@@ -5,7 +5,7 @@
 	background-color: #18191C; /* Black background color */
 	color: #fff; /* White text color */
 	text-align: center; /* Centered text */
-	border-radius: 5px; /* Rounded borders */
+	border-radius: 20px; /* Rounded borders */
 	padding: 16px; /* Padding */
 	position: fixed; /* Sit on top of the screen */
 	z-index: 1; /* Add a z-index if needed */

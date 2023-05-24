@@ -5,6 +5,7 @@
 }
 
 .btn-img {
+	cursor: pointer;
 	margin-left: 10px;
 	width: 21px;
 	height: 21px;

@@ -1,9 +1,29 @@
-﻿@if (!DataLink.IsNullOrEmpty(DataLink) && DataLink.BoardId != default)
+﻿@inject SnackBar SnackBar
+
+@if (!DataLink.IsNullOrEmpty(DataLink) && DataLink.BoardId != default)
 {
 	<div class="item mt-3 mb-4" role="listitem" style="width: 400px">
 		<div class="card main-card">
 			<div class="card-body">
-				<label class="text-center">Data Link</label>
+				<h5 class="text-center">Data Link</h5>
+				@if (DataLink.ValueOperation != DataLink.ValueOperations.None)
+				{
+					string operationName = Enum.GetName(typeof(DataLink.ValueOperations), DataLink.ValueOperation);
+					<div class="card secondary-card mt-3">
+						<div class="card-body">
+							<strong>Involved Operation</strong>
+							@if (DataLink.ValueOperation == DataLink.ValueOperations.Negation)
+							{
+								<div class="gray-txt">@operationName</div>
+							}
+							else
+							{
+								<div class="gray-txt">@operationName@DataLink.Value</div>
+							}
+						</div>
+					</div>
+				}
+
 				<div class="card secondary-card mt-3">
 					<div class="card-header">
 						From
@@ -57,7 +77,7 @@
 	[Parameter]
 	public DataLink DataLink { get; set; }
 
-	private void DeleteDataLink()
+	private async Task DeleteDataLink()
 	{
 		//TODO: DELETE does not work, Fix it!!
 		DataLinker.RemoveLink(DataLink.Id);
@@ -68,6 +88,8 @@
 		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, portPin.Id, out int pinIndex)) return;
 
 		ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].DataLink = new();
+
+		await SnackBar.ShowMessage("Link has been deleted!");
 	}
 
 	protected override async Task OnParametersSetAsync()

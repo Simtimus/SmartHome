@@ -1,5 +1,9 @@
 ﻿@if (PortPin is not null)
 {
+	<ModalPage @ref="linkingMenuModal" Width="@Width" @bind-IsVisible="isModalVisible">
+		<PortPinEditingMenu IsModalVisible="HideModal" PortPin="PortPin"></PortPinEditingMenu>
+	</ModalPage>
+
 	<div class="card mt-3 mb-4 @Style" style="width: 400px">
 		<div class="card-header ">
 			<div class="inline space-between row gutters-sm">
@@ -20,7 +24,11 @@
 			</div>
 		</div>
 		<div class="card-body">
-			<a>@Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode) Mode | Value: "@PortPin.GetValueString()"</a>
+			<div class="inline space-between">
+				<a>@PortPin.GetFormatedStringValue()</a>
+				<img src="/img/edit.png" class="btn-img_small" @onclick="OpenEditingMenu">
+			</div>
+			<a style="font-size: 0.8rem">@Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode) Mode</a>
 		</div>
 	</div>
 }
@@ -31,12 +39,27 @@
 
 	private PortPin? PortPin = null;
 
+	private ModalPage linkingMenuModal;
+	private bool isModalVisible;
+
+	private string Width = "600px";
+
 	private string Style = string.Empty;
 
 	private void SetStyles()
 	{
 		Style = Enum.GetName(typeof(PortPin.ObjectValueType), PortPin.ValueType).ToLower();
 
+	}
+
+	private void HideModal(bool value)
+	{
+		isModalVisible = value;
+	}
+
+	private void OpenEditingMenu()
+	{
+		isModalVisible = true;
 	}
 
 	private void ChangeFavouriteState()

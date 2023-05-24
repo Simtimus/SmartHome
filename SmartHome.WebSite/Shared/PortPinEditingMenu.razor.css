@@ -1,0 +1,17 @@
+﻿input {
+	color: #fff;
+	background-color: #08151D;
+	border-color: #08151D;
+	border-radius: 10px;
+}
+
+	input:focus {
+		color: #fff;
+		background-color: #08151D;
+		border-color: #08151D;
+		border-radius: 10px;
+	}
+
+.round-button {
+	border-radius: 30px;
+}

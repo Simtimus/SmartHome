@@ -1,0 +1,47 @@
+﻿@inject SnackBar SnackBar
+
+@if (portPin != null)
+{
+	<div class="form-outline">
+		<div class="text-center mb-3">
+			<h5>Value String Format</h5>
+		</div>
+		<input type="text" class="form-control form-control-lg" @bind="portPin.FormatString" @bind:event="oninput" />
+	</div>
+	<div class="text-center mt-3">
+		<button class="btn btn-primary round-button" style="width: 100px" @onclick="SaveChanges">Save</button>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public EventCallback<bool> IsModalVisible { get; set; }
+
+	[Parameter]
+	public PortPin? PortPin { get; set; }
+
+	private PortPin? portPin;
+
+	private async Task SaveChanges()
+	{
+		await IsModalVisible.InvokeAsync(false);
+		await SnackBar.ShowMessage("Format has been saved!");
+	}
+
+	private void GetPortPin()
+	{
+		if (PortPin is not null)
+		{
+			if (!ClientManager.GetClientIndexById(PortPin.ParentComponent.ParentClient.Id, out int clientIndex)) return;
+			if (!ClientManager.GetComponentIndexById(clientIndex, PortPin.ParentComponent.Id, out int componentIndex)) return;
+			if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PortPin.Id, out int pinIndex)) return;
+			portPin = ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex];
+		}
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		GetPortPin();
+		StateHasChanged();
+	}
+}
