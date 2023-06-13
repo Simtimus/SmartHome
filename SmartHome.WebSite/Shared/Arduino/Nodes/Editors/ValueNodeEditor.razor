@@ -1,0 +1,135 @@
+﻿@inject IJSRuntime JSRuntime
+@inject SnackBar SnackBar
+@inject ClipboardService ClipboardService
+
+@if (Node is not null)
+{
+	<div class="form-outline">
+		<div class="text-center mb-3">
+			<h5>Value</h5>
+		</div>
+		<div style="padding-left: 100px; padding-right: 100px;">
+			<input type="text" class="form-control form-control-lg text-center @Style" @bind="Value" @bind:event="oninput" />
+		</div>
+	</div>
+	<div class="text-center mt-3">
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio0" 
+				   value="0" @onchange="UpdateSelection" checked="@IsChecked("0")">
+			<label class="form-check-label" for="inlineRadio10">String</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" 
+				   value="1" @onchange="UpdateSelection" checked="@IsChecked("1")">
+			<label class="form-check-label" for="inlineRadio1">Integer</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" 
+				   value="2" @onchange="UpdateSelection" checked="@IsChecked("2")">
+			<label class="form-check-label" for="inlineRadio2">Float</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" 
+				   value="3" @onchange="UpdateSelection" checked="@IsChecked("3")">
+			<label class="form-check-label" for="inlineRadio3">Bool</label>
+		</div>
+		<div class="text-center mt-3">
+			<button class="btn btn-primary round-button" style="width: 100px" @onclick="SaveNewValue">
+				Set Value
+			</button>
+			<button class="btn btn-primary round-button" style="width: 70px; margin-left: 16px" @onclick="RemoveComponent">
+				<img src="img/trash.png" class="round-btn-img" />
+			</button>
+			<button class="btn btn-primary round-button button-gray" style="margin-left: 16px" @onclick="() => CopyNodeId(Node.Id)">
+				<img src="img/copy.png" class="round-btn-img" />
+			</button>
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public string NodeId { get; set; } = string.Empty;
+
+	[Parameter]
+	public EventCallback<bool> IsModalVisible { get; set; }
+
+	private INode? Node { get; set; }
+
+	private string? Value;
+
+	private string? selectedOption = "0";
+
+	private string Style = string.Empty;
+
+	private bool IsChecked(string option) => selectedOption == option;
+
+	private async Task CopyNodeId(Guid id)
+	{
+		await ClipboardService.CopyToClipboard(JSRuntime, id.ToString());
+	}
+
+	private async Task UpdateSelection(ChangeEventArgs e)
+	{
+		if (Node is null)
+			return;
+
+		selectedOption = e.Value.ToString();
+		ObjectValueType type = Enum.Parse<ObjectValueType>(selectedOption);
+		Node.FlexiValue.Type = type;
+		Style = Enum.GetName(typeof(ObjectValueType), Node.FlexiValue.Type).ToLower();
+	}
+
+	private async Task SaveNewValue()
+	{
+		if (Node is null)
+			return;
+
+		if (!FlexibleValue.TryParse(Value, Node.FlexiValue.Type, out object result))
+		{
+			string? type = Enum.GetName(typeof(ObjectValueType), Node.FlexiValue.Type);
+			await SnackBar.ShowMessage($"Invalid value for {type} type");
+		}
+		else
+		{
+			Node.FlexiValue.Set(Value);
+			await SnackBar.ShowMessage($"Value \"{result}\" set successfully!");
+		}
+	}
+
+	private async Task RemoveComponent()
+	{
+		if (Node is null)
+			return;
+
+		if (NodeManager.RemoveNodesById(Node.Id))
+		{
+			await IsModalVisible.InvokeAsync(false);
+			await SnackBar.ShowMessage("Node deleted successfull!");
+		}
+		else
+		{
+			await IsModalVisible.InvokeAsync(false);
+			await SnackBar.ShowMessage("Node not found!");
+		}
+	}
+
+	private void SetStyles()
+	{
+		if (Node is null)
+			return;
+
+		Style = Enum.GetName(typeof(ObjectValueType), Node.FlexiValue.Type).ToLower();
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (!string.IsNullOrEmpty(NodeId))
+		{
+			Node = NodeManager.GetNodeById(Guid.Parse(NodeId));
+		}
+
+		SetStyles();
+		StateHasChanged();
+	}
+}

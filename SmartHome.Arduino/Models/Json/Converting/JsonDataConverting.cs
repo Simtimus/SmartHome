@@ -19,6 +19,10 @@ using SmartHome.Arduino.Models.Data.Transmited;
 using SmartHome.Arduino.Application.Logging;
 using SmartHome.Arduino.Models.Data.DataLinks;
 using System.Globalization;
+using SmartHome.Arduino.Models.Nodes.Common.Interfaces;
+using SmartHome.Arduino.Models.Nodes.Common;
+using SmartHome.Arduino.Models.Nodes;
+using SmartHome.Arduino.Models.CommonTypes;
 
 namespace SmartHome.Arduino.Models.Json.Converting
 {
@@ -134,7 +138,8 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			{
 				PortPin? boardPin = new();
 				UpdateModelFromJson(boardPin, jsonObject, false);
-				boardPin.DataLink = ConvertDataLink(jsonObject["DataLink"].ToString());
+				if (jsonObject.ContainsKey("DataLink"))
+					boardPin.DataLink = ConvertDataLink(jsonObject["DataLink"].ToString());
 				return boardPin;
 			}
 			return null;
@@ -291,6 +296,59 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			}
 		}
 
+		public static void ConvertINodes(string serializedObject, out List<INode> nodesList)
+		{
+			nodesList = new();
+
+			JArray nodesArray = JArray.Parse(serializedObject);
+			if (nodesArray != null)
+			{
+				foreach (var jsonComponent in nodesArray)
+				{
+					INode? Node = ConvertINode(jsonComponent.ToString());
+					if (Node != null)
+					{
+						nodesList.Add(Node);
+					}
+				}
+			}
+		}
+
+		public static INode? ConvertINode(string serializedObject)
+		{
+			JObject jsonObject = JObject.Parse(serializedObject);
+			GeneralNode.NodeTypes nodeId = GeneralNode.GetTypeByString(jsonObject["Type"].ToString());
+			INode? Node = GeneralNode.CreateById(nodeId);
+			if (Node != null)
+				UpdateModelFromJson(Node, jsonObject, false);
+			else
+				return null;
+
+			if (Node is ValueNode) { }
+			else if (Node is DataLinkNode dataLinkComponent)
+			{
+				JObject linkFromObject = JObject.Parse(jsonObject["LinkFrom"].ToString());
+				UpdateModelFromJson(dataLinkComponent.LinkFrom, linkFromObject, false);
+			}
+
+			return Node;
+		}
+
+		public static DataReference ConvertDataReference(string? serializedObject)
+		{
+			DataReference dataReference = new();
+
+			if (string.IsNullOrEmpty(serializedObject)) return dataReference;
+			JObject jsonObject = JObject.Parse(serializedObject);
+
+			if (jsonObject != null)
+			{
+				UpdateModelFromJson(dataReference, jsonObject, false);
+			}
+
+			return dataReference;
+		}
+
 		public static void UpdateModelFromJson<T>(T model, JObject jsonObject, bool setNewGuid = false)
 		{
 			Type clientType = model.GetType();
@@ -298,52 +356,56 @@ namespace SmartHome.Arduino.Models.Json.Converting
 
 			foreach (PropertyInfo property in properties)
 			{
-				if (jsonObject.TryGetValue(property.Name, out JToken? value))
+				if (jsonObject.TryGetValue(property.Name, out JToken? stringValue))
 				{
 					object? deserializedValue = null;
 
 					if (property.PropertyType == typeof(Guid))
 					{
-						if (setNewGuid || string.IsNullOrEmpty(value.ToString()))
+						if (setNewGuid || string.IsNullOrEmpty(stringValue.ToString()))
 							deserializedValue = Guid.NewGuid();
 						else
-							deserializedValue = Guid.Parse(value.ToString());
+							deserializedValue = Guid.Parse(stringValue.ToString());
 					}
 					else if (property.PropertyType == typeof(IPEndPoint))
 					{
-						if (value != null && !string.IsNullOrEmpty(value.ToString()))
+						if (stringValue != null && !string.IsNullOrEmpty(stringValue.ToString()))
 						{
-							deserializedValue = IPEndPoint.Parse(value.ToString());
+							deserializedValue = IPEndPoint.Parse(stringValue.ToString());
 						}
 					}
 					else if (property.PropertyType == typeof(DateTime))
 					{
-						DateTime.TryParse(value.ToString(), out DateTime dateTimeValue);
+						DateTime.TryParse(stringValue.ToString(), out DateTime dateTimeValue);
 						if (dateTimeValue != default) { deserializedValue = dateTimeValue; }
 					}
 					else if (property.PropertyType == typeof(int))
 					{
-						int.TryParse(value.ToString(), out int intValue);
+						int.TryParse(stringValue.ToString(), out int intValue);
 						deserializedValue = intValue;
 					}
 					else if (property.PropertyType == typeof(double))
 					{
-						double.TryParse(value.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue);
+						double.TryParse(stringValue.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue);
 						deserializedValue = doubleValue;
 					}
 					else if (property.PropertyType == typeof(string))
 					{
-						deserializedValue = value.ToString();
+						deserializedValue = stringValue.ToString();
 					}
 					else if (property.PropertyType == typeof(bool))
 					{
-						bool.TryParse(value.ToString(), out bool boolValue);
+						bool.TryParse(stringValue.ToString(), out bool boolValue);
 						deserializedValue = boolValue;
 					}
 					else if (property.PropertyType.IsEnum)
 					{
-						deserializedValue = Enum.Parse(property.PropertyType, value.ToString());
+						deserializedValue = Enum.Parse(property.PropertyType, stringValue.ToString());
 					}
+					else
+					{
+						ComplementaryChecks(property, stringValue, out deserializedValue);
+                    }
 
 					if (deserializedValue != null)
 					{
@@ -352,5 +414,22 @@ namespace SmartHome.Arduino.Models.Json.Converting
 				}
 			}
 		}
+
+		private static void ComplementaryChecks(PropertyInfo property, JToken? stringValue, out object deserializedValue)
+		{
+			deserializedValue = null;
+
+            if (property.PropertyType == typeof(FlexibleValue))
+            {
+                if (stringValue != null && stringValue is JObject jObject)
+                {
+					FlexibleValue flexibleValue = new();
+					flexibleValue.Type = Enum.Parse<ObjectValueType>(jObject["Type"].ToString());
+                    string val = jObject["Value"].ToString();
+                    FlexibleValue.TryParse(val, flexibleValue.Type, out object value);
+					deserializedValue = flexibleValue;
+                }
+            }
+        }
 	}
 }

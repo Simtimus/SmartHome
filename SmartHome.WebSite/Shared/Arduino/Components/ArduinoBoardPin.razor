@@ -1,30 +1,33 @@
-﻿@if (PortPin is not null)
+﻿@inject WindowDimension WindowsDimension
+
+@if (PortPin is not null)
 {
 	<ModalPage @ref="linkingMenuModal" Width="@Width" @bind-IsVisible="isModalVisible">
-		<PortPinEditingMenu IsModalVisible="HideModal" PortPin="PortPin"></PortPinEditingMenu>
+		<DataLinkerPage IsModalVisible="HideModal" ReceivedPin="PortPin" ></DataLinkerPage>
 	</ModalPage>
 
 	<div class="card mt-3 @Style">
 		<div class="card-header ">
 			<div class="inline space-between">
-				<a>Pin: @PortPin.Id - @Style</a>
+				<a>Pin: @PortPin.Id - @PortPin.ValueType</a>
 
 				@if (PortPin.Favorite)
 				{
-					<img src="/img/favourite-check.png" class="btn-img" @onclick="ChangeFavouriteState">
+					<img src="/img/favourite-check.png" class="btn-img" @onclick="() => ChangeFavouriteState()">
 				}
 				else
 				{
-					<img src="/img/favourite-uncheck.png" class="btn-img" @onclick="ChangeFavouriteState">
+					<img src="/img/favourite-uncheck.png" class="btn-img" @onclick="() => ChangeFavouriteState()">
 				}
 			</div>
 		</div>
 		<div class="card-body">
-			<div class="inline space-between">
-				<a>@PortPin.GetFormatedStringValue()</a>
-				<img src="/img/edit.png" class="btn-img" @onclick="OpenEditingMenu">
+			<div class="space-between inline">
+				<a>@Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode) Mode | Value: "@PortPin.GetValueString()"</a>
+				<button class="btn btn-primary round-button button-@Style" @onclick="() => OpenLinkingMenu()">
+					<img src="img/link.png" class="round-btn-img" />
+				</button>
 			</div>
-			<a style="font-size: 0.8rem">@Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode) Mode</a>
 		</div>
 	</div>
 }
@@ -36,24 +39,13 @@
 	private ModalPage linkingMenuModal;
 	private bool isModalVisible;
 
-	private string Width = "600px";
-
 	private string Style = string.Empty;
 
-	private void HideModal(bool value)
-	{
-		isModalVisible = value;
-	}
-
-	private void OpenEditingMenu()
-	{
-		isModalVisible = true;
-	}
+	private string Width = "960px";
 
 	private void SetStyles()
 	{
-		Style = Enum.GetName(typeof(PortPin.ObjectValueType), PortPin.ValueType).ToLower();
-
+		Style = Enum.GetName(typeof(ObjectValueType), PortPin.ValueType).ToLower();
 	}
 
 	private void ChangeFavouriteState()
@@ -64,6 +56,16 @@
 		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PortPin.Id, out int pinIndex)) return;
 
 		ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Favorite = !PortPin.Favorite;
+	}
+
+	private void HideModal(bool value)
+	{
+		isModalVisible = value;
+	}
+
+	private void OpenLinkingMenu()
+	{
+		isModalVisible = true;
 	}
 
 	protected override async Task OnParametersSetAsync()

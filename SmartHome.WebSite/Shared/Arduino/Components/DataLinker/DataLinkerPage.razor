@@ -137,7 +137,7 @@
 			{
 				LinkState = "possible";
 			}
-			else if (LinkFrom.ValueType == PortPin.ObjectValueType.Float && LinkTo.ValueType == PortPin.ObjectValueType.Integer)
+			else if (LinkFrom.ValueType == ObjectValueType.Float && LinkTo.ValueType == ObjectValueType.Integer)
 			{
 				LinkState = "partial";
 			}
@@ -171,6 +171,7 @@
 		{
 			LinkTo = ReceivedPin;
 		}
+
 		GetDataLinkState();
 		StateHasChanged();
 	}

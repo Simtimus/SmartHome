@@ -72,6 +72,21 @@ Echipamente Conectate:
 		- Rosu -- Rea
 !Releu pentru conectare/deconectare alimentare proiect
 
+
+
+1. Interfata pentru pastrarea `Componentelor Logice`: (Data Link, Value Operation, Conditions)
+	* Operatiile vor fi cele care exista deja + calcule intre Data Link sau alte Operatii
+	! Conditiile sa contina valoare default + comparare cu link, rutarea datelor link in dependenta de rezultatul conditiei
+	- Salvarea si convertarea acestor blocuri
+	- PortPin sa pastreze DataReference spre Nodes
+2. Posibilitate de linkare a componentelor logice si port pinurile arduino
+3. Reprezentarea informatiei de intrare si de iesire din bloc
+4. Buton de copierea id-ului componentului logic
+5. Denumiri pentru comoditate
+
+!1. De utilizat DataReference la PortPin-uri
+
+
 Releu 4x - 79.14MDL + 15.07MDL
 Butoane (10x) - 3.01MDL + 12.44MDL
 Led (100x) - 17.90MDL + 19.41MDL

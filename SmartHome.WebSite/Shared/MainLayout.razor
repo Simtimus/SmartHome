@@ -1,7 +1,9 @@
 ﻿@inherits LayoutComponentBase
+@inject SnackBar SnackBar
 
 <div class="page">
-    <main>
-        @Body
-    </main>
+ <main>
+  @Body
+  <PageSnackBar SnackBarMessage="@SnackBar.Message"></PageSnackBar>
+ </main>
 </div>

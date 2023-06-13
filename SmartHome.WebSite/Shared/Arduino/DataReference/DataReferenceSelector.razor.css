@@ -1,0 +1,105 @@
+﻿input {
+	color: #000;
+	border-radius: 10px;
+	background-color: #fff;
+	border-color: #08151D;
+}
+
+.card {
+	color: #fff;
+}
+
+.main-card {
+	border-radius: 20px;
+	background-color: #08151D;
+	border-color: #08151D;
+}
+
+.form-select {
+	color: #000;
+	border-radius: 10px;
+	background-color: #fff;
+	border-color: #fff;
+}
+
+.secondary-card {
+	border-radius: 10px;
+	background-color: #202C34;
+	border-color: #202C34;
+}
+
+.button-gray {
+	background-color: lightgray;
+	border-color: lightgray;
+}
+
+.main-card {
+	border-radius: 20px;
+	background-color: #08151D;
+	border-color: #08151D;
+}
+
+.secondary-card {
+	border-radius: 10px;
+	background-color: #202C34;
+	border-color: #202C34;
+}
+
+.inline {
+	display: flex;
+	align-items: center; /* vertically aligns the items to the center */
+	justify-content: flex-start; /* aligns the items to the start horizontally, you can change this as needed */
+}
+
+.btn-img {
+	cursor: pointer;
+	margin-right: 5px;
+	width: 20px;
+	height: 20px;
+}
+
+.space-between {
+	display: flex;
+	justify-content: space-between;
+}
+
+.card-header {
+	border-radius: 10px 10px 0px 0px;
+}
+
+.round-btn-img {
+	width: 25px;
+	height: 25px;
+}
+
+.round-button {
+	border-radius: 30px;
+}
+
+.gray-txt {
+	color: #A6ABAE;
+}
+
+.string {
+	color: #609B60;
+	background-color: #ECF4EC;
+	border-color: #ECF4EC;
+}
+
+.integer {
+	color: #609B99;
+	background-color: #E2F4F5;
+	border-color: #E2F4F5;
+}
+
+.float {
+	color: #E66256;
+	background-color: #FFF3F1;
+	border-color: #FFF3F1;
+}
+
+.boolean {
+	color: #4C4571;
+	background-color: #EEECF4;
+	border-color: #EEECF4;
+}

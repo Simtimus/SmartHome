@@ -1,0 +1,119 @@
+﻿@inject IJSRuntime JSRuntime
+@inject SnackBar SnackBar
+@inject ClipboardService ClipboardService
+
+<div class="bg-arduinolist border-right" id="sidebar-wrapper">
+
+	<div class="list-group list-group-flush overflow-auto" style="margin: 20px; height: 97%">
+		@if (Clients.Count > 0)
+		{
+			@foreach (var client in Clients)
+			{
+				string style = "idle";
+				@if (client.Id.Equals(SelectedClient.Id))
+				{
+					style = "active";
+				}
+				<div class="card mb-3 @style">
+					<button @onclick="() => OnClientClick(client)" class="button-transparent">
+						<div class="card-body">
+							<div class="row gutters-sm">
+								<div class="col-sm-8 inline">
+									@if (client.State == ArduinoClient.ConnectionState.Online)
+									{
+										<img src="/img/online-circle.png" class="activity-img">
+									}
+									else
+									{
+										<img src="/img/offline-circle.png" class="activity-img">
+									}
+									<div>@client.Name</div>
+								</div>
+								@if (!client.Id.Equals(SelectedClient.Id))
+								{
+									<div class="col-sm-2">
+										<button class="btn btn-primary round-button" @onclick="() => CopyClientId(client.Id)">
+											<img src="img/copy.png" class="small-btn-img" />
+										</button>
+									</div>
+								}
+							</div>
+							@if (client.Id.Equals(SelectedClient.Id))
+							{
+								<div class="mt-2">
+									<div>Delay: @client.Ping ms</div>
+									<div>@client.IP</div>
+								</div>
+							}
+						</div>
+						@if (client.Id.Equals(SelectedClient.Id))
+						{
+							<div class="inline mb-3">
+								<div class="col-md-6">
+									<button class="btn btn-primary round-button" style="width: 90px" @onclick="() => CopyClientId(client.Id)">
+										<img src="img/copy.png" class="small-btn-img" />
+									</button>
+								</div>
+								<div class="col-sm-6">
+									<button class="btn btn-primary round-button" style="width: 90px" @onclick="() => DeleteClient(client)">
+										<img src="img/trash.png" class="round-btn-img" />
+									</button>
+								</div>
+							</div>
+						}
+					</button>
+				</div>
+			}
+		}
+	</div>
+
+	@* <div class="card mt-3">
+	<button class="button-transparent">
+	<div class="card-body card-button">
+	<img src="/img/home.png" class="button-img" />
+	<h5 class="mt-2">Some button</h5>
+	</div>
+	</button>
+	</div>*@
+</div>
+
+@code {
+	[Parameter]
+	public List<ArduinoClient> Clients { get; set; } = new List<ArduinoClient>();
+
+	[Parameter]
+	public EventCallback<ArduinoClient> ClientClick { get; set; }
+
+	private ArduinoClient SelectedClient = new();
+
+	public Guid[,] ClientsTable = new Guid[,] { };
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (Clients != null && Clients.Count > 0)
+		{
+
+		}
+	}
+
+	private async Task DeleteClient(ArduinoClient client)
+	{
+		ClientManager.RemoveClient(client);
+		await SnackBar.ShowMessage("Client Deleted Successfully");
+		SelectedClient = new();
+		await ClientClick.InvokeAsync(SelectedClient);
+		StateHasChanged();
+	}
+
+	private async Task CopyClientId(Guid id)
+	{
+		await ClipboardService.CopyToClipboard(JSRuntime, id.ToString());
+	}
+
+	private async Task OnClientClick(ArduinoClient client)
+	{
+		SelectedClient = client;
+		await ClipboardService.CopyToClipboard(JSRuntime, client.Id.ToString());
+		await ClientClick.InvokeAsync(client);
+	}
+}

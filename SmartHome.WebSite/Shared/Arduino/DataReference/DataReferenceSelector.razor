@@ -1,0 +1,273 @@
+﻿@inject SnackBar SnackBar
+@inject WindowDimension WindowsDimension
+
+@if (DataReference is null)
+{
+	<div class="card main-card p-3" style="height: 315px">
+		<div>
+			<input type="text" class="form-control form-control-lg text-center" @bind="DataId" @bind:event="oninput" @onkeydown="Enter" />
+		</div>
+		@if (ReferenceType == DataReference.ReferenceType.PortPin)
+		{
+			if (!ArduinoClient.IsNullOrEmpty(Client))
+			{
+				<div class="mt-3">
+					<select class="form-select form-select-lg" @bind="ComponentId">
+						<option disabled selected value="@string.Empty">-</option>
+						@foreach (IGeneralComponent component in Client.Components)
+						{
+							<option value="@component.Id">
+								<lable>@component.Id</lable>
+							</option>
+						}
+					</select>
+					<label>Component Id</label>
+				</div>
+
+				if (Component is not null)
+				{
+					<div class="mt-3">
+						<select class="form-select form-select-lg" @bind="PortPinId">
+							<option disabled value="@string.Empty">-</option>
+							@foreach (PortPin portPin in Component.ConnectedPins)
+							{
+								<option value="@portPin.Id">
+									<lable>@portPin.Id</lable>
+									<lable>@Enum.GetName(typeof(ObjectValueType), portPin.ValueType)</lable>
+								</option>
+							}
+						</select>
+						<label>Pin Id</label>
+					</div>
+				}
+			}
+		}
+		else if (ReferenceType == DataReference.ReferenceType.Node)
+		{
+			if (Node is not null)
+			{
+				<label>Node</label>
+			}
+		}
+	</div>
+	<select class="mt-3 text-center form-select form-select-lg" @onchange="SetReferenceType">
+		<option disabled value="@string.Empty">-</option>
+		<option value="0">
+			<lable>PortPin</lable>
+		</option>
+		<option value="1">
+			<lable>Node</lable>
+		</option>
+	</select>
+}
+else
+{
+	// DataReferenceView
+	<div class="card main-card p-3">
+		<div class="card secondary-card p-3 mb-3">
+			<strong>Reference Data Id</strong>
+			<div class="gray-txt">@DataReference.DataId</div>
+		</div>
+		<div class="card secondary-card p-3 mb-3">
+			<strong>Reference Type</strong>
+			@if (DataReference.Type is DataReference.ReferenceType.PortPin)
+			{
+				<div class="gray-txt">PortPin</div>
+			}
+			else if (DataReference.Type is DataReference.ReferenceType.Node)
+			{
+				<div class="gray-txt">Node</div>
+			}
+		</div>
+		<div class="card secondary-card p-3 mb-3">
+			<strong>Value Type</strong>
+			@if (DataReference.Type is DataReference.ReferenceType.PortPin)
+			{
+				<div class="gray-txt">@Pin.ValueType</div>
+			}
+			else if (DataReference.Type is DataReference.ReferenceType.Node)
+			{
+				<div class="gray-txt">@Node?.FlexiValue.Type</div>
+			}
+		</div>
+		<div class="text-center">
+			<button class="btn btn-primary round-button" style="width: 70px" @onclick="ClearDataReference">
+				<img src="img/refresh.png" class="round-btn-img" />
+			</button>
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public EventCallback<bool> IsModalVisible { get; set; }
+
+	[Parameter]
+	public EventCallback<DataReference> SetDataReference { get; set; }
+
+	[Parameter]
+	public DataReference? DataReference { get; set; }
+
+	DataReference.ReferenceType ReferenceType;
+
+	private string DataId
+	{
+		get { return _selectedDataId; }
+		set
+		{
+			if (string.IsNullOrEmpty(value))
+			{
+				Node = null;
+				Client = null;
+			}
+			if (value != _selectedDataId)
+			{
+				_selectedDataId = value;
+			}
+		}
+	}
+
+	public string ComponentId
+	{
+		get { return _selectedComponent; }
+		set
+		{
+			if (value != _selectedComponent)
+			{
+				_selectedComponent = value;
+				PortPinId = string.Empty;
+				Component = null;
+
+				GetComponent();
+				StateHasChanged();
+			}
+		}
+	}
+
+	[Parameter]
+	public string PortPinId
+	{
+		get { return _selectedPortPin; }
+		set
+		{
+			if (value != _selectedPortPin)
+			{
+				_selectedPortPin = value;
+				if (!ArduinoClient.IsNullOrEmpty(Client) && Component is not null)
+				{
+					if (!string.IsNullOrEmpty(_selectedPortPin))
+					{
+						Pin = ClientManager.GetPortPinById(Guid.Parse(_selectedDataId), int.Parse(_selectedComponent), int.Parse(_selectedPortPin));
+						CreateDataReference();
+					}
+				}
+			}
+		}
+	}
+
+	private INode? Node;
+	private ArduinoClient? Client;
+	private IGeneralComponent? Component;
+	private PortPin? Pin;
+
+	private string _selectedDataId = string.Empty;
+	private string _selectedComponent = string.Empty;
+	private string _selectedPortPin = string.Empty;
+
+	public async Task Enter(KeyboardEventArgs e)
+	{
+		if (e.Code == "Enter" || e.Code == "NumpadEnter")
+		{
+			await GetDataByIdAndType();
+			StateHasChanged();
+		}
+	}
+
+	private async Task GetDataByIdAndType()
+	{
+		if (string.IsNullOrEmpty(DataId))
+			return;
+		if (DataId.Length != 36)
+			return;
+
+		if (ReferenceType == DataReference.ReferenceType.PortPin)
+		{
+			Node = null;
+			Client = ClientManager.GetClientById(Guid.Parse(DataId));
+			if (ArduinoClient.IsNullOrEmpty(Client))
+				Client = null;
+		}
+		else if (ReferenceType == DataReference.ReferenceType.Node)
+		{
+			Client = null;
+			Node = NodeManager.GetNodeById(Guid.Parse(DataId));
+			if (Node is not null)
+			{
+				CreateDataReference();
+			}
+		}
+		StateHasChanged();
+	}
+
+	private void GetComponent()
+	{
+		if (ArduinoClient.IsNullOrEmpty(Client)) return;
+		if (int.TryParse(ComponentId, out int componentId))
+		{
+			Component = ClientManager.GetComponentById(Client.Id, componentId);
+		}
+	}
+
+	private void SetReferenceType(ChangeEventArgs e)
+	{
+		string value = e.Value.ToString();
+		if (!string.IsNullOrEmpty(value))
+		{
+			ReferenceType = Enum.Parse<DataReference.ReferenceType>(value);
+		}
+	}
+
+	private void CreateDataReference()
+	{
+		if (ReferenceType == DataReference.ReferenceType.PortPin)
+		{
+			DataReference = new()
+			{
+				DataId = Guid.Parse(DataId),
+				ComponentId = int.Parse(ComponentId),
+				PortPinId = int.Parse(PortPinId),
+			};
+		}
+		else
+		{
+			DataReference = new()
+			{
+				DataId = Guid.Parse(DataId),
+				Type = ReferenceType,
+			};
+		}
+		Task.Run(async () => await SetDataReference.InvokeAsync(DataReference));
+		StateHasChanged();
+	}
+
+	private async Task ClearDataReference()
+	{
+		PortPinId = string.Empty;
+		DataReference = null;
+		await SetDataReference.InvokeAsync(DataReference);
+	}
+
+	private void GetPortPin(ElementAddress elementAddress)
+	{
+		if (!ClientManager.GetClientIndexById(elementAddress.ClientId, out int clientIndex)) return;
+		if (!ClientManager.GetComponentIndexById(clientIndex, elementAddress.ComponentId, out int componentIndex)) return;
+		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, elementAddress.PortPinId, out int pinIndex)) return;
+
+		// Reference Valid
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		StateHasChanged();
+	}
+}

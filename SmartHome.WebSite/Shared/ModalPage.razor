@@ -1,53 +1,53 @@
 ﻿@if (IsVisible)
 {
-    <div class="modal">
-        <div class="modal-content" style="width: @WidthVal;">
-            <span class="close" @onclick="Hide">&times;</span>
-            @ChildContent
-        </div>
-    </div>
+ <div class="modal">
+  <div class="modal-content" style="width: @WidthVal;">
+   <span class="close" @onclick="Hide">&times;</span>
+   @ChildContent
+  </div>
+ </div>
 }
 
 @code {
-    private bool _isVisible;
+ private bool _isVisible;
 
-    [Parameter]
-    public bool IsVisible
-    {
-        get => _isVisible;
-        set
-        {
-            if (_isVisible == value) return;
-            _isVisible = value;
-            IsVisibleChanged.InvokeAsync(value);
-        }
-    }
+ [Parameter]
+ public bool IsVisible
+ {
+  get => _isVisible;
+  set
+  {
+   if (_isVisible == value) return;
+   _isVisible = value;
+   IsVisibleChanged.InvokeAsync(value);
+  }
+ }
 
-    [Parameter]
-    public EventCallback<bool> IsVisibleChanged { get; set; }
+ [Parameter]
+ public EventCallback<bool> IsVisibleChanged { get; set; }
 
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
+ [Parameter]
+ public RenderFragment ChildContent { get; set; }
 
-    [Parameter]
-    public string Width { get; set; }
+ [Parameter]
+ public string Width { get; set; }
 
-    private string WidthVal = "80%";
+ private string WidthVal = "80%";
 
-    public void Show() => IsVisible = true;
-    public void Hide() => IsVisible = false;
+ public void Show() => IsVisible = true;
+ public void Hide() => IsVisible = false;
 
-    private void UpdateWidth()
-    {
-        if (!string.IsNullOrEmpty(Width))
-        {
-            WidthVal = Width;
-        }
-    }
+ private void UpdateWidth()
+ {
+  if (!string.IsNullOrEmpty(Width))
+  {
+   WidthVal = Width;
+  }
+ }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        UpdateWidth();
-        StateHasChanged();
-    }
+ protected override async Task OnParametersSetAsync()
+ {
+  UpdateWidth();
+  StateHasChanged();
+ }
 }

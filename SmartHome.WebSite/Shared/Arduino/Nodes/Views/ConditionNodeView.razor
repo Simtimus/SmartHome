@@ -1,0 +1,66 @@
+﻿@inject IJSRuntime JSRuntime
+@inject SnackBar SnackBar
+@inject ClipboardService ClipboardService
+
+@if (Node is not null && Node is ConditionNode node)
+{
+	<ModalPage @ref="ComponentCreatorModal" Width="@Width" @bind-IsVisible="isModalVisible">
+		<ConditionNodeEditor IsModalVisible="SetModalVisibility" NodeId="@Node.Id.ToString()"></ConditionNodeEditor>
+	</ModalPage>
+
+	<div class="card main-card p-3">
+		<div class="card secondary-card p-3 mb-3">
+			<strong>Node Id</strong>
+			<div class="gray-txt">@Node.Id</div>
+		</div>
+		<div class="card secondary-card p-3 mb-3">
+			<strong>Node Type</strong>
+			<div class="gray-txt">@Node.Type</div>
+		</div>
+		<div class="card secondary-card p-3 mb-3">
+			<strong>Node Value Type</strong>
+			<div class="gray-txt">@Node.FlexiValue.Type</div>
+		</div>
+		<div class="card secondary-card p-3 mb-3">
+			<strong>Condition</strong>
+			<div class="gray-txt">@node.Condition</div>
+		</div>
+		<div class="text-center">
+			<button class="btn btn-primary round-button" style="width: 70px" @onclick="EditNode">
+				<img src="img/edit.png" class="round-btn-img" style="margin-left: 5px" />
+			</button>
+			<button class="btn btn-primary round-button button-gray" style="margin-left: 16px" @onclick="() => CopyNodeId(Node.Id)">
+				<img src="img/copy.png" class="round-btn-img" />
+			</button>
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public INode Node { get; set; }
+
+	private bool isModalVisible;
+	private string Width = "960px";
+	private ModalPage? ComponentCreatorModal;
+
+	private async Task EditNode()
+	{
+		isModalVisible = true;
+	}
+
+	private async Task CopyNodeId(Guid id)
+	{
+		await ClipboardService.CopyToClipboard(JSRuntime, id.ToString());
+	}
+
+	private void SetModalVisibility(bool value)
+	{
+		isModalVisible = value;
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		StateHasChanged();
+	}
+}

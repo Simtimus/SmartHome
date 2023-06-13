@@ -41,18 +41,25 @@ namespace SmartHome.Arduino.Models.Data.DataLinks
             PinId = reference.Id;
         }
 
-        public string GetValue()
+        public string GetStringValue()
         {
             if (!ClientManager.GetClientIndexById(BoardId, out int clientIndex)) return string.Empty;
             if (!ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex)) return string.Empty;
             if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex)) return string.Empty;
 
             return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Value;
-        }
+		}
 
-        public override string ToString() => $"{BoardId}.{ComponentId}.{PinId}";
+		public object GetValue()
+		{
+			if (!ClientManager.GetClientIndexById(BoardId, out int clientIndex)) return string.Empty;
+			if (!ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex)) return string.Empty;
+			if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PinId, out int pinIndex)) return string.Empty;
 
-        public static bool IsNullOrEmpty([NotNullWhen(false)] DataLink? dataLink)
+			return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].GetValue();
+		}
+
+		public static bool IsNullOrEmpty([NotNullWhen(false)] DataLink? dataLink)
         {
             if (dataLink is null)
                 return true;

@@ -1,0 +1,190 @@
+﻿@inject IJSRuntime JSRuntime
+@inject SnackBar SnackBar
+@inject ClipboardService ClipboardService
+
+@if (Node is not null)
+{
+	<div class="form-outline">
+		<div class="inline mb-3" style="margin-left: 380px">
+			<h5 class="" style="margin-right: 16px">Condition</h5>
+			<img src="img/@CompatibilityImg" class="round-btn-img mb-2" />
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<lable>First Operand</lable>
+			<DataReferenceSelector DataReference="FirstOperand" SetDataReference="SetFirstOperand"></DataReferenceSelector>
+		</div>
+		<div class="col-md-6">
+			<lable>Second Operand</lable>
+			<DataReferenceSelector DataReference="SecondOperand" SetDataReference="SetSecondOperand"></DataReferenceSelector>
+		</div>
+	</div>
+	<div class="row mt-3">
+		<div class="col-md-6">
+			<lable>Result on True</lable>
+			<DataReferenceSelector DataReference="FirstResult" SetDataReference="SetOnTrueResult"></DataReferenceSelector>
+		</div>
+		<div class="col-md-6">
+			<lable>Result on False</lable>
+			<DataReferenceSelector DataReference="SecondResult" SetDataReference="SetOnFalseResult"></DataReferenceSelector>
+		</div>
+	</div>
+	<div class="text-center mt-3">
+		<div>
+			@for (int conditionId = 0; conditionId < 4; conditionId++)
+			{
+				ConditionNode.Conditions condition = Enum.Parse<ConditionNode.Conditions>(conditionId.ToString());
+				string image = $"img/{condition}.png";
+
+				<button class="btn btn-primary round-button @IsPressed(condition)" style="width: 70px; margin-left: 16px" @onclick="(() => SetConditionType(condition))">
+					<img src="@image" class="round-btn-img" />
+				</button>
+			}
+		</div>
+		<div class="text-center mt-3">
+			<button class="btn btn-primary round-button" style="width: 100px" @onclick="SaveChanges">
+				Set Value
+			</button>
+			<button class="btn btn-primary round-button" style="width: 70px; margin-left: 16px" @onclick="RemoveComponent">
+				<img src="img/trash.png" class="round-btn-img" />
+			</button>
+			<button class="btn btn-primary round-button button-gray" style="margin-left: 16px" @onclick="() => CopyNodeId(Node.Id)">
+				<img src="img/copy.png" class="round-btn-img" />
+			</button>
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public string NodeId { get; set; } = string.Empty;
+
+	[Parameter]
+	public EventCallback<bool> IsModalVisible { get; set; }
+
+	private INode? Node { get; set; }
+
+	private string? Value;
+
+	ConditionNode.Conditions Condition;
+
+	private string CompatibilityImg = "incompatible.png";
+
+	private DataReference? FirstOperand;
+	private DataReference? SecondOperand;
+	private DataReference? FirstResult;
+	private DataReference? SecondResult;
+
+	private void SetFirstOperand(DataReference input)
+	{
+		FirstOperand = input;
+		CheckCompatibility();
+	}
+
+	private void SetSecondOperand(DataReference input)
+	{
+		SecondOperand = input;
+		CheckCompatibility();
+	}
+
+	private void SetOnTrueResult(DataReference input)
+	{
+		FirstResult = input;
+		CheckCompatibility();
+	}
+
+	private void SetOnFalseResult(DataReference input)
+	{
+		SecondResult = input;
+		CheckCompatibility();
+	}
+
+	private void CheckCompatibility()
+	{
+
+		CompatibilityImg = "compatible.png";
+		if (FirstOperand is null || SecondOperand is null)
+		{
+			CompatibilityImg = "incompatible.png";
+		}
+		else
+		{
+			ObjectValueType first = FirstOperand.GetValueType();
+			ObjectValueType second = SecondOperand.GetValueType();
+			if (first == ObjectValueType.Integer && second == ObjectValueType.Float) { }
+			else if (first == ObjectValueType.Float && second == ObjectValueType.Integer) { }
+			else if (first == second) { }
+			else
+			{
+				CompatibilityImg = "incompatible.png";
+			}
+		}
+	}
+
+	private string IsPressed(ConditionNode.Conditions condition)
+	{
+		if (Condition == condition)
+			return "pressed";
+		return "not-presesd";
+	}
+
+	private void SetConditionType(ConditionNode.Conditions condition)
+	{
+		Condition = condition;
+	}
+
+	private async Task CopyNodeId(Guid id)
+	{
+		await ClipboardService.CopyToClipboard(JSRuntime, id.ToString());
+	}
+
+	private async Task SaveChanges()
+	{
+		if (FirstOperand is null || SecondOperand is null || FirstResult is null || SecondResult is null)
+		{
+			await SnackBar.ShowMessage("Invalid Operation!");
+		}
+		else
+		{
+			Node.FlexiValue.Set(FlexibleValue.GetDefault(FirstOperand.GetValueType()));
+			if (Node is ConditionNode node)
+			{
+				Node.FlexiValue.Type = FirstOperand.GetValueType();
+				node.Condition = Condition;
+				node.In1 = FirstOperand;
+				node.In2 = SecondOperand;
+				node.Out1 = FirstResult;
+				node.Out2 = SecondResult;
+				await IsModalVisible.InvokeAsync(false);
+				await SnackBar.ShowMessage("Successfull!");
+			}
+		}
+	}
+
+	private async Task RemoveComponent()
+	{
+		if (Node is null)
+			return;
+
+		if (NodeManager.RemoveNodesById(Node.Id))
+		{
+			await IsModalVisible.InvokeAsync(false);
+			await SnackBar.ShowMessage("Node deleted successfull!");
+		}
+		else
+		{
+			await IsModalVisible.InvokeAsync(false);
+			await SnackBar.ShowMessage("Node not found!");
+		}
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (!string.IsNullOrEmpty(NodeId))
+		{
+			Node = NodeManager.GetNodeById(Guid.Parse(NodeId));
+		}
+		StateHasChanged();
+	}
+}

@@ -20,6 +20,7 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using SmartHome.Arduino.Models.Data.DataLinks;
 using SmartHome.Arduino.Models.Components.Common.Interfaces;
+using SmartHome.Arduino.Models.Nodes.Common;
 
 namespace SmartHome.Arduino.Application
 {
@@ -31,7 +32,7 @@ namespace SmartHome.Arduino.Application
         public static int PortHost { get { return portHost; } }
         public const int portHost = 8080;
 
-        private const int secondsUntilOffline = 60;
+        private const int secondsUntilOffline = 35;
         private const int secondsBetweenSaves = 30;
 
         private readonly UdpClient server = new(portHost);
@@ -39,7 +40,6 @@ namespace SmartHome.Arduino.Application
         private readonly ArduinoDataProcessor dataProcessor;
         private static readonly TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time");
         private static DateTime LastSave = new();
-        private static DateTime LastCycleRun = new();
 
         public Server()
         {
@@ -51,6 +51,7 @@ namespace SmartHome.Arduino.Application
             //ClientManager.SaveClientTestData();
             ClientManager.RecoverClientData();
             DataLinker.RecoverDataLinks();
+            NodeManager.RecoverAllData();
             Task.Run(() => ReceiveAndProcessMessages());
             Task.Run(() => MonitorClients());
         }
@@ -69,6 +70,7 @@ namespace SmartHome.Arduino.Application
                 if (GetDTNow() >= LastSave.AddSeconds(secondsBetweenSaves))
                 {
                     ClientManager.SaveClientData();
+                    NodeManager.SaveData();
                     LastSave = GetDTNow();
                 }
                 await Task.Delay(1000);

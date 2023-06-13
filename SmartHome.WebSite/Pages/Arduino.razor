@@ -18,7 +18,7 @@
 			</button>
 			<a href="/">
 				<button class="btn btn-primary">
-						<img src="img/home.png" class="btn-img" />
+					<img src="img/home.png" class="btn-img" />
 				</button>
 			</a>
 			<a class="nav-link text-white">@ArduinoServer.IpHost : @Server.PortHost</a>
@@ -26,9 +26,15 @@
 			@*Empty div is part of design*@
 			<div class="collapse navbar-collapse"></div>
 			<div><a>@WindowDimensions.Width</a></div>
-			<button class="btn btn-primary" @onclick="ShowModal">Open Modal</button>
-			<button class="btn btn-primary"  @onclick="RunTest">Test</button>
+			@if (activeTab == 1)
+			{
+				<button class="btn btn-primary" @onclick="ShowModal">
+					<img src="img/add.png" class="btn-img" />
+				</button>
+				<button class="btn btn-primary"  @onclick="RunTest">Test</button>
+			}
 		</nav>
+
 		<ul class="nav nav-tabs">
 			<li class="nav-item">
 				<button class="nav-link disabled" tabindex="-1" aria-disabled="true">Arduino Tabs:</button>
@@ -37,17 +43,13 @@
 				<button class="nav-link @ComponentTabClass" @onclick="() => ActivateTab(0)">Components</button>
 			</li>
 			<li class="nav-item">
-				<button class="nav-link @LogicBlocksTabClass" @onclick="() => ActivateTab(1)">Logic Blocks</button>
+				<button class="nav-link @LogicBlocksTabClass" @onclick="() => ActivateTab(1)">Logic Nodes</button>
 			</li>
-			<li class="nav-item">
+			@*<li class="nav-item">
 				<button class="nav-link @ProgramLogsTabClass" @onclick="() => ActivateTab(2)">Program Logs</button>
-			</li>
+			</li>*@
 		</ul>
-		<ModalPage @ref="myModal" @bind-IsVisible="isModalVisible">
-			<h2>Modal Title</h2>
-			<p>Some text in the Modal..</p>
-			<button @onclick="HideModal">Close</button>
-		</ModalPage>
+		
 		<div class="container-fluid">
 			@if (activeTab == 0)
 			{
@@ -55,17 +57,20 @@
 			}
 			else if (activeTab == 1)
 			{
-				<DataLinkTable DataLinks="DataLinker.DataLinks" WrapperState="@WrapperState" WebWidth="@WindowDimensions.Width" />
+				<NodesTable Nodes="NodeManager.Nodes" WrapperState="@WrapperState" WebWidth="WindowDimensions.Width"></NodesTable>
+				@*<DataLinkTable DataLinks="DataLinker.DataLinks" WrapperState="@WrapperState" WebWidth="@WindowDimensions.Width" />*@
 			}
 			else if (activeTab == 2)
 			{
 				// Add logs
-				// Add calculations for data links
 			}
 		</div>
 	</div>
 	<!-- /#page-content-wrapper -->
 </div>
+<ModalPage @ref="ComponentCreatorModal" Width="@Width" @bind-IsVisible="isModalVisible">
+	<SelectMenu IsModalVisible="SetModalVisibility"></SelectMenu>
+</ModalPage>
 <PageSnackBar SnackBarMessage="@SnackBar.Message"></PageSnackBar>
 
 @code {
@@ -80,17 +85,18 @@
 	string LogicBlocksTabClass => activeTab == 1 ? "active" : "";
 	string ProgramLogsTabClass => activeTab == 2 ? "active" : "";
 
-	private ModalPage myModal;
+	private ModalPage? ComponentCreatorModal;
 	private bool isModalVisible;
+	private string Width = "960px";
 
 	private void ShowModal()
 	{
 		isModalVisible = true;
 	}
 
-	private void HideModal()
+	private void SetModalVisibility(bool value)
 	{
-		isModalVisible = false;
+		isModalVisible = value;
 	}
 
 	void ActivateTab(int tabName)

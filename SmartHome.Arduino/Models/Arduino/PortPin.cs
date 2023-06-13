@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SmartHome.Arduino.Models.Data.DataLinks;
 using SmartHome.Arduino.Models.Components.Common.Interfaces;
+using SmartHome.Arduino.Models.CommonTypes;
 using System.Globalization;
 
 namespace SmartHome.Arduino.Models.Arduino
@@ -34,17 +35,9 @@ namespace SmartHome.Arduino.Models.Arduino
 			Write,
 		}
 
-		public enum ObjectValueType
-		{
-			String,
-			Integer,
-			Float,
-			Boolean,
-		}
-
 		public object? GetValue()
 		{
-			string stringData = DataLink.GetValue();
+			string stringData = DataLink.GetStringValue();
 			
 			if (string.IsNullOrEmpty(stringData))
 			{
@@ -61,7 +54,7 @@ namespace SmartHome.Arduino.Models.Arduino
 			}
 			else if (ValueType == ObjectValueType.Float)
 			{
-				return ApplyDataLinkOperation(float.Parse(stringData, CultureInfo.InvariantCulture));
+				return ApplyDataLinkOperation(double.Parse(stringData, CultureInfo.InvariantCulture));
 			}
 			else if (ValueType == ObjectValueType.Boolean)
 			{
@@ -116,22 +109,22 @@ namespace SmartHome.Arduino.Models.Arduino
 				}
 				else if (ValueType == ObjectValueType.Float)
 				{
-					dataValue = float.Parse(dataLinkValue, CultureInfo.InvariantCulture);
+					dataValue = double.Parse(dataLinkValue, CultureInfo.InvariantCulture);
 					if (DataLink.ValueOperation == DataLink.ValueOperations.Addition)
 					{
-						return (float)value + (float)dataValue;
+						return (double)value + (double)dataValue;
 					}
 					else if (DataLink.ValueOperation == DataLink.ValueOperations.Substraction)
 					{
-						return (float)value - (float)dataValue;
+						return (double)value - (double)dataValue;
 					}
 					else if (DataLink.ValueOperation == DataLink.ValueOperations.Multiplication)
 					{
-						return (float)value * (float)dataValue;
+						return (double)value * (double)dataValue;
 					}
 					else if (DataLink.ValueOperation == DataLink.ValueOperations.Division)
 					{
-						return (float)value / (float)dataValue;
+						return (double)value / (double)dataValue;
 					}
 				}
 				else if (ValueType == ObjectValueType.Boolean)

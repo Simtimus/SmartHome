@@ -1,0 +1,116 @@
+﻿@inject SnackBar SnackBar
+
+@if (string.IsNullOrEmpty(NodeId))
+{
+	<div class="text-center">
+		<h5>Create New</h5>
+		<div class="" style="width: 300px; margin-left: 313px">
+			@for (int conditionId = 0; conditionId < 4; conditionId++)
+			{
+				GeneralNode.NodeTypes type = Enum.Parse<GeneralNode.NodeTypes>(conditionId.ToString());
+
+				<div class="card card-body mt-3 btn-cursor @IsPressed(type)" @onclick="(() => SetNodeType(type))">
+					@type Node
+				</div>
+			}
+		</div>
+
+	</div>
+	<div class="text-center mt-3">
+		<button class="btn btn-primary round-button" style="width: 200px" @onclick="CreateComponent">
+			Add <lable>@Enum.GetName(typeof(GeneralNode.NodeTypes), NodeType)</lable>
+		</button>
+	</div>
+}
+else
+{
+	if (NodeType == GeneralNode.NodeTypes.Value)
+	{
+		<ValueNodeEditor IsModalVisible="SetModalVisibility" NodeId="@NodeId"></ValueNodeEditor>
+	}
+	else if (NodeType == GeneralNode.NodeTypes.DataLink)
+	{
+		
+	}
+	else if (NodeType == GeneralNode.NodeTypes.ValueOperation)
+	{
+		<ValueOperationNodeEditor IsModalVisible="SetModalVisibility" NodeId="@NodeId"></ValueOperationNodeEditor>
+	}
+	else if (NodeType == GeneralNode.NodeTypes.Condition)
+	{
+		<ConditionNodeEditor IsModalVisible="SetModalVisibility" NodeId="@NodeId"></ConditionNodeEditor>
+	}
+}
+
+
+@code {
+	private bool CreateButtonPressed;
+	private GeneralNode.NodeTypes NodeType;
+	private string NodeId = string.Empty;
+
+	[Parameter]
+	public EventCallback<bool> IsModalVisible { get; set; }
+
+	private void CreateValueNode()
+	{
+		NodeType = GeneralNode.NodeTypes.Value;
+	}
+
+	private void CreateDataLinkNode()
+	{
+		NodeType = GeneralNode.NodeTypes.DataLink;
+	}
+
+	private void CreateValueOperationNode()
+	{
+		NodeType = GeneralNode.NodeTypes.ValueOperation;
+	}
+
+	private void CreateConditionNode()
+	{
+		NodeType = GeneralNode.NodeTypes.Condition;
+	}
+
+	private async Task CreateComponent()
+	{
+		if (NodeType == GeneralNode.NodeTypes.Value)
+		{
+			NodeId = NodeManager.CreateValueNode();
+		}
+		else if (NodeType == GeneralNode.NodeTypes.DataLink)
+		{
+			NodeId = NodeManager.CreateDataLinkNode();
+		}
+		else if (NodeType == GeneralNode.NodeTypes.ValueOperation)
+		{
+			NodeId = NodeManager.CreateValueOperationNode();
+		}
+		else if (NodeType == GeneralNode.NodeTypes.Condition)
+		{
+			NodeId = NodeManager.CreateConditionNode();
+		}
+		await SnackBar.ShowMessage($"Component ID: {NodeId}");
+	}
+
+	private string IsPressed(GeneralNode.NodeTypes type)
+	{
+		if (NodeType == type)
+			return "pressed";
+		return "not-presesd";
+	}
+
+	private void SetNodeType(GeneralNode.NodeTypes type)
+	{
+		NodeType = type;
+	}
+
+	private async Task SetModalVisibility(bool value)
+	{
+		await IsModalVisible.InvokeAsync(value);
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		StateHasChanged();
+	}
+}

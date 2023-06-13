@@ -133,11 +133,11 @@ namespace SmartHome.Arduino.Application
             }
         }
 
-        public static void RemoveClient(ArduinoClient client)
+        public static void RemoveClient(ArduinoClient arduinoClient)
         {
             lock (_lock)
             {
-                Clients.Remove(client);
+                Clients.RemoveAll(client => client.Id.ToString() == arduinoClient.Id.ToString());
             }
         }
 

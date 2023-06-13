@@ -1,34 +1,52 @@
-﻿@inject Models.CustomTimeModule CustomTime
+﻿@inject IJSRuntime JSRuntime
+@inject CustomTimeModule CustomTime
+@inject ClipboardService ClipboardService
 
-<div class="@_snackBarState" id="snackbar">@_snackBarMessage</div>
+<div class="@_snackBarState" id="snackbar" @onclick="CopyMessageToClipboard">
+ <div class="snackbar-content" style="width: @Width">@_snackBarMessage</div>
+</div>
 
 @code {
-    private string _snackBarState { get; set; } = String.Empty;
+ private string _snackBarState { get; set; } = String.Empty;
 
-    private string _snackBarMessage { get; set; } = String.Empty;
+ private string _snackBarMessage { get; set; } = String.Empty;
 
-    [Parameter] public string SnackBarMessage { get; set; }
+ private string Width = "125px";
 
-    public async Task ChangeSnackBarState(string state = "show", int delay = 2600)
-    {
-        while (_snackBarState.StartsWith("show"))
-        {
-            await CustomTime.WaitAmountOfSeconds(0.5);
-        }
-        _snackBarMessage = SnackBarMessage;
-        _snackBarState = "show";
-        StateHasChanged();
-        await Task.Run(async () => { await Task.Delay(delay); _snackBarState = ""; });
-        StateHasChanged();
-        _snackBarMessage = String.Empty;
-    }
+ [Parameter] public string SnackBarMessage { get; set; }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (_snackBarMessage != SnackBarMessage && !string.IsNullOrEmpty(SnackBarMessage))
-        {
-            _snackBarMessage = SnackBarMessage;
-            await ChangeSnackBarState();
-        }
+ public async Task ChangeSnackBarState(string state = "show", int delay = 2600)
+ {
+  SetWidth();
+  while (_snackBarState.StartsWith("show"))
+  {
+   await CustomTime.WaitAmountOfSeconds(0.5);
+  }
+  _snackBarMessage = SnackBarMessage;
+  _snackBarState = "show";
+  StateHasChanged();
+  await Task.Run(async () => { await Task.Delay(delay); _snackBarState = ""; });
+  StateHasChanged();
+  _snackBarMessage = String.Empty;
+ }
+
+ private void SetWidth()
+ {
+  int digitalWidth = _snackBarMessage.Length * 10;
+  Width = $"{digitalWidth}px";
+ }
+
+ private async Task CopyMessageToClipboard()
+ {
+  await ClipboardService.CopyToClipboard(JSRuntime, _snackBarMessage);
+ }
+
+ protected override async Task OnParametersSetAsync()
+ {
+  if (_snackBarMessage != SnackBarMessage && !string.IsNullOrEmpty(SnackBarMessage))
+  {
+   _snackBarMessage = SnackBarMessage;
+   await ChangeSnackBarState();
+  }
 	}
 }

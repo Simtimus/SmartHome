@@ -4,29 +4,25 @@
 		<PortPinEditingMenu IsModalVisible="HideModal" PortPin="PortPin"></PortPinEditingMenu>
 	</ModalPage>
 
-	<div class="card mt-3 mb-4 @Style" style="width: 400px">
+	<div class="card mt-3 @Style">
 		<div class="card-header ">
-			<div class="inline space-between row gutters-sm">
-				<div class="col-md-10">
-					<a>Pin: @PortPin.Id - @Style</a>
-				</div>
-				<div class="col-md-2">
-					@if (PortPin.Favorite)
-					{
-						<img src="/img/favourite-check.png" class="btn-img" @onclick="() => ChangeFavouriteState()">
-					}
-					else
-					{
-						<img src="/img/favourite-uncheck.png" class="btn-img" @onclick="() => ChangeFavouriteState()">
-					}
-				</div>
+			<div class="inline space-between">
+				<a>Pin: @PortPin.Id - @PortPin.ValueType</a>
 
+				@if (PortPin.Favorite)
+				{
+					<img src="/img/favourite-check.png" class="btn-img" @onclick="ChangeFavouriteState">
+				}
+				else
+				{
+					<img src="/img/favourite-uncheck.png" class="btn-img" @onclick="ChangeFavouriteState">
+				}
 			</div>
 		</div>
 		<div class="card-body">
 			<div class="inline space-between">
 				<a>@PortPin.GetFormatedStringValue()</a>
-				<img src="/img/edit.png" class="btn-img_small" @onclick="OpenEditingMenu">
+				<img src="/img/edit.png" class="btn-img" @onclick="OpenEditingMenu">
 			</div>
 			<a style="font-size: 0.8rem">@Enum.GetName(typeof(PortPin.PinMode), PortPin.Mode) Mode</a>
 		</div>
@@ -35,9 +31,7 @@
 
 @code {
 	[Parameter]
-	public ElementAddress FavPortPin { get; set; } = new();
-
-	private PortPin? PortPin = null;
+	public PortPin PortPin { get; set; } = new();
 
 	private ModalPage linkingMenuModal;
 	private bool isModalVisible;
@@ -45,12 +39,6 @@
 	private string Width = "600px";
 
 	private string Style = string.Empty;
-
-	private void SetStyles()
-	{
-		Style = Enum.GetName(typeof(PortPin.ObjectValueType), PortPin.ValueType).ToLower();
-
-	}
 
 	private void HideModal(bool value)
 	{
@@ -62,11 +50,14 @@
 		isModalVisible = true;
 	}
 
+	private void SetStyles()
+	{
+		Style = Enum.GetName(typeof(ObjectValueType), PortPin.ValueType).ToLower();
+
+	}
+
 	private void ChangeFavouriteState()
 	{
-		if (PortPin is null)
-			return;
-
 		IGeneralComponent component = PortPin.ParentComponent;
 		if (!ClientManager.GetClientIndexById(component.ParentClient.Id, out int clientIndex)) return;
 		if (!ClientManager.GetComponentIndexById(clientIndex, component.Id, out int componentIndex)) return;
@@ -77,12 +68,6 @@
 
 	protected override async Task OnParametersSetAsync()
 	{
-		if (!ClientManager.GetClientIndexById(FavPortPin.ClientId, out int clientIndex)) return;
-		if (!ClientManager.GetComponentIndexById(clientIndex, FavPortPin.ComponentId, out int componentIndex)) return;
-		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, FavPortPin.PortPinId, out int pinIndex)) return;
-
-		PortPin = ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex];
-
 		SetStyles();
 		StateHasChanged();
 	}

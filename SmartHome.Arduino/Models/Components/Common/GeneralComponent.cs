@@ -43,5 +43,5 @@ namespace SmartHome.Arduino.Models.Components.Common
 			GasSensor,
             InfraredSensor
 		}
-    }
+	}
 }

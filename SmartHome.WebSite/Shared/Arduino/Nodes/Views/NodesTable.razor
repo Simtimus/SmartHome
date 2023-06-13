@@ -1,0 +1,132 @@
+﻿@inject IJSRuntime JsRuntime
+@inject WindowDimension WindowsDimension
+
+@if (Nodes.Count > 0)
+{
+	<div class="row gutters-sm mt-3" role="list" style="margin-left: @Margin !important; margin-right: @Margin !important;">
+		@for (int cols = 0; cols < Columns; cols++)
+		{
+			<div class="@ColumnClass column">
+				@for (int rows = 0; rows < Rows; rows++)
+				{
+					int index = rows * Columns + cols;
+					if (index >= Nodes.Count)
+						continue;
+
+					<div class="mb-4 mt-3">
+						@if (Nodes[index] is ValueNode valueNode)
+						{
+							<ValueNodeView Node="@valueNode"></ValueNodeView>
+						}
+						else if (Nodes[index] is DataLinkNode)
+						{
+							<DataLinkNodeView></DataLinkNodeView>
+						}
+						else if (Nodes[index] is ValueOperationNode valueOperationNode)
+						{
+							<ValueOperationNodeView Node="@valueOperationNode"></ValueOperationNodeView>
+						}
+						else if (Nodes[index] is ConditionNode conditionNode)
+						{
+							<ConditionNodeView Node="@conditionNode"></ConditionNodeView>
+						}
+					</div>
+				}
+			</div>
+		}
+	</div>
+}
+else
+{
+	<div class="inline" style="margin-top: 14%">
+		<img src="img/sticker/nothing.png" />
+	</div>
+}
+
+@code {
+	[Parameter]
+	public List<INode> Nodes { get; set; } = new();
+
+	[Parameter]
+	public string WrapperState { get; set; } = string.Empty;
+
+	[Parameter]
+	public double WebWidth { get; set; } = 1980;
+
+	private int Columns = 3;
+	private int Rows = 0;
+
+	private string ColumnClass = "col-md-4";
+	private string Margin = "0px";
+
+	public void CreateTable()
+	{
+		int elementsDivided = Nodes.Count / Columns;
+		Rows = Nodes.Count % Columns == 0 ? elementsDivided : elementsDivided + 1;
+	}
+
+	private void GetListDimmensions()
+	{
+		if (WrapperState == "toggled")
+		{
+			if (WebWidth < 890)
+			{
+				ColumnClass = "col-md-12";
+				Columns = 1;
+				Margin = $"{(int)(WebWidth - 440 * Columns) / 2}px";
+			}
+			else if (WebWidth < 1310)
+			{
+				ColumnClass = "col-md-6";
+				Columns = 2;
+				Margin = $"{(int)(WebWidth - 440 * Columns) / 2}px";
+			}
+			else if (WebWidth < 1735)
+			{
+				ColumnClass = "col-md-4";
+				Columns = 3;
+				Margin = $"{(int)(WebWidth - 430 * Columns) / 2}px";
+			}
+			else
+			{
+				ColumnClass = "col-md-3";
+				Columns = 4;
+				Margin = $"{(int)(WebWidth - 430 * Columns) / 2}px";
+			}
+		}
+		else
+		{
+			if (WebWidth < 765)
+			{
+				ColumnClass = "col-md-12";
+				Columns = 1;
+				Margin = $"{(int)(WebWidth - 445) / 2}px";
+			}
+			else if (WebWidth < 1130)
+			{
+				ColumnClass = "col-md-12";
+				Columns = 1;
+				Margin = $"{(int)(WebWidth - 200 - 500 * Columns) / 2}px";
+			}
+			else if (WebWidth < 1580)
+			{
+				ColumnClass = "col-md-6";
+				Columns = 2;
+				Margin = $"{(int)(WebWidth - 580 * Columns) / 2}px";
+			}
+			else
+			{
+				ColumnClass = "col-md-4";
+				Columns = 3;
+				Margin = $"{(int)(WebWidth - 525 * Columns) / 2}px";
+			}
+		}
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		GetListDimmensions();
+		CreateTable();
+		StateHasChanged();
+	}
+}

@@ -1,0 +1,223 @@
+﻿@inject IJSRuntime JSRuntime
+@inject SnackBar SnackBar
+@inject ClipboardService ClipboardService
+
+@if (Node is not null)
+{
+	<div class="form-outline">
+		<div class="inline mb-3" style="margin-left: 380px">
+			<h5 class="" style="margin-right: 16px">Value Operation</h5>
+			<img src="img/@CompatibilityImg" class="round-btn-img mb-2" />
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<label>First Operand</label>
+			<DataReferenceSelector DataReference="FirstOperand" SetDataReference="SetFirstOperand"></DataReferenceSelector>
+		</div>
+		<div class="col-md-6">
+			<label>Second Operand</label>
+			<DataReferenceSelector DataReference="SecondOperand" SetDataReference="SetSecondOperand"></DataReferenceSelector>
+		</div>
+	</div>
+	<div class="text-center mt-3">
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio0"
+		  value="0" @onchange="UpdateSelection" checked="@IsChecked("0")" disabled="@disableOption0">
+			<label class="form-check-label" for="inlineRadio10">Negation</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
+		  value="1" @onchange="UpdateSelection" checked="@IsChecked("1")" disabled="@disableOption1">
+			<label class="form-check-label" for="inlineRadio1">Addition</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2"
+		  value="2" @onchange="UpdateSelection" checked="@IsChecked("2")" disabled="@disableOption2">
+			<label class="form-check-label" for="inlineRadio2">Substraction</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
+		  value="3" @onchange="UpdateSelection" checked="@IsChecked("3")" disabled="@disableOption3">
+			<label class="form-check-label" for="inlineRadio3">Multiplication</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio4"
+		  value="4" @onchange="UpdateSelection" checked="@IsChecked("4")" disabled="@disableOption4">
+			<label class="form-check-label" for="inlineRadio4">Division</label>
+		</div>
+		<div class="text-center mt-3">
+			<button class="btn btn-primary round-button" style="width: 100px" @onclick="SaveChanges">
+				Set Value
+			</button>
+			<button class="btn btn-primary round-button" style="width: 70px; margin-left: 16px" @onclick="RemoveComponent">
+				<img src="img/trash.png" class="round-btn-img" />
+			</button>
+			<button class="btn btn-primary round-button button-gray" style="margin-left: 16px" @onclick="() => CopyNodeId(Node.Id)">
+				<img src="img/copy.png" class="round-btn-img" />
+			</button>
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public string NodeId { get; set; } = string.Empty;
+
+	[Parameter]
+	public EventCallback<bool> IsModalVisible { get; set; }
+
+	private INode? Node { get; set; }
+
+	private string? Value;
+
+	private string? SelectedOption = "0";
+
+	private string CompatibilityImg = "incompatible.png";
+
+	private DataReference? FirstOperand;
+	private DataReference? SecondOperand;
+
+	bool disableOption0 = false;
+	bool disableOption1 = false;
+	bool disableOption2 = false;
+	bool disableOption3 = false;
+	bool disableOption4 = false;
+
+	private void SetFirstOperand(DataReference input)
+	{
+		FirstOperand = input;
+		CheckCompatibility();
+	}
+
+	private void SetSecondOperand(DataReference input)
+	{
+		SecondOperand = input;
+		CheckCompatibility();
+	}
+
+	private void CheckCompatibility()
+	{
+		disableOption0 = false;
+		disableOption1 = false;
+		disableOption2 = false;
+		disableOption3 = false;
+		disableOption4 = false;
+
+		CompatibilityImg = "compatible.png";
+		if (SecondOperand is null)
+		{
+			if (FirstOperand is not null)
+			{
+				ObjectValueType firstOperand = FirstOperand.GetValueType();
+				if (firstOperand == ObjectValueType.String)
+				{
+					disableOption1 = true;
+					disableOption2 = true;
+					disableOption3 = true;
+					disableOption4 = true;
+				}
+				else if (firstOperand == ObjectValueType.Boolean)
+				{
+					disableOption1 = true;
+					disableOption2 = true;
+					disableOption3 = true;
+					disableOption4 = true;
+					return;
+				}
+				else
+				{
+					disableOption1 = true;
+				}
+			}
+			CompatibilityImg = "incompatible.png";
+			return;
+		}
+		if (FirstOperand is not null)
+		{
+			ObjectValueType first = FirstOperand.GetValueType();
+			ObjectValueType second = SecondOperand.GetValueType();
+			if (first == ObjectValueType.Integer && second == ObjectValueType.Float)
+			{
+				Node.FlexiValue.Type = ObjectValueType.Float;
+			}
+			else if (first == ObjectValueType.Float && second == ObjectValueType.Integer)
+			{
+				Node.FlexiValue.Type = ObjectValueType.Float;
+			}
+			else if (first == second)
+			{
+				Node.FlexiValue.Type = first;
+			}
+			else
+			{
+				CompatibilityImg = "incompatible.png";
+			}
+		}
+	}
+
+	private bool IsChecked(string option) => SelectedOption == option;
+
+	private async Task CopyNodeId(Guid id)
+	{
+		await ClipboardService.CopyToClipboard(JSRuntime, id.ToString());
+	}
+
+	private async Task UpdateSelection(ChangeEventArgs e)
+	{
+		if (Node is null)
+			return;
+
+		if (Node is ValueOperationNode component)
+		{
+			SelectedOption = e.Value.ToString();
+			var operation = Enum.Parse<ValueOperationNode.ValueOperations>(SelectedOption);
+			component.Operation = operation;
+		}
+	}
+
+	private async Task SaveChanges()
+	{
+		if (FirstOperand is not null)
+		{
+			Node.FlexiValue.Set(FlexibleValue.GetDefault(FirstOperand.GetValueType()));
+			if (Node is ValueOperationNode node)
+			{
+				node.In1 = FirstOperand;
+				node.In2 = SecondOperand;
+				await IsModalVisible.InvokeAsync(false);
+				await SnackBar.ShowMessage("Successfull!");
+			}
+		}
+		else
+		{
+			await SnackBar.ShowMessage("Invalid Operation!");
+		}
+	}
+
+	private async Task RemoveComponent()
+	{
+		if (Node is null)
+			return;
+
+		if (NodeManager.RemoveNodesById(Node.Id))
+		{
+			await IsModalVisible.InvokeAsync(false);
+			await SnackBar.ShowMessage("Node deleted successfull!");
+		}
+		else
+		{
+			await IsModalVisible.InvokeAsync(false);
+			await SnackBar.ShowMessage("Node not found!");
+		}
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (!string.IsNullOrEmpty(NodeId))
+		{
+			Node = NodeManager.GetNodeById(Guid.Parse(NodeId));
+		}
+		StateHasChanged();
+	}
+}

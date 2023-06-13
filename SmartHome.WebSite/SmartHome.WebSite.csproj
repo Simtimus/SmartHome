@@ -1,31 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+ <TargetFramework>net6.0</TargetFramework>
+ <Nullable>enable</Nullable>
+ <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Pages\Arduino.razor.css" />
-    <None Remove="Shared\ArduinoComponent.razor.css" />
-    <None Remove="Shared\ArduinoDataTable.razor.css" />
-    <None Remove="Shared\ArduinoSidebar.razor.css" />
+ <None Remove="Pages\Arduino.razor.css" />
+ <None Remove="Shared\ArduinoComponent.razor.css" />
+ <None Remove="Shared\ArduinoDataTable.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="ReceivedData.json" />
+ <_ContentIncludedByDefault Remove="ReceivedData.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Arduino.razor.css" />
-    <Content Include="Shared\ArduinoComponent.razor.css" />
-    <Content Include="Shared\ArduinoDataTable.razor.css" />
-    <Content Include="Shared\ArduinoSidebar.razor.css" />
+ <Content Include="Pages\Arduino.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmartHome.Arduino\SmartHome.Arduino.csproj" />
+ <ProjectReference Include="..\SmartHome.Arduino\SmartHome.Arduino.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Shared\Arduino\Components\NewFolder\" />
   </ItemGroup>
 
 </Project>
