@@ -3,13 +3,13 @@
 @if (PortPin is not null)
 {
 	<ModalPage @ref="linkingMenuModal" Width="@Width" @bind-IsVisible="isModalVisible">
-		<DataLinkerPage IsModalVisible="HideModal" ReceivedPin="PortPin" ></DataLinkerPage>
+		<BoardPinDataReferenceEditor IsModalVisible="SetModalVisibility" PortPin="PortPin"></BoardPinDataReferenceEditor>
 	</ModalPage>
 
 	<div class="card mt-3 @Style">
 		<div class="card-header ">
 			<div class="inline space-between">
-				<a>Pin: @PortPin.Id - @PortPin.ValueType</a>
+				<a>Pin: @PortPin.Id - @PortPin.FlexiValue.Type</a>
 
 				@if (PortPin.Favorite)
 				{
@@ -45,7 +45,7 @@
 
 	private void SetStyles()
 	{
-		Style = Enum.GetName(typeof(ObjectValueType), PortPin.ValueType).ToLower();
+		Style = Enum.GetName(typeof(ObjectValueType), PortPin.FlexiValue.Type).ToLower();
 	}
 
 	private void ChangeFavouriteState()
@@ -58,7 +58,7 @@
 		ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Favorite = !PortPin.Favorite;
 	}
 
-	private void HideModal(bool value)
+	private void SetModalVisibility(bool value)
 	{
 		isModalVisible = value;
 	}

@@ -33,7 +33,7 @@
 							{
 								<option value="@portPin.Id">
 									<lable>@portPin.Id</lable>
-									<lable>@Enum.GetName(typeof(ObjectValueType), portPin.ValueType)</lable>
+									<lable>@portPin.FlexiValue.Type</lable>
 								</option>
 							}
 						</select>
@@ -83,7 +83,7 @@ else
 			<strong>Value Type</strong>
 			@if (DataReference.Type is DataReference.ReferenceType.PortPin)
 			{
-				<div class="gray-txt">@Pin.ValueType</div>
+				<div class="gray-txt">@Pin.FlexiValue.Type</div>
 			}
 			else if (DataReference.Type is DataReference.ReferenceType.Node)
 			{

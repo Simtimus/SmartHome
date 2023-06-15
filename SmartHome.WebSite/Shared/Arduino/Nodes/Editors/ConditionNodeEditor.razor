@@ -147,19 +147,24 @@
 		}
 		else
 		{
-			Node.FlexiValue.Set(FlexibleValue.GetDefault(FirstOperand.GetValueType()));
-			if (Node is ConditionNode node)
+			Node.FlexiValue.Type = FirstOperand.GetValueType();
+			Node.FlexiValue.SetDefault();
+			if (CompatibilityImg == "compatible.png")
 			{
-				Node.FlexiValue.Type = FirstOperand.GetValueType();
-				node.Condition = Condition;
-				node.In1 = FirstOperand;
-				node.In2 = SecondOperand;
-				node.Out1 = FirstResult;
-				node.Out2 = SecondResult;
-				await IsModalVisible.InvokeAsync(false);
-				await SnackBar.ShowMessage("Successfull!");
+				if (Node is ConditionNode node)
+				{
+					node.Condition = Condition;
+					node.In1 = FirstOperand;
+					node.In2 = SecondOperand;
+					node.Out1 = FirstResult;
+					node.Out2 = SecondResult;
+					await IsModalVisible.InvokeAsync(false);
+					await SnackBar.ShowMessage("Successfull!");
+					return;
+				}
 			}
 		}
+		await SnackBar.ShowMessage("Invalid operation!");
 	}
 
 	private async Task RemoveComponent()

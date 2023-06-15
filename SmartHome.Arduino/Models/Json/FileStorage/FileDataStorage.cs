@@ -36,10 +36,15 @@ namespace SmartHome.Arduino.Models.Json.FileStorage
         /// <param name="filePath">The file path where the data will be saved.</param>
         public static void SaveDataToJsonFile(object data, string filePath)
         {
-            if (data == null)
+            try
             {
-                throw new ArgumentNullException(nameof(data));
+                if (data is null)
+                {
+                    throw new ArgumentNullException(nameof(data));
+                }
             }
+            catch { }
+
             string serializedObject = JsonConvert.SerializeObject(data);
             using StreamWriter writer = new(filePath);
             writer.Write(serializedObject);

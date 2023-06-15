@@ -61,39 +61,47 @@ namespace SmartHome.Arduino.Models.Nodes.Common
 
 		public static string CreateValueNode()
 		{
-			ValueNode Node = new();
-			Node.Id = Guid.NewGuid();
+			ValueNode Node = new()
+			{
+				Id = Guid.NewGuid()
+			};
 			Nodes.Add(Node);
 			return Node.Id.ToString();
 		}
 
 		public static string CreateDataLinkNode()
 		{
-			DataLinkNode Node = new();
-			Node.Id = Guid.NewGuid();
+			DataLinkNode Node = new()
+			{
+				Id = Guid.NewGuid()
+			};
 			Nodes.Add(Node);
 			return Node.Id.ToString();
 		}
 
 		public static string CreateValueOperationNode()
 		{
-			ValueOperationNode Node = new();
-			Node.Id = Guid.NewGuid();
+			ValueOperationNode Node = new()
+			{
+				Id = Guid.NewGuid()
+			};
 			Nodes.Add(Node);
 			return Node.Id.ToString();
 		}
 
 		public static string CreateConditionNode()
 		{
-			ConditionNode Node = new();
-			Node.Id = Guid.NewGuid();
+			ConditionNode Node = new()
+			{
+				Id = Guid.NewGuid()
+			};
 			Nodes.Add(Node);
 			return Node.Id.ToString();
 		}
 
 		//public static void LinkData(ref PortPin from, ref PortPin to, DataLinkNode.ValueOperations valueOperation, string value)
 		//{
-		//	to.DataLink = new(from)
+		//	to.DataReference = new(from)
 		//	{
 		//		Id = Guid.NewGuid(),
 		//		ParentPortPin = to,
@@ -102,7 +110,7 @@ namespace SmartHome.Arduino.Models.Nodes.Common
 		//	};
 		//	lock (_lock)
 		//	{
-		//		DataLinks.Add(to.DataLink);
+		//		DataLinks.Add(to.DataReference);
 		//	}
 		//}
 	}

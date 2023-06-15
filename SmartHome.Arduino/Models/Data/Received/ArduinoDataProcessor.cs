@@ -11,6 +11,7 @@ using SmartHome.Arduino.Application;
 using SmartHome.Arduino.Application.Events;
 using SmartHome.Arduino.Application.Logging;
 using SmartHome.Arduino.Models.Arduino;
+using SmartHome.Arduino.Models.Components.Common.Interfaces;
 using SmartHome.Arduino.Models.Data.DataBoxs;
 using SmartHome.Arduino.Models.Data.Transmited;
 using SmartHome.Arduino.Models.Json.Converting;
@@ -143,17 +144,16 @@ namespace SmartHome.Arduino.Models.Data.Received
 			if (!ClientManager.GetClientIndexById(receivedData.BoardId, out int clientIndex)) return false;
 			if (!ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex)) return false;
 
+			ArduinoClient client = ClientManager.GetClientById(receivedData.BoardId);
+			IGeneralComponent component = ClientManager.GetComponentById(receivedData.BoardId, receivedData.ComponentId);
+
 			JObject jsonObject = JObject.Parse(receivedData.Data);
 
-			JsonDataConverting.UpdateComponentFromJson(
-				ClientManager.Clients[clientIndex].
-				Components[componentIndex], jsonObject);
+			JsonDataConverting.UpdateComponentFromJson(component, jsonObject);
 
-
-
-			ClientManager.Clients[clientIndex].IP = receivedData.IP;
-			ClientManager.Clients[clientIndex].State = ArduinoClient.ConnectionState.Online;
-			ClientManager.Clients[clientIndex].LastConnection = receivedData.LastConnection;
+			client.IP = receivedData.IP;
+			client.State = ArduinoClient.ConnectionState.Online;
+			client.LastConnection = receivedData.LastConnection;
 
 			ClientEvents.TriggerClientChanged();
             transmitManager.TransmitEmpty(ClientManager.Clients[clientIndex].Id.ToString());
@@ -166,18 +166,18 @@ namespace SmartHome.Arduino.Models.Data.Received
 			if (!ClientManager.GetComponentIndexById(clientIndex, receivedData.ComponentId, out int componentIndex)) return false;
 			if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, receivedData.PinId, out int pinIndex)) return false;
 
-			JObject jsonObject = JObject.Parse(receivedData.Data);
-			JsonDataConverting.UpdateModelFromJson(
-				ClientManager.Clients[clientIndex].
-				Components[componentIndex].
-				ConnectedPins[pinIndex], jsonObject);
+			ArduinoClient client = ClientManager.GetClientById(receivedData.BoardId);
+			PortPin pin = ClientManager.GetPortPinById(receivedData.BoardId, receivedData.ComponentId, receivedData.PinId);
 
-			ClientManager.Clients[clientIndex].IP = receivedData.IP;
-			ClientManager.Clients[clientIndex].State = ArduinoClient.ConnectionState.Online;
-			ClientManager.Clients[clientIndex].LastConnection = receivedData.LastConnection;
+			JObject jsonObject = JObject.Parse(receivedData.Data);
+			JsonDataConverting.UpdatePortPinFromJson(pin, jsonObject);
+
+			client.IP = receivedData.IP;
+			client.State = ArduinoClient.ConnectionState.Online;
+			client.LastConnection = receivedData.LastConnection;
 
 			ClientEvents.TriggerClientChanged();
-            transmitManager.TransmitEmpty(ClientManager.Clients[clientIndex].Id.ToString());
+            transmitManager.TransmitEmpty(client.Id.ToString());
             return true;
 		}
 	}

@@ -107,7 +107,10 @@ namespace SmartHome.Arduino.Application
         {
             lock (_lock)
             {
-                FileDataStorage.SaveDataToJsonFile(Clients, FileName);
+                if (Clients.Count > 0)
+                {
+                    FileDataStorage.SaveDataToJsonFile(Clients, FileName);
+                }
             }
         }
 

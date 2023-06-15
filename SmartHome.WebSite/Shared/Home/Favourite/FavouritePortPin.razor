@@ -8,7 +8,7 @@
 		<div class="card-header ">
 			<div class="inline space-between row gutters-sm">
 				<div class="col-md-10">
-					<a>Pin: @PortPin.Id - @PortPin.ValueType</a>
+					<a>Pin: @PortPin.Id - @PortPin.FlexiValue.Type</a>
 				</div>
 				<div class="col-md-2">
 					@if (PortPin.Favorite)
@@ -48,7 +48,7 @@
 
 	private void SetStyles()
 	{
-		Style = Enum.GetName(typeof(ObjectValueType), PortPin.ValueType).ToLower();
+		Style = Enum.GetName(typeof(ObjectValueType), PortPin.FlexiValue.Type).ToLower();
 
 	}
 

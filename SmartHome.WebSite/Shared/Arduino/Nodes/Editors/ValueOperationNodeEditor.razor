@@ -180,19 +180,21 @@
 	{
 		if (FirstOperand is not null)
 		{
-			Node.FlexiValue.Set(FlexibleValue.GetDefault(FirstOperand.GetValueType()));
-			if (Node is ValueOperationNode node)
+			if (CompatibilityImg == "compatible.png")
 			{
-				node.In1 = FirstOperand;
-				node.In2 = SecondOperand;
-				await IsModalVisible.InvokeAsync(false);
-				await SnackBar.ShowMessage("Successfull!");
+				Node.FlexiValue.Type = FirstOperand.GetValueType();
+				Node.FlexiValue.SetDefault();
+				if (Node is ValueOperationNode node)
+				{
+					node.In1 = FirstOperand;
+					node.In2 = SecondOperand;
+					await IsModalVisible.InvokeAsync(false);
+					await SnackBar.ShowMessage("Successfull!");
+					return;
+				}
 			}
 		}
-		else
-		{
-			await SnackBar.ShowMessage("Invalid Operation!");
-		}
+		await SnackBar.ShowMessage("Invalid Operation!");
 	}
 
 	private async Task RemoveComponent()

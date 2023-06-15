@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using SmartHome.Arduino.Models.Data.DataLinks;
 using SmartHome.Arduino.Models.Components.Common.Interfaces;
 using SmartHome.Arduino.Models.CommonTypes;
 using System.Globalization;
+using SmartHome.Arduino.Models.Nodes.Common;
 
 namespace SmartHome.Arduino.Models.Arduino
 {
@@ -16,9 +16,8 @@ namespace SmartHome.Arduino.Models.Arduino
 		public int Id { get; set; }
 		public PinType Type { get; set; }
 		public PinMode Mode { get; set; }
-		public string Value { get; set; } = string.Empty;
-		public ObjectValueType ValueType { get; set; }
-		public DataLink DataLink { get; set; } = new DataLink();
+		public FlexibleValue FlexiValue { get; set; } = new();
+		public DataReference? DataReference { get; set; } = new();
 		public bool Favorite { get; set; }
 		public string FormatString { get; set; } = "{0}";
 		[JsonIgnore] public IGeneralComponent? ParentComponent { get; set; }
@@ -37,106 +36,78 @@ namespace SmartHome.Arduino.Models.Arduino
 
 		public object? GetValue()
 		{
-			string stringData = DataLink.GetStringValue();
-			
-			if (string.IsNullOrEmpty(stringData))
+			if (DataReference is not null && DataReference.DataId != default)
 			{
-				stringData = Value;
-			}
-
-			if (ValueType == ObjectValueType.String)
-			{
-				return stringData;
-			}
-			else if (ValueType == ObjectValueType.Integer)
-			{
-				return ApplyDataLinkOperation(int.Parse(stringData));
-			}
-			else if (ValueType == ObjectValueType.Float)
-			{
-				return ApplyDataLinkOperation(double.Parse(stringData, CultureInfo.InvariantCulture));
-			}
-			else if (ValueType == ObjectValueType.Boolean)
-			{
-				if (bool.TryParse(stringData, out bool boolValue))
-				{ 
-					return ApplyDataLinkOperation(boolValue);
-				}
-				else
+				object? result = DataReference.GetValue();
+				if (result is null)
 				{
-					if (stringData == "1")
-					{
-						return ApplyDataLinkOperation(true);
-					}
-					else
-					{
-						return ApplyDataLinkOperation(false);
-					}
+					return FlexibleValue.GetDefault(FlexiValue);
 				}
+				return result;
 			}
-			return null;
+			return FlexiValue.Value;
 		}
 
-		public object ApplyDataLinkOperation(object value)
-		{
-			string dataLinkValue = DataLink.Value;
-			object dataValue;
+		//public object ApplyDataLinkOperation(object value)
+		//{
+		//	string dataLinkValue = DataReference.Value;
+		//	object dataValue;
 
-			if (DataLink.ValueOperation == DataLink.ValueOperations.None)
-				return value;
+		//	if (DataReference.ValueOperation == DataReference.ValueOperations.None)
+		//		return value;
 
-			if (!string.IsNullOrEmpty(dataLinkValue) || ValueType == ObjectValueType.Boolean)
-			{
-				if (ValueType == ObjectValueType.Integer)
-				{
-					dataValue = int.Parse(dataLinkValue);
-					if (DataLink.ValueOperation == DataLink.ValueOperations.Addition)
-					{
-						return (int)value + (int)dataValue;
-					}
-					else if (DataLink.ValueOperation == DataLink.ValueOperations.Substraction)
-					{
-						return (int)value - (int)dataValue;
-					}
-					else if (DataLink.ValueOperation == DataLink.ValueOperations.Multiplication)
-					{
-						return (int)value * (int)dataValue;
-					}
-					else if (DataLink.ValueOperation == DataLink.ValueOperations.Division)
-					{
-						return (int)value / (int)dataValue;
-					}
-				}
-				else if (ValueType == ObjectValueType.Float)
-				{
-					dataValue = double.Parse(dataLinkValue, CultureInfo.InvariantCulture);
-					if (DataLink.ValueOperation == DataLink.ValueOperations.Addition)
-					{
-						return (double)value + (double)dataValue;
-					}
-					else if (DataLink.ValueOperation == DataLink.ValueOperations.Substraction)
-					{
-						return (double)value - (double)dataValue;
-					}
-					else if (DataLink.ValueOperation == DataLink.ValueOperations.Multiplication)
-					{
-						return (double)value * (double)dataValue;
-					}
-					else if (DataLink.ValueOperation == DataLink.ValueOperations.Division)
-					{
-						return (double)value / (double)dataValue;
-					}
-				}
-				else if (ValueType == ObjectValueType.Boolean)
-				{
-					if (DataLink.ValueOperation == DataLink.ValueOperations.Negation)
-					{
-						return !(bool)value;
-					}
-				}
-			}
-			return value;
-		}
+		//	if (!string.IsNullOrEmpty(dataLinkValue) || ValueType == ObjectValueType.Boolean)
+		//	{
+		//		if (ValueType == ObjectValueType.Integer)
+		//		{
+		//			dataValue = int.Parse(dataLinkValue);
+		//			if (DataReference.ValueOperation == DataReference.ValueOperations.Addition)
+		//			{
+		//				return (int)value + (int)dataValue;
+		//			}
+		//			else if (DataReference.ValueOperation == DataReference.ValueOperations.Substraction)
+		//			{
+		//				return (int)value - (int)dataValue;
+		//			}
+		//			else if (DataReference.ValueOperation == DataReference.ValueOperations.Multiplication)
+		//			{
+		//				return (int)value * (int)dataValue;
+		//			}
+		//			else if (DataReference.ValueOperation == DataReference.ValueOperations.Division)
+		//			{
+		//				return (int)value / (int)dataValue;
+		//			}
+		//		}
+		//		else if (ValueType == ObjectValueType.Float)
+		//		{
+		//			dataValue = double.Parse(dataLinkValue, CultureInfo.InvariantCulture);
+		//			if (DataReference.ValueOperation == DataReference.ValueOperations.Addition)
+		//			{
+		//				return (double)value + (double)dataValue;
+		//			}
+		//			else if (DataReference.ValueOperation == DataReference.ValueOperations.Substraction)
+		//			{
+		//				return (double)value - (double)dataValue;
+		//			}
+		//			else if (DataReference.ValueOperation == DataReference.ValueOperations.Multiplication)
+		//			{
+		//				return (double)value * (double)dataValue;
+		//			}
+		//			else if (DataReference.ValueOperation == DataReference.ValueOperations.Division)
+		//			{
+		//				return (double)value / (double)dataValue;
+		//			}
+		//		}
+		//		else if (ValueType == ObjectValueType.Boolean)
+		//		{
+		//			if (DataReference.ValueOperation == DataReference.ValueOperations.Negation)
+		//			{
+		//				return !(bool)value;
+		//			}
+		//		}
+		//	}
+		//	return value;
+		//}
 
 		public string? GetValueString()
 		{

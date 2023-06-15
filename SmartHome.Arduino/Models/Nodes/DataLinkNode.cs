@@ -50,7 +50,7 @@ namespace SmartHome.Arduino.Models.Nodes
 			if (!ClientManager.GetClientIndexById(LinkFrom.DataId, out int clientIndex)) return string.Empty;
 			if (!ClientManager.GetComponentIndexById(clientIndex, LinkFrom.ComponentId, out int componentIndex)) return string.Empty;
 			if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, LinkFrom.PortPinId, out int pinIndex)) return string.Empty;
-			return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].Value;
+			return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].FlexiValue;
 		}
 
 		public static bool IsNullOrEmpty([NotNullWhen(false)] DataLinkNode? dataLink)

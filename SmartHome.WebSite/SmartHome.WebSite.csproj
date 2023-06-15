@@ -24,8 +24,4 @@
  <ProjectReference Include="..\SmartHome.Arduino\SmartHome.Arduino.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Shared\Arduino\Components\NewFolder\" />
-  </ItemGroup>
-
 </Project>

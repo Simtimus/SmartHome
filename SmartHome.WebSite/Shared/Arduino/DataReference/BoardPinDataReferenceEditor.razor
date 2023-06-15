@@ -1,0 +1,106 @@
+﻿@inject IJSRuntime JSRuntime
+@inject SnackBar SnackBar
+@inject ClipboardService ClipboardService
+
+@if (PortPin is not null)
+{
+	<div class="form-outline">
+		<div class="inline mb-3" style="margin-left: 380px">
+			<h5 class="" style="margin-right: 16px">Value Operation</h5>
+			<img src="img/@CompatibilityImg" class="round-btn-img mb-2" />
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<label>Data Reference</label>
+			<DataReferenceSelector DataReference="Reference" SetDataReference="SetPortPinReference"></DataReferenceSelector>
+		</div>
+	</div>
+	<div class="text-center mt-3">
+		<button class="btn btn-primary round-button" style="width: 100px" @onclick="SaveChanges">
+			Set Value
+		</button>
+		<button class="btn btn-primary round-button" style="width: 50px" @onclick="RemoveReference">
+			<img src="img/trash.png" class="round-btn-img" />
+		</button>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public PortPin PortPin { get; set; }
+
+	[Parameter]
+	public EventCallback<bool> IsModalVisible { get; set; }
+
+	private string CompatibilityImg = "incompatible.png";
+
+	private DataReference? Reference;
+
+	private void SetPortPinReference(DataReference input)
+	{
+		Reference = input;
+		CheckCompatibility();
+	}
+
+	private void CheckCompatibility()
+	{
+		CompatibilityImg = "incompatible.png";
+
+		if (Reference is not null)
+		{
+			ObjectValueType referenceType = Reference.GetValueType();
+			ObjectValueType portPinValueType = Reference.GetValueType();
+
+			if (referenceType == ObjectValueType.Integer && portPinValueType == ObjectValueType.Float)
+			{
+				PortPin.FlexiValue.Type = ObjectValueType.Float;
+			}
+			else if (referenceType == ObjectValueType.Float && portPinValueType == ObjectValueType.Integer)
+			{
+				CompatibilityImg = "compatible.png";
+			}
+			else if (referenceType == portPinValueType)
+			{
+				CompatibilityImg = "compatible.png";
+			}
+		}
+	}
+
+	private async Task SaveChanges()
+	{
+		if (Reference is not null)
+		{
+			if (CompatibilityImg == "compatible.png")
+			{
+				IGeneralComponent component = PortPin.ParentComponent;
+				if (!ClientManager.GetClientIndexById(component.ParentClient.Id, out int clientIndex)) return;
+				if (!ClientManager.GetComponentIndexById(clientIndex, component.Id, out int componentIndex)) return;
+				if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PortPin.Id, out int pinIndex)) return;
+
+				ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].DataReference = Reference;
+				await IsModalVisible.InvokeAsync(false);
+				await SnackBar.ShowMessage("Successfull!");
+				return;
+			}
+		}
+		await SnackBar.ShowMessage("Invalid Operation!");
+	}
+
+	private async Task RemoveReference()
+	{
+		IGeneralComponent component = PortPin.ParentComponent;
+		if (!ClientManager.GetClientIndexById(component.ParentClient.Id, out int clientIndex)) return;
+		if (!ClientManager.GetComponentIndexById(clientIndex, component.Id, out int componentIndex)) return;
+		if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PortPin.Id, out int pinIndex)) return;
+
+		ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].DataReference = new();
+		await IsModalVisible.InvokeAsync(false);
+		await SnackBar.ShowMessage("Reference Removed!");
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		StateHasChanged();
+	}
+}

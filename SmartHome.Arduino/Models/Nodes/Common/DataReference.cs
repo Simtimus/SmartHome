@@ -46,7 +46,7 @@ namespace SmartHome.Arduino.Models.Nodes.Common
 				if (!ClientManager.GetClientIndexById(DataId, out int clientIndex)) return ObjectValueType.String;
 				if (!ClientManager.GetComponentIndexById(clientIndex, ComponentId, out int componentIndex)) return ObjectValueType.String;
 				if (!ClientManager.GetBoardPinIndexById(clientIndex, componentIndex, PortPinId, out int pinIndex)) return ObjectValueType.String;
-				return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].ValueType;
+				return ClientManager.Clients[clientIndex].Components[componentIndex].ConnectedPins[pinIndex].FlexiValue.Type;
 			}
 			else
 			{

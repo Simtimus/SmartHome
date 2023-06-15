@@ -15,7 +15,7 @@ namespace SmartHome.Arduino.Models.Nodes
 		public Guid Id { get; set; }
 		public string Name { get; set; }
 		public FlexibleValue FlexiValue { get; set; } = new();
-		public NodeTypes Type { get; set; } = NodeTypes.Value;
+		public NodeTypes Type { get; set; } = NodeTypes.Condition;
 
 		public Conditions Condition { get; set; }
 		public DataReference In1 { get; set; }
@@ -35,9 +35,16 @@ namespace SmartHome.Arduino.Models.Nodes
 		{
 			bool comparation = Compare();
 
-			if (comparation)
-				return Out1.GetValue();
-			else return Out2.GetValue();
+			if (Out1 is not null && Out2 is not null)
+			{
+				if (comparation)
+					return Out1.GetValue();
+				else return Out2.GetValue();
+			}
+			else
+			{
+				return FlexiValue.Value;
+			}
 		}
 
 		public bool Compare()

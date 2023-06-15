@@ -17,7 +17,6 @@ using System.Xml.Linq;
 using SmartHome.Arduino.Models.Data.DataBoxs;
 using SmartHome.Arduino.Models.Data.Transmited;
 using SmartHome.Arduino.Application.Logging;
-using SmartHome.Arduino.Models.Data.DataLinks;
 using System.Globalization;
 using SmartHome.Arduino.Models.Nodes.Common.Interfaces;
 using SmartHome.Arduino.Models.Nodes.Common;
@@ -138,26 +137,15 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			{
 				PortPin? boardPin = new();
 				UpdateModelFromJson(boardPin, jsonObject, false);
-				if (jsonObject.ContainsKey("DataLink"))
-					boardPin.DataLink = ConvertDataLink(jsonObject["DataLink"].ToString());
+				if (jsonObject.ContainsKey("DataReference"))
+					boardPin.DataReference = ConvertDataReference(jsonObject["DataReference"].ToString());
+				if (jsonObject.ContainsKey("FlexiValue"))
+					boardPin.FlexiValue = ConvertFlexibleValue(jsonObject["FlexiValue"].ToString());
+				if (jsonObject.ContainsKey("ValueType"))
+					boardPin.FlexiValue = ConvertFlexibleValue(jsonObject["ValueType"].ToString(), jsonObject["Value"].ToString());
 				return boardPin;
 			}
 			return null;
-		}
-
-		public static DataLink ConvertDataLink(string? serializedObject)
-		{
-			DataLink dataLink = new();
-
-			if (string.IsNullOrEmpty(serializedObject)) return dataLink;
-			JObject jsonObject = JObject.Parse(serializedObject);
-
-			if (jsonObject != null)
-			{
-				UpdateModelFromJson(dataLink, jsonObject, false);
-			}
-
-			return dataLink;
 		}
 
 		public static void UpdateClientFromJson(ArduinoClient client, string serializedObject)
@@ -207,10 +195,21 @@ namespace SmartHome.Arduino.Models.Json.Converting
 					JObject? foundObject = FindObjecInArrayByPropriety(componentsArray, proprietyName, component.ConnectedPins[i].Id);
 					if (foundObject != null)
 					{
-						UpdateModelFromJson(component.ConnectedPins[i], foundObject);
+						UpdatePortPinFromJson(component.ConnectedPins[i], foundObject);
 					}
 				}
 			}
+		}
+
+		public static void UpdatePortPinFromJson(PortPin portPin, JObject jsonObject)
+		{
+			UpdateModelFromJson(portPin, jsonObject);
+			if (jsonObject.ContainsKey("DataReference"))
+				portPin.DataReference = ConvertDataReference(jsonObject["DataReference"].ToString());
+			if (jsonObject.ContainsKey("FlexiValue"))
+				portPin.FlexiValue = ConvertFlexibleValue(jsonObject["FlexiValue"].ToString());
+			if (jsonObject.ContainsKey("ValueType"))
+				portPin.FlexiValue = ConvertFlexibleValue(jsonObject["ValueType"].ToString(), jsonObject["Value"].ToString());
 		}
 
 		private static JObject? FindObjecInArrayByPropriety(JArray objectArray, string proprietyName, object Value)
@@ -238,10 +237,6 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			foreach (PortPin boardPin in component.ConnectedPins)
 			{
 				boardPin.ParentComponent = component;
-				if (boardPin.DataLink != default)
-				{
-					boardPin.DataLink.ParentPortPin = boardPin;
-				}
 			}
 		}
 
@@ -275,23 +270,6 @@ namespace SmartHome.Arduino.Models.Json.Converting
 						UpdateModelFromJson(component, jsonObject, false);
 						logList.Add(component);
 					}
-				}
-			}
-		}
-
-		public static void ConvertDataLinks(string serializedObject, out List<DataLink> dataLinks)
-		{
-			dataLinks = new();
-
-			JArray componentsArray = JArray.Parse(serializedObject);
-			if (componentsArray != null)
-			{
-				foreach (var jsonComponent in componentsArray)
-				{
-					DataLink dataLink = new();
-					JObject jsonObject = JObject.Parse(jsonComponent.ToString());
-					UpdateModelFromJson(dataLink, jsonObject, false);
-					dataLinks.Add(dataLink);
 				}
 			}
 		}
@@ -349,6 +327,34 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			return dataReference;
 		}
 
+		public static FlexibleValue ConvertFlexibleValue(string? serializedObject)
+		{
+			FlexibleValue flexiValue = new();
+
+			if (string.IsNullOrEmpty(serializedObject)) return flexiValue;
+			JObject jsonObject = JObject.Parse(serializedObject);
+
+			if (jsonObject != null)
+			{
+				flexiValue.Type = Enum.Parse<ObjectValueType>(jsonObject["Type"].ToString());
+				flexiValue.SetOrDefault(jsonObject["Value"].ToString());
+			}
+
+			return flexiValue;
+		}
+
+		public static FlexibleValue ConvertFlexibleValue(string? type, string? value)
+		{
+			FlexibleValue flexiValue = new();
+			if (!string.IsNullOrEmpty(type))
+			{
+				flexiValue.Type = Enum.Parse<ObjectValueType>(type);
+			}
+			flexiValue.SetOrDefault(value);
+
+			return flexiValue;
+		}
+
 		public static void UpdateModelFromJson<T>(T model, JObject jsonObject, bool setNewGuid = false)
 		{
 			Type clientType = model.GetType();
@@ -386,7 +392,7 @@ namespace SmartHome.Arduino.Models.Json.Converting
 					}
 					else if (property.PropertyType == typeof(double))
 					{
-						double.TryParse(stringValue.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue);
+						double.TryParse(stringValue.ToString(), NumberStyles.Float, CultureInfo.InstalledUICulture, out double doubleValue);
 						deserializedValue = doubleValue;
 					}
 					else if (property.PropertyType == typeof(string))
@@ -404,7 +410,7 @@ namespace SmartHome.Arduino.Models.Json.Converting
 					}
 					else
 					{
-						ComplementaryChecks(property, stringValue, out deserializedValue);
+						ComplementaryChecks(model, property, stringValue, out deserializedValue);
                     }
 
 					if (deserializedValue != null)
@@ -415,21 +421,27 @@ namespace SmartHome.Arduino.Models.Json.Converting
 			}
 		}
 
-		private static void ComplementaryChecks(PropertyInfo property, JToken? stringValue, out object deserializedValue)
+		private static void ComplementaryChecks<T>(T model, PropertyInfo property, JToken? stringValue, out object deserializedValue)
 		{
 			deserializedValue = null;
 
-            if (property.PropertyType == typeof(FlexibleValue))
-            {
-                if (stringValue != null && stringValue is JObject jObject)
-                {
-					FlexibleValue flexibleValue = new();
-					flexibleValue.Type = Enum.Parse<ObjectValueType>(jObject["Type"].ToString());
-                    string val = jObject["Value"].ToString();
-                    FlexibleValue.TryParse(val, flexibleValue.Type, out object value);
-					deserializedValue = flexibleValue;
-                }
-            }
-        }
+			if (model is INode)
+			{
+				if (property.PropertyType == typeof(FlexibleValue))
+				{
+					if (stringValue != null && stringValue is JObject jObject)
+					{
+						FlexibleValue flexibleValue = new()
+						{
+							Type = Enum.Parse<ObjectValueType>(jObject["Type"].ToString())
+						};
+						string val = jObject["Value"].ToString();
+						FlexibleValue.TryParse(val, flexibleValue.Type, out object value);
+						flexibleValue.Set(value);
+						deserializedValue = flexibleValue;
+					}
+				}
+			}
+		}
 	}
 }

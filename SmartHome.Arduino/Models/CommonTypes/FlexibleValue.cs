@@ -25,8 +25,9 @@ namespace SmartHome.Arduino.Models.CommonTypes
             Value = value ?? GetDefault(valueType);
         }
 
-        public bool Set(string inputValue)
+        public bool Set(string? inputValue)
         {
+            if (string.IsNullOrEmpty(inputValue)) return false;
             if (TryParse(inputValue, Type, out object value))
             {
                 Value = value;
@@ -35,18 +36,52 @@ namespace SmartHome.Arduino.Models.CommonTypes
             return false;
         }
 
-        public bool Set(object inputValue)
+        public bool Set(object? inputValue)
         {
             if (inputValue is not null)
             {
                 Value = inputValue;
                 return true;
             }
-            Value = GetDefault(Type);
             return false;
-        }
+		}
 
-        public static object GetDefault(ObjectValueType valueType)
+		public void SetOrDefault(string? inputValue)
+		{
+            if (string.IsNullOrEmpty(inputValue))
+            {
+                Value = GetDefault(Type);
+            }
+            else
+            {
+			    if (TryParse(inputValue, Type, out object value))
+			    {
+				    Value = value;
+			    }
+                else
+                {
+					Value = GetDefault(Type);
+				}
+            }
+		}
+
+		public void SetOrDefault(object? inputValue)
+		{
+			if (inputValue is not null)
+			{
+				Value = inputValue;
+			}
+            else {
+			    Value = GetDefault(Type);
+            }
+		}
+
+        public void SetDefault()
+        {
+			Value = GetDefault(Type);
+		}
+
+		public static object GetDefault(ObjectValueType valueType)
         {
             if (valueType == ObjectValueType.Integer)
             {
@@ -64,9 +99,29 @@ namespace SmartHome.Arduino.Models.CommonTypes
             {
                 return string.Empty;
             }
-        }
+		}
 
-        public static bool TryParse(string? inputValue, ObjectValueType valueType, out object result)
+		public static object GetDefault(FlexibleValue flexiValue)
+		{
+			if (flexiValue.Type == ObjectValueType.Integer)
+			{
+				return 0;
+			}
+			else if (flexiValue.Type == ObjectValueType.Float)
+			{
+				return double.Parse("0", CultureInfo.InvariantCulture);
+			}
+			else if (flexiValue.Type == ObjectValueType.Boolean)
+			{
+				return false;
+			}
+			else
+			{
+				return string.Empty;
+			}
+		}
+
+		public static bool TryParse(string? inputValue, ObjectValueType valueType, out object result)
         {
             bool Parsed;
 
@@ -89,7 +144,7 @@ namespace SmartHome.Arduino.Models.CommonTypes
             }
             else if (valueType == ObjectValueType.Float)
             {
-                Parsed = double.TryParse(inputValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double doubleValue);
+                Parsed = double.TryParse(inputValue, NumberStyles.Float, CultureInfo.InstalledUICulture, out double doubleValue);
                 result = doubleValue;
                 return Parsed;
             }
@@ -130,10 +185,9 @@ namespace SmartHome.Arduino.Models.CommonTypes
 
         public override bool Equals(object obj)
         {
-            if (obj is FlexibleValue)
+            if (obj is FlexibleValue flexiValue)
             {
-                var other = (FlexibleValue)obj;
-                return Type == other.Type && Equals(Value, other.Value);
+                return Type == flexiValue.Type && Equals(Value, flexiValue.Value);
             }
             return false;
         }
